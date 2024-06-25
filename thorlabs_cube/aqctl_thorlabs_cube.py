@@ -2,10 +2,10 @@
 
 import argparse
 import sys
-import os
 import asyncio
 
-from thorlabs_tcube.driver import Tdc, Tpz, TdcSim, TpzSim
+from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
+from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 from sipyco.pc_rpc import simple_server_loop
 from sipyco import common_args
 

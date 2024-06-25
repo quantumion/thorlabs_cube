@@ -1,18 +1,21 @@
-Welcome to Thorlabs_TCube's documentation!
+Welcome to Thorlabs_Cube's documentation!
 ==========================================
 
 General instructions
 --------------------
 
 .. note::
-    When power is applied before the USB connection, some devices will enter a state where they fail to report the completion of commands. When using the ARTIQ controller, this cause certain function calls to never return and freeze the controller. To prevent this, connect USB first and then power up the device. When a device has entered the problematic state, power-cycling it while keeping the USB connection active also resolves the problem.
+    When power is applied before the USB connection, some devices will enter a state where they fail to report the completion of commands.
+    When using the ARTIQ controller, this cause certain function calls to never return and freeze the controller.
+    To prevent this, connect USB first and then power up the device.
+    When a device has entered the problematic state, power-cycling it while keeping the USB connection active also resolves the problem.
 
 TDC001 controller usage example
 +++++++++++++++++++++++++++++++
 
 First, run the TDC001 controller::
 
-    $ aqctl_thorlabs_tcube -P TDC001 -d /dev/ttyUSBx
+    $ aqctl_thorlabs_cube -P TDC001 -d /dev/ttyUSBx
 
 .. note::
     On Windows the serial port (the ``-d`` argument) will be of the form ``COMx``.
@@ -45,7 +48,7 @@ TPZ001 controller usage example
 
 First, run the TPZ001 controller::
 
-    $ aqctl_thorlabs_tcube -P TPZ001 -d /dev/ttyUSBx
+    $ aqctl_thorlabs_cube -P TPZ001 -d /dev/ttyUSBx
 
 .. note::
     On Windows the serial port (the ``-d`` argument) will be of the form ``COMx``.
@@ -69,16 +72,24 @@ Then, send commands to it via the ``artiq_rpctool`` utility::
 API
 ---
 
-.. automodule:: thorlabs_tcube.driver
+.. automodule:: thorlabs_cube.driver.message
     :members:
 
+.. automodule:: thorlabs_cube.driver.base
+    :members:
+
+.. automodule:: thorlabs_cube.driver.tcube.tpz
+    :members:
+
+.. automodule:: thorlabs_cube.driver.tcube.tdc
+    :members:
 
 ARTIQ Controller
 ----------------
 
 .. argparse::
-   :ref: thorlabs_tcube.aqctl_thorlabs_tcube.get_argparser
-   :prog: aqctl_thorlabs_tcube
+   :ref: thorlabs_cube.aqctl_thorlabs_cube.get_argparser
+   :prog: aqctl_thorlabs_cube
 
 
 Indices and tables
