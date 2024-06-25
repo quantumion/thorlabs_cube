@@ -84,6 +84,9 @@ API
 .. automodule:: thorlabs_cube.driver.tcube.tdc
     :members:
 
+.. automodule:: thorlabs_cube.driver.kcube.kdc
+    :members:
+
 ARTIQ Controller
 ----------------
 
