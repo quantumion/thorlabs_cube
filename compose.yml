@@ -1,0 +1,18 @@
+# builds and runs the wavemeter control container
+services:
+  thorlabs_cube:
+    container_name: kdc101
+    restart: always
+    ports:
+      - 3255:3255
+    networks:
+      - motor
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    # to run in simulation mode, include "--simulation" in the entrypoint command after port number
+    entrypoint: [ "aqctl_thorlabs_cube"]
+    command: ["-p", "3255", "--product", "kdc101", "--device", "/dev/ttyUSBx", "--bind", "*", "--simulation"]
+
+networks:
+  motor:
