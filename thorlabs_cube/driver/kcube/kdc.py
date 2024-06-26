@@ -1,6 +1,6 @@
 import struct as st
 
-from thorlabs_cube.driver.tcube.tdc import Tdc
+from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.message import MGMSG, MsgError, Message
 
 
@@ -231,3 +231,52 @@ class Kdc(Tdc):
         """
         get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEPOSTRIGPARAMS, [MGMSG.MOT_GET_KCUBEPOSTRIGPARAMS], 1)
         return st.unpack("<llllllll", get_msg.data[2:])
+
+
+class KdcSim(TdcSim):
+    def set_digital_outputs_config(self):
+        raise NotImplementedError
+
+    def get_digital_outputs_config(self):
+        raise NotImplementedError
+
+    async def set_mmi_parameters(self, mode: int, max_velocity: int, max_acceleration: int, direction: int,
+                                 position1: int, position2: int, brightness: int, timeout: int, dim: int):
+        self.mode = mode
+        self.max_velocity = max_velocity
+        self.max_acceleration = max_acceleration
+        self.direction = direction
+        self.position1 = position1
+        self.position2 = position2
+        self.brightness = brightness
+        self.timeout= timeout
+        self.dim = dim
+
+    async def get_mmi_parameters(self):
+        return (self.mode, self.max_velocity, self.max_acceleration, self.direction, self.position1, self.position2,
+                self.brightness, self.timeout, self.dim,)
+
+    async def set_trigger_io_config(self, mode1: int, polarity1: int, mode2: int, polarity2: int):
+        self.mode1 = mode1
+        self.polarity1 = polarity1
+        self.mode2 = mode2
+        self.polarity2 = polarity2
+
+    async def get_trigger_io_config(self):
+        return (self.mode1, self.polarity1, self.mode2, self.polarity2)
+
+    async def set_position_trigger_parameters(self, start_position_fwd: int, interval_fwd: int, num_pulses_fwd: int,
+                                              start_position_rev: int, interval_rev: int, num_pulses_rev: int,
+                                              pulse_width: int, num_cycles: int):
+        self.start_position_fwd = start_position_fwd
+        self.interval_fwd = interval_fwd
+        self.num_pulses_fwd = num_pulses_fwd
+        self.start_position_rev = start_position_rev
+        self.interval_rev = interval_rev
+        self.num_pulses_rev = num_pulses_rev
+        self.pulse_width = pulse_width
+        self.num_cycles =num_cycles
+
+    async def get_position_trigger_parameters(self):
+        return (self.start_position_fwd, self.interval_fwd,self. num_pulses_fwd, self.start_position_rev,
+                self.interval_rev, self.num_pulses_rev, self.pulse_width, self.num_cycles)
