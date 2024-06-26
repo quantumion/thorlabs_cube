@@ -6,7 +6,7 @@ from thorlabs_cube.driver.message import MGMSG, MsgError, Message
 
 class Kdc(Tdc):
     """
-    Controller class for KDC101 K-Cube Brushed DC Servo Motor Controller
+    KDC101 K-Cube Brushed DC Servo Motor Controller class
     """
 
     def __init__(self, serial_dev: str):
@@ -35,6 +35,20 @@ class Kdc(Tdc):
                 self.status_report_counter += 1
             # 'r' is a currently unused and reserved field
             self.position, self.velocity, r, self.status = st.unpack("<LHHL", data[2:])
+
+    async def set_digital_outputs_config(self):
+        """Set digital output pins on the motor control output port.
+
+        Not required for the KDC101. Unimplemented.
+        """
+        raise NotImplementedError
+
+    async def get_digital_outputs_config(self):
+        """Get digital output pin values on the motor control output port.
+
+        Not required for the KDC101. Unimplemented.
+        """
+        raise NotImplementedError
 
     async def set_mmi_parameters(self, mode: int, max_velocity: int, max_acceleration: int, direction: int,
                                  position1: int, position2: int, brightness: int, timeout: int, dim: int):
@@ -118,7 +132,7 @@ class Kdc(Tdc):
 
         * 0x00: The trigger IO is disabled
         * 0x01: General purpose logic input (read through status bits using the :py:meth:`get_status_bits()
-          <Kdc.get_status_bits>` method)
+          <thorlabs_cube.driver.tcube.tdc.Tdc.get_status_bits>` method)
         * 0x02: Input trigger for relative move
         * 0x03: Input trigger for absolute move
         * 0x04: Input trigger for home move
@@ -132,8 +146,8 @@ class Kdc(Tdc):
         When configured as an output, the TRIG ports can be used as a general purpose digital output, or to indicate
         motion status or to produce a trigger pulse at configurable positions as follows:
 
-        * 0x0A: General purpose logic output (set using the :py:meth:`set_digital_outputs_mode()
-          <Kdc.set_digital_outputs_mode>` message).
+        * 0x0A: General purpose logic output (set using the :py:meth:`set_digital_outputs_config()
+          <Kdc.set_digital_outputs_config>` method).
         * 0x0B: Trigger output active (level) when motor 'in motion'. The output trigger goes high (5V) or low (0V)
           (as set in the polarity1 and polarity2 parameters) when the stage is in motion.
         * 0x0C: Trigger output active (level) when motor at 'maximum velocity'.
