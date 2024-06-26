@@ -9,11 +9,11 @@ class Kdc(Tdc):
     Controller class for KDC101 K-Cube Brushed DC Servo Motor Controller
     """
 
-    def __init__(self, serial_dev):
+    def __init__(self, serial_dev: str):
         """Initialize from TDC001 control class"""
         super().__init__(serial_dev)
 
-    async def handle_message(self, msg):
+    async def handle_message(self, msg: MGMSG):
         """Parse messages from the device. Minor adaptation from TDC001 method."""
         msg_id = msg.id
         data = msg.data
@@ -36,8 +36,8 @@ class Kdc(Tdc):
             # 'r' is a currently unused and reserved field
             self.position, self.velocity, r, self.status = st.unpack("<LHHL", data[2:])
 
-    async def set_mmi_parameters(self, mode, max_velocity, max_acceleration, direction, position1, position2,
-                                 brightness, timeout, dim):
+    async def set_mmi_parameters(self, mode: int, max_velocity: int, max_acceleration: int, direction: int,
+                                 position1: int, position2: int, brightness: int, timeout: int, dim: int):
         """Set the operating parameters of the top panel wheel (Joystick).
 
         :param mode: This parameter specifies the operating mode of the wheel/joy stick as follows:\n
@@ -93,7 +93,7 @@ class Kdc(Tdc):
         get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEMMIPARAMS, [MGMSG.MOT_GET_KCUBEMMIPARAMS], 1)
         return st.unpack("<HllHllHHH", get_msg.data[2:28])
 
-    async def set_trigger_io_config(self, mode1, polarity1, mode2, polarity2):
+    async def set_trigger_io_config(self, mode1: int, polarity1: int, mode2: int, polarity2: int):
         """Set trigger intput/output parameters.
 
         The K-Cube motor controllers have two bidirectional trigger ports (TRIG1 and TRIG2) that can be used to read an
