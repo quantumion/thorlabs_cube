@@ -68,6 +68,38 @@ Then, send commands to it via the ``artiq_rpctool`` utility::
     $ artiq_rpctool ::1 3255 call set_output_volts 150 # set output voltage to 150 V
     $ artiq_rpctool ::1 3255 call close # close the device
 
+KDC101 controller usage example
++++++++++++++++++++++++++++++++
+
+First, run the KDC101 controller::
+
+    $ aqctl_thorlabs_cube -P KDC101 -d /dev/ttyUSBx
+
+.. note::
+    On Windows the serial port (the ``-d`` argument) will be of the form ``COMx``.
+
+.. note::
+    Anything compatible with `serial_for_url <http://pyserial.sourceforge.net/pyserial_api.html#serial.serial_for_url>`_
+    can be given as a device in ``-d`` argument.
+
+    For instance, if you want to specify the Vendor/Product ID and the USB Serial Number, you can do:
+
+    ``-d "hwgrep://<VID>:<PID> SNR=<serial_number>"``.
+    for instance:
+
+    ``-d "hwgrep://0403:faf0 SNR=83852734"``
+
+    The hwgrep URL works on both Linux and Windows.
+
+Then, send commands to it via the ``artiq_rpctool`` utility::
+
+    $ artiq_rpctool ::1 3255 list-targets
+    Target(s):   tdc001
+    $ artiq_rpctool ::1 3255 call move_relative 10000 # will move forward
+    $ artiq_rpctool ::1 3255 call move_relative -10000 # will move backward
+    $ artiq_rpctool ::1 3255 call move_absolute 20000 # absolute move to 20000
+    $ artiq_rpctool ::1 3255 call move_home # will go back to home position
+    $ artiq_rpctool ::1 3255 call close # close the device
 
 API
 ---
