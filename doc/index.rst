@@ -94,7 +94,7 @@ First, run the KDC101 controller::
 Then, send commands to it via the ``artiq_rpctool`` utility::
 
     $ artiq_rpctool ::1 3255 list-targets
-    Target(s):   tdc001
+    Target(s):   kdc101
     $ artiq_rpctool ::1 3255 call move_relative 10000 # will move forward
     $ artiq_rpctool ::1 3255 call move_relative -10000 # will move backward
     $ artiq_rpctool ::1 3255 call move_absolute 20000 # absolute move to 20000
