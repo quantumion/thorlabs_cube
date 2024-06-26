@@ -11,6 +11,7 @@ setup(
         "docs": [
             "sphinx",
             "sphinx-argparse",
+            "sphinx-autodoc-typehints",
         ]
     },
     packages=find_packages(),

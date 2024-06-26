@@ -94,7 +94,7 @@ class Kdc(Tdc):
         return st.unpack("<HllHllHHH", get_msg.data[2:28])
 
     async def set_trigger_io_config(self, mode1, polarity1, mode2, polarity2):
-        """Set trigger parameters.
+        """Set trigger intput/output parameters.
 
         The K-Cube motor controllers have two bidirectional trigger ports (TRIG1 and TRIG2) that can be used to read an
         external logic signal or output a logic level to control external equipment. Either of them can be independently
@@ -155,7 +155,7 @@ class Kdc(Tdc):
         await self.send(Message(MGMSG.MOT_SET_KCUBETRIGIOCONFIG, data=payload))
 
     async def get_trigger_io_config(self):
-        """Get trigger parameters.
+        """Get trigger input/output parameters.
 
         :return: A 4 int tuple containing in this order: mode1, polarity1, mode2, polarity2. Cf.
                  :py:meth:`get_trigger_io_config()<Kdc.get_trigger_io_config>` for description.
@@ -163,3 +163,57 @@ class Kdc(Tdc):
         """
         get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBETRIGIOCONFIG, [MGMSG.MOT_GET_KCUBETRIGIOCONFIG], 1)
         return st.unpack("<HHHH", get_msg.data[2:10])
+
+    async def set_position_trigger_parameters(self, start_position_fwd: int, interval_fwd: int, num_pulses_fwd: int,
+                                              start_position_rev: int, interval_rev: int, num_pulses_rev: int,
+                                              pulse_width: int, num_cycles: int):
+        """Set positioning trigger parameters.
+
+        The K-Cube motor controllers have two bidirectional trigger ports (TRIG1 and TRIG2) that can be set to be used
+        as input or output triggers. This method sets operating parameters used when the triggering mode is set to a
+        trigger out position steps mode by calling the ;py:meth:`set_trigger_io_config()<Kdc.set_trigger_io_config>`
+        method. As soon as position triggering is selected on either of the TRIG ports, the port will assert the
+        inactive logic state. As the stage moves in its travel range and the actual position matches the position set in
+        the start_position_fwd parameter, the TRIG port will output its active logic state. The active state will be
+        output for the length of time specified by the pulse_width parameter, then return to its inactive state and
+        schedule the next position trigger point at the start_position_fwd value plus the value set in the interval_fwd
+        parameter. Thus when this second position is reached, the TRIG output will be asserted to its active state
+        again. The sequence is repeated the number of times set in the num_pulses_fwd parameter. When the number of
+        pulses set in the num_pulses_fwd parameter has been generated, the trigger engine will schedule the next
+        position to occur at the position specified in the start_position_rev parameter. The same sequence as the
+        forward direction is now repeated in reverse, except that the interval_rev and num_pulses_rev parameters apply.
+        When the number of pulses has been output, the entire forward-reverse sequence will repeat the number of times
+        specified by num_cycles parameter. This means that the total number of pulses output will be num_cycles x
+        (num_pulses_fwd + num_pulses_rev).
+
+        Once the total number of output pulses have been generated, the trigger output will remain inactive.
+
+        When a unidirectional sequence is selected, only the forward or reverse part of the sequence will be activated.
+
+        :param start_position_fwd: When moving forward, this is the stage position [in position counts - encoder counts
+                                   or microsteps] to start the triggering sequence.
+        :param interval_fwd: When moving forward, this is the interval [in position counts - encoder counts or
+                             microsteps] at which to output the trigger pulses.
+        :param num_pulses_fwd: Number of output pulses during a forward move.
+        :param start_position_rev: When moving backwards, this is the stage position [in position counts - encoder
+                                   counts or microsteps] to start the triggering sequence.
+        :param interval_rev: When moving backwards, this is the interval [in position counts - encoder counts or
+                             microsteps] at which to output the trigger pulses.
+        :param num_pulses_rev: Number of output pulses during a backwards move.
+        :param pulse_width: Trigger output pulse width (from 1 µs to 1000000 µs).
+        :param num_cycles: Number of forward/reverse move cycles.
+        """
+        payload = st.pack("<Hllllllll", 1, start_position_fwd, interval_fwd, num_pulses_fwd, start_position_rev,
+                          interval_rev, num_pulses_rev, pulse_width, num_cycles)
+        await self.send(Message(MGMSG.MOT_SET_KCUBEPOSTRIGPARAMS), data=payload)
+
+    async def get_position_trigger_parameters(self):
+        """Get the positioning trigger parameters.
+
+        :return: An 8 int tuple containing in this order: start_position_fwd, interval_fwd, num_pulses_fwd,
+                 start_position_rev, interval_rev, num_pulses_rev, pulse_width, num_cycles. Cf.
+                 :py:meth:`set_position_trigger_parameters()<Kdc.set_position_trigger_parameters>` for description.
+        :rtype: An 8 int tuple
+        """
+        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEPOSTRIGPARAMS, [MGMSG.MOT_GET_KCUBEPOSTRIGPARAMS], 1)
+        return st.unpack("<llllllll", get_msg.data[2:])
