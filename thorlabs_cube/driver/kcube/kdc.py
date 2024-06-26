@@ -12,7 +12,6 @@ class Kdc(Tdc):
     def __init__(self, serial_dev):
         """Initialize from TDC001 control class"""
         super().__init__(serial_dev)
-        # TODO: anything else?
 
     async def handle_message(self, msg):
         """Parse messages from the device. Minor adaptation from TDC001 method."""
@@ -39,7 +38,7 @@ class Kdc(Tdc):
 
     async def set_mmi_parameters(self, mode, max_velocity, max_acceleration, direction, position1, position2,
                                  brightness, timeout, dim):
-        """Configure the operating parameters of the top panel wheel (Joystick).
+        """Set the operating parameters of the top panel wheel (Joystick).
 
         :param mode: This parameter specifies the operating mode of the wheel/joy stick as follows:\n
                      * 1: Velocity Control Mode - Deflecting the wheel starts a move with the velocity proportional to
@@ -82,3 +81,14 @@ class Kdc(Tdc):
         payload = st.pack("<HHllHllHHHH", 1, mode, max_velocity, max_acceleration, direction, position1, position2,
                           brightness, timeout, dim, 0)
         await self.send(Message(MGMSG.MOT_SET_KCUBEMMIPARAMS, data=payload))
+
+    async def get_mmi_parameters(self):
+        """Get the operating parameters of the top panel wheel (Joystick).
+
+        :return: A 9 int tuple containing in this order: joystick mode, maximum velocity, maximum acceleration,
+                 direction, position1, position2, brightness, timeout, and dim. Cf. :py:meth:`set_mmi_parameters()
+                 <Kdc.set_mmi_parameters>` for description.
+        :rtype: A 9 int tuple
+        """
+        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEMMIPARAMS, [MGMSG.MOT_GET_KCUBEMMIPARAMS], 1)
+        return st.unpack("<HllHllHHH", get_msg.data[2:28])
