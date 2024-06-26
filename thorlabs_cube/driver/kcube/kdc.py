@@ -275,7 +275,7 @@ class KdcSim(TdcSim):
         self.interval_rev = interval_rev
         self.num_pulses_rev = num_pulses_rev
         self.pulse_width = pulse_width
-        self.num_cycles =num_cycles
+        self.num_cycles = num_cycles
 
     async def get_position_trigger_parameters(self):
         return (self.start_position_fwd, self.interval_fwd,self. num_pulses_fwd, self.start_position_rev,
