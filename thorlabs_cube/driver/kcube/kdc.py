@@ -78,8 +78,8 @@ class Kdc(Tdc):
         :param dim: The dim level, as a value from 0 (Off) to 10 (brightest) but is also limited by the brightness
                     parameter.
         """
-        payload = st.pack("<HHllHllHHHH", 1, mode, max_velocity, max_acceleration, direction, position1, position2,
-                          brightness, timeout, dim, 0)
+        payload = st.pack("<HHllHllHHHlHH", 1, mode, max_velocity, max_acceleration, direction, position1, position2,
+                          brightness, timeout, dim, 0, 0, 0)
         await self.send(Message(MGMSG.MOT_SET_KCUBEMMIPARAMS, data=payload))
 
     async def get_mmi_parameters(self):
@@ -92,3 +92,74 @@ class Kdc(Tdc):
         """
         get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEMMIPARAMS, [MGMSG.MOT_GET_KCUBEMMIPARAMS], 1)
         return st.unpack("<HllHllHHH", get_msg.data[2:28])
+
+    async def set_trigger_io_config(self, mode1, polarity1, mode2, polarity2):
+        """Set trigger parameters.
+
+        The K-Cube motor controllers have two bidirectional trigger ports (TRIG1 and TRIG2) that can be used to read an
+        external logic signal or output a logic level to control external equipment. Either of them can be independently
+        configured as an input or an output and the active logic state can be selected High or Low to suit the
+        requirements of the application. Electrically the ports output 5 Volt logic signals and are designed to be
+        driven from a 5 Volt logic. When the port is used in the input mode, the logic levels are TTL compatible, i.e.
+        a voltage level less than 0.8 Volt will be recognised as a logic LOW and a level greater than 2.4 Volt as a
+        logic HIGH. The input contains a weak pull-up, so the state of the input with nothing connected will default to
+        a logic HIGH. The weak pull-up feature allows a passive device, such as a mechanical switch to be connected
+        directly to the input. When the port is used as an output it provides a push-pull drive of 5 Volts, with the
+        maximum current limited to approximately 8 mA. The current limit prevents damage when the output is accidentally
+        shorted to ground or driven to the opposite logic state by external circuity.
+
+        **Warning**: do not drive the TRIG ports from any voltage source that can produce an output in excess of the
+        normal 0 to 5 Volt logic level range. In any case the voltage at the TRIG ports must be limited to -0.25 to
+        +5.25 Volts.
+
+        **Input Trigger Modes**\n
+        When configured as an input, the TRIG ports can be used as a general purpose digital input, or for triggering a
+        relative, absolute or home move as follows:
+
+        * 0x00: The trigger IO is disabled
+        * 0x01: General purpose logic input (read through status bits using the :py:meth:`get_status_bits()
+          <Kdc.get_status_bits>` method)
+        * 0x02: Input trigger for relative move
+        * 0x03: Input trigger for absolute move
+        * 0x04: Input trigger for home move
+
+        When used for triggering a move, the port is edge sensitive. In other words, it has to see a transition from the
+        inactive to the active logic state (Low->High or High->Low) for the trigger input to be recognized. For the same
+        reason a sustained logic level will not trigger repeated moves. The trigger input has to return to its inactive
+        state first in order to start the next trigger.
+
+        **Output Trigger Modes**\n
+        When configured as an output, the TRIG ports can be used as a general purpose digital output, or to indicate
+        motion status or to produce a trigger pulse at configurable positions as follows:
+
+        * 0x0A: General purpose logic output (set using the :py:meth:`set_digital_outputs_mode()
+          <Kdc.set_digital_outputs_mode>` message).
+        * 0x0B: Trigger output active (level) when motor 'in motion'. The output trigger goes high (5V) or low (0V)
+          (as set in the polarity1 and polarity2 parameters) when the stage is in motion.
+        * 0x0C: Trigger output active (level) when motor at 'maximum velocity'.
+        * 0x0D: Trigger output active (pulsed) at pre-defined positions moving forward (set using start_position_fwd,
+          interval_fwd, num_pulses_fwd and pulse_width parameters in the :py:meth:`set_position_trigger_parameters()
+          <Kdc.set_position_trigger_parameters>` message). Only one Trigger port at a time can be set to this mode.
+        * 0x0E: Trigger output active (pulsed) at pre-defined positions moving backwards (set using start_position_rev,
+          interval_rev, num_pulses_rev and pulse_width parameters in the :py:meth:`set_position_trigger_parameters()
+          <Kdc.set_position_trigger_parameters>` message). Only one Trigger port at a time can be set to this mode.
+        * 0x0F: Trigger output active (pulsed) at pre-defined positions moving forwards and backward. Only one Trigger
+          port at a time can be set to this mode.
+
+        :param mode1: TRIG1 operating mode
+        :param polarity1: The active state of TRIG1 (i.e. logic high or logic low)
+        :param mode2: TRIG2 operating mode
+        :param polarity2: The active state of TRIG2 (i.e. logic high or logic low)
+        """
+        payload = st.pack("<HHHHHQH", 1, mode1, polarity1, mode2, polarity2, 0, 0)
+        await self.send(Message(MGMSG.MOT_SET_KCUBETRIGIOCONFIG, data=payload))
+
+    async def get_trigger_io_config(self):
+        """Get trigger parameters.
+
+        :return: A 4 int tuple containing in this order: mode1, polarity1, mode2, polarity2. Cf.
+                 :py:meth:`get_trigger_io_config()<Kdc.get_trigger_io_config>` for description.
+        :rtype: A 4 int tuple
+        """
+        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBETRIGIOCONFIG, [MGMSG.MOT_GET_KCUBETRIGIOCONFIG], 1)
+        return st.unpack("<HHHH", get_msg.data[2:10])
