@@ -4,11 +4,12 @@ import argparse
 import sys
 import asyncio
 
+from sipyco.pc_rpc import simple_server_loop
+from sipyco import common_args
+
 from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
-from sipyco.pc_rpc import simple_server_loop
-from sipyco import common_args
 
 
 def get_argparser():
@@ -48,12 +49,12 @@ def main():
                 sys.exit(1)
         else:
             if product == "tdc001":
-                dev = Tdc(args.device)
+                dev = Tdc(loop, args.device)
             elif product == "tpz001":
-                dev = Tpz(args.device)
+                dev = Tpz(loop, args.device)
                 loop.run_until_complete(dev.get_tpz_io_settings())
             elif product == "kdc101":
-                dev = Kdc(args.device)
+                dev = Kdc(loop, args.device)
             else:
                 print("Invalid product string (-P/--product), choose from tdc001, tpz001, or kdc101")
                 sys.exit(1)
