@@ -9,8 +9,8 @@ class Tpz(_Cube):
     or :py:meth:`get_tpz_io_settings()<Tpz.get_tpz_io_settings>` must
     be completed to finish initialising the driver.
     """
-    def __init__(self, serial_dev):
-        _Cube.__init__(self, serial_dev)
+    def __init__(self, loop, serial_dev):
+        _Cube.__init__(self, loop, serial_dev)
         self.voltage_limit = None
 
     async def handle_message(self, msg):

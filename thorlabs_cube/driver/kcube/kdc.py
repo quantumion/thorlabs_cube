@@ -4,14 +4,19 @@ from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.message import MGMSG, MsgError, Message
 
 
+_RESERVED = 0x0
+_CHANNEL = 0x01
+_REQUEST_LENGTH = 1
+
+
 class Kdc(Tdc):
     """
     KDC101 K-Cube Brushed DC Servo Motor Controller class
     """
 
-    def __init__(self, serial_dev: str):
+    def __init__(self, loop, serial_dev: str):
         """Initialize from TDC001 control class"""
-        super().__init__(serial_dev)
+        super().__init__(loop, serial_dev)
 
     async def handle_message(self, msg: MGMSG):
         """Parse messages from the device. Minor adaptation from TDC001 method."""
@@ -24,7 +29,7 @@ class Kdc(Tdc):
             raise MsgError("Hardware error, please disconnect and reconnect the KDC101")
         elif msg_id == MGMSG.HW_RICHRESPONSE:
             (code, ) = st.unpack("<H", data[2:4])
-            raise MsgError(f"Hardware error {code}: {data[4:].decode(encoding="ascii")}")
+            raise MsgError(f"Hardware error {code}: {data[4:].decode(encoding='ascii')}")
         elif (msg_id == MGMSG.MOT_MOVE_COMPLETED or
               msg_id == MGMSG.MOT_MOVE_STOPPED or
               msg_id == MGMSG.MOT_GET_DCSTATUSUPDATE):
@@ -92,8 +97,8 @@ class Kdc(Tdc):
         :param dim: The dim level, as a value from 0 (Off) to 10 (brightest) but is also limited by the brightness
                     parameter.
         """
-        payload = st.pack("<HHllHllHHHlHH", 1, mode, max_velocity, max_acceleration, direction, position1, position2,
-                          brightness, timeout, dim, 0, 0, 0)
+        payload = st.pack("<HHllHllHHHlHH", _CHANNEL, mode, max_velocity, max_acceleration, direction, position1,
+                          position2, brightness, timeout, dim, _RESERVED, _RESERVED, _RESERVED)
         await self.send(Message(MGMSG.MOT_SET_KCUBEMMIPARAMS, data=payload))
 
     async def get_mmi_parameters(self):
@@ -104,7 +109,7 @@ class Kdc(Tdc):
                  <Kdc.set_mmi_parameters>` for description.
         :rtype: A 9 int tuple
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEMMIPARAMS, [MGMSG.MOT_GET_KCUBEMMIPARAMS], 1)
+        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEMMIPARAMS, [MGMSG.MOT_GET_KCUBEMMIPARAMS], _REQUEST_LENGTH)
         return st.unpack("<HllHllHHH", get_msg.data[2:28])
 
     async def set_trigger_io_config(self, mode1: int, polarity1: int, mode2: int, polarity2: int):
@@ -165,7 +170,7 @@ class Kdc(Tdc):
         :param mode2: TRIG2 operating mode
         :param polarity2: The active state of TRIG2 (i.e. logic high or logic low)
         """
-        payload = st.pack("<HHHHHQH", 1, mode1, polarity1, mode2, polarity2, 0, 0)
+        payload = st.pack("<HHHHHQH", _CHANNEL, mode1, polarity1, mode2, polarity2, _RESERVED, _RESERVED)
         await self.send(Message(MGMSG.MOT_SET_KCUBETRIGIOCONFIG, data=payload))
 
     async def get_trigger_io_config(self):
@@ -175,7 +180,8 @@ class Kdc(Tdc):
                  :py:meth:`get_trigger_io_config()<Kdc.get_trigger_io_config>` for description.
         :rtype: A 4 int tuple
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBETRIGIOCONFIG, [MGMSG.MOT_GET_KCUBETRIGIOCONFIG], 1)
+        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBETRIGIOCONFIG, [MGMSG.MOT_GET_KCUBETRIGIOCONFIG],
+                                          _REQUEST_LENGTH)
         return st.unpack("<HHHH", get_msg.data[2:10])
 
     async def set_position_trigger_parameters(self, start_position_fwd: int, interval_fwd: int, num_pulses_fwd: int,
@@ -217,7 +223,7 @@ class Kdc(Tdc):
         :param pulse_width: Trigger output pulse width (from 1 µs to 1000000 µs).
         :param num_cycles: Number of forward/reverse move cycles.
         """
-        payload = st.pack("<Hllllllll", 1, start_position_fwd, interval_fwd, num_pulses_fwd, start_position_rev,
+        payload = st.pack("<Hllllllll", _CHANNEL, start_position_fwd, interval_fwd, num_pulses_fwd, start_position_rev,
                           interval_rev, num_pulses_rev, pulse_width, num_cycles)
         await self.send(Message(MGMSG.MOT_SET_KCUBEPOSTRIGPARAMS), data=payload)
 
@@ -229,8 +235,9 @@ class Kdc(Tdc):
                  :py:meth:`set_position_trigger_parameters()<Kdc.set_position_trigger_parameters>` for description.
         :rtype: An 8 int tuple
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEPOSTRIGPARAMS, [MGMSG.MOT_GET_KCUBEPOSTRIGPARAMS], 1)
-        return st.unpack("<llllllll", get_msg.data[2:])
+        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEPOSTRIGPARAMS, [MGMSG.MOT_GET_KCUBEPOSTRIGPARAMS],
+                                          _REQUEST_LENGTH)
+        return st.unpack("<llllllll", get_msg.data[2:34])
 
 
 class KdcSim(TdcSim):
