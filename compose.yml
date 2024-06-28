@@ -8,7 +8,7 @@ services:
     ports:
       - 3255:3255
     devices:
-     - /dev/ttyUSB0:/dev/ttyUSB0
+     - /dev/kdc101_z:/dev/ttyUSB0
     networks:
       - thorlabs_cube
     build:
@@ -24,7 +24,7 @@ services:
     ports:
       - 3256:3255
     devices:
-     - /dev/ttyUSB1:/dev/ttyUSB0
+     - /dev/kdc101_y:/dev/ttyUSB0
     networks:
       - thorlabs_cube
     build:
