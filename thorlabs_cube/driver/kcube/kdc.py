@@ -30,9 +30,7 @@ class Kdc(Tdc):
         elif msg_id == MGMSG.HW_RICHRESPONSE:
             (code, ) = st.unpack("<H", data[2:4])
             raise MsgError(f"Hardware error {code}: {data[4:].decode(encoding='ascii')}")
-        elif (msg_id == MGMSG.MOT_MOVE_COMPLETED or
-              msg_id == MGMSG.MOT_MOVE_STOPPED or
-              msg_id == MGMSG.MOT_GET_DCSTATUSUPDATE):
+        elif msg_id in [MGMSG.MOT_MOVE_COMPLETED, MGMSG.MOT_MOVE_STOPPED, MGMSG.MOT_GET_DCSTATUSUPDATE]:
             if self.status_report_counter == 25:
                 self.status_report_counter = 0
                 await self.send(Message(MGMSG.MOT_ACK_DCSTATUSUPDATE))
