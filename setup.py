@@ -1,12 +1,23 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="thorlabs_tcube",
-    install_requires=["sipyco", "asyncserial"],
+    name="thorlabs_cube",
+    install_requires=[
+        "sipyco@git+ssh://git@github.com/m-labs/sipyco.git",
+        "asyncserial",
+        "numpy", # hidden sipyco dependency
+    ],
+    extras_require={
+        "docs": [
+            "sphinx",
+            "sphinx-argparse",
+            "sphinx-autodoc-typehints",
+        ]
+    },
     packages=find_packages(),
     entry_points={
         "console_scripts": [
-            "aqctl_thorlabs_tcube = thorlabs_tcube.aqctl_thorlabs_tcube:main",
+            "aqctl_thorlabs_cube = thorlabs_cube.aqctl_thorlabs_cube:main",
         ],
     },
 )

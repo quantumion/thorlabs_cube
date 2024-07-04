@@ -20,7 +20,7 @@ for module in mock_modules:
 
 # -- Project information -----------------------------------------------------
 
-project = 'Thorlabs_TCube'
+project = 'Thorlabs_Cube'
 copyright = '2019, M-Labs'
 author = 'M-Labs'
 
@@ -41,7 +41,8 @@ release = '1.0'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinxarg.ext'
+    'sphinxarg.ext',
+    'sphinx_autodoc_typehints',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -104,7 +105,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Thorlabs_TCubedoc'
+htmlhelp_basename = 'Thorlabs_Cubedoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -131,7 +132,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Thorlabs_TCube.tex', 'Thorlabs_TCube Documentation',
+    (master_doc, 'Thorlabs_Cube.tex', 'Thorlabs_Cube Documentation',
      'M-Labs', 'manual'),
 ]
 
@@ -141,7 +142,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'thorlabs_tcube', 'Thorlabs_TCube Documentation',
+    (master_doc, 'thorlabs_cube', 'Thorlabs_Cube Documentation',
      [author], 1)
 ]
 
@@ -152,8 +153,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'Thorlabs_TCube', 'Thorlabs_TCube Documentation',
-     author, 'Thorlabs_TCube', 'One line description of project.',
+    (master_doc, 'Thorlabs_Cube', 'Thorlabs_Cube Documentation',
+     author, 'Thorlabs_Cube', 'One line description of project.',
      'Miscellaneous'),
 ]
 
