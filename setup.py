@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name="thorlabs_cube",
     install_requires=[
-        "sipyco@git+ssh://git@github.com/m-labs/sipyco.git",
+        "sipyco@git+https://github.com/m-labs/sipyco.git",
         "asyncserial",
         "numpy", # hidden sipyco dependency
     ],

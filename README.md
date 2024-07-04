@@ -3,23 +3,30 @@
 Derived from the [thorlabs_tcube](https://github.com/m-labs/thorlabs_tcube) package.
 
 ## Installation
-Clone the repository then install using pip:
+Clone the repository then install using [pip](https://pip.pypa.io/en/stable/installation/):
 ```sh
 $ git clone git@github.com:quantumion/thorlabs_cube.git
 $ cd thorlabs_cube
 $ pip install .
 ```
 
-Optionally, install with Sphinx to build autodocumentation:
+Optionally, install with [Sphinx](https://www.sphinx-doc.org/) to build autodocumentation:
 ```sh
 $ pip install .[docs]
+```
+
+### Docker Container
+Build and launch the application as a service in a container with [Docker Compose](https://docs.docker.com/compose/):
+```sh
+$ docker compose build
+$ docker compose up -d
 ```
 
 ## Usage
 See the [documentation](/doc/index.rst) for setup and usage instructions.
 
 ## Documentation
-Build the documentation with Sphinx:
+Build the documentation with [Sphinx](https://www.sphinx-doc.org/):
 ```sh
 $ cd doc
 $ make html
