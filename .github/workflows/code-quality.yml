@@ -15,6 +15,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
       - name: Install package, flake8
         run: |
           python -m pip install --upgrade pip==24.0
@@ -24,13 +25,13 @@ jobs:
         uses: psf/black@stable
         with:
           options: "--check --verbose"
-          src: "./thorlabs_cube"
+          src: "."
       - name: Setup and run isort
         uses: isort/isort-action@master
         with:
           isortVersion: "5.13.2"
-          sortPaths: "./thorlabs_cube"
+          sortPaths: "."
           configuration: "--check-only --diff --profile black --filter-files"
       - name: Setup and run flake8
         run: |
-          flake8 ./thorlabs_cube
+          flake8 .
