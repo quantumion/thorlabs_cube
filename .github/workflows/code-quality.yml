@@ -24,16 +24,16 @@ jobs:
         uses: psf/black@stable
         with:
           options: "--check --verbose"
-          src: "."
+          src: "./thorlabs_cube"
       - name: Setup and run isort
         uses: isort/isort-action@master
         with:
           isortVersion: "5.13.2"
-          sortPaths: "."
+          sortPaths: "./thorlabs_cube"
           configuration: "--check-only --diff --profile black --filter-files"
       - name: Setup and run flake8
         run: |
-          flake8 .
+          flake8 ./thorlabs_cube
 
   check-types:
     runs-on: ubuntu-22.04
@@ -49,4 +49,4 @@ jobs:
           python -m pip install mypy==1.10.0
       - name: Run mypy
         run: |
-          mypy .
+          mypy ./thorlabs_cube
