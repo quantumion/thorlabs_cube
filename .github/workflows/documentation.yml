@@ -21,7 +21,7 @@ jobs:
           python -m pip install numpy
           python -m pip install sipyco@git+https://github.com/m-labs/sipyco.git asyncserial
           python -m pip install -U sphinx==7.3.7
-          pythom -m pip install sphinx-argparse==0.5.0
+          python -m pip install sphinx-argparse==0.5.0
           python -m pip install .
       - name: Build documentation
         run: |
