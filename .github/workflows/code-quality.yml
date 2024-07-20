@@ -1,10 +1,11 @@
+---
 name: Code Quality
 
 on:
   push:
-    branches: [ "master", "cicd-init" ]
+    branches: ["master", "4-cicd-init"]
   pull_request:
-    branches: [ "master", "cicd-init" ]
+    branches: ["master", "4-cicd-init"]
 
 jobs:
   lint:
@@ -36,6 +37,8 @@ jobs:
       - name: Setup and run flake8
         run: |
           flake8 ./thorlabs_cube
+      - name: yamllint
+        uses: karancode/yamllint-github-action@v2.1.1
 
   check-types:
     runs-on: ubuntu-22.04

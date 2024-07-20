@@ -1,10 +1,11 @@
+---
 name: Container
 
 on:
   push:
-    branches: [ "master", "cicd-init" ]
+    branches: ["master", "4-cicd-init"]
   pull_request:
-    branches: [ "master", "cicd-init" ]
+    branches: ["master", "4-cicd-init"]
 
 jobs:
   lint:

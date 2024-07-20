@@ -1,10 +1,11 @@
+---
 name: Documentation
 
 on:
   push:
-    branches: [ "master", "cicd-init" ]
+    branches: ["master", "4-cicd-init"]
   pull_request:
-    branches: [ "master", "cicd-init" ]
+    branches: ["master", "4-cicd-init"]
 
 jobs:
   build:
