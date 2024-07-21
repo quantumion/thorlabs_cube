@@ -18,31 +18,34 @@ class Tdc(_Cube):
         if msg_id == MGMSG.HW_DISCONNECT:
             raise MsgError("Error: Please disconnect the TDC001")
         elif msg_id == MGMSG.HW_RESPONSE:
-            raise MsgError("Hardware error, please disconnect "
-                           "and reconnect the TDC001")
+            raise MsgError(
+                "Hardware error, please disconnect " "and reconnect the TDC001"
+            )
         elif msg_id == MGMSG.HW_RICHRESPONSE:
-            (code, ) = st.unpack("<H", data[2:4])
-            raise MsgError("Hardware error {}: {}"
-                           .format(code,
-                                   data[4:].decode(encoding="ascii")))
-        elif (msg_id == MGMSG.MOT_MOVE_COMPLETED or
-              msg_id == MGMSG.MOT_MOVE_STOPPED or
-              msg_id == MGMSG.MOT_GET_DCSTATUSUPDATE):
+            (code,) = st.unpack("<H", data[2:4])
+            raise MsgError(
+                "Hardware error {}: {}".format(code, data[4:].decode(encoding="ascii"))
+            )
+        elif (
+            msg_id == MGMSG.MOT_MOVE_COMPLETED
+            or msg_id == MGMSG.MOT_MOVE_STOPPED
+            or msg_id == MGMSG.MOT_GET_DCSTATUSUPDATE
+        ):
             if self.status_report_counter == 25:
                 self.status_report_counter = 0
                 await self.send(Message(MGMSG.MOT_ACK_DCSTATUSUPDATE))
             else:
                 self.status_report_counter += 1
             # 'r' is a currently unused and reserved field
-            self.position, self.velocity, r, self.status = st.unpack(
-                "<LHHL", data[2:])
+            self.position, self.velocity, r, self.status = st.unpack("<LHHL", data[2:])
 
     async def is_moving(self):
         status_bits = await self.get_status_bits()
         return (status_bits & 0x2F0) != 0
 
-    async def set_pot_parameters(self, zero_wnd, vel1, wnd1, vel2, wnd2, vel3,
-                                 wnd3, vel4):
+    async def set_pot_parameters(
+        self, zero_wnd, vel1, wnd1, vel2, wnd2, vel3, wnd3, vel4
+        ):
         """Set pot parameters.
 
         :param zero_wnd: The deflection from the mid position (in ADC counts
@@ -58,8 +61,9 @@ class Tdc(_Cube):
             wnd2 to 127) to apply vel3.
         :param vel4: The velocity to move when beyond wnd3.
         """
-        payload = st.pack("<HHLHLHLHL", 1, zero_wnd, vel1, wnd1, vel2, wnd2,
-                          vel3, wnd3, vel4)
+        payload = st.pack(
+            "<HHLHLHLHL", 1, zero_wnd, vel1, wnd1, vel2, wnd2, vel3, wnd3, vel4
+        )
         await self.send(Message(MGMSG.MOT_SET_POTPARAMS, data=payload))
 
     async def get_pot_parameters(self):
@@ -71,13 +75,15 @@ class Tdc(_Cube):
             description of each tuple element meaning.
         :rtype: An 8 int tuple
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_POTPARAMS,
-                                          [MGMSG.MOT_GET_POTPARAMS], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_POTPARAMS, [MGMSG.MOT_GET_POTPARAMS], 1
+        )
         return st.unpack("<HLHLHLHL", get_msg.data[2:])
 
     async def hub_get_bay_used(self):
-        get_msg = await self.send_request(MGMSG.HUB_REQ_BAYUSED,
-                                          [MGMSG.HUB_GET_BAYUSED])
+        get_msg = await self.send_request(
+            MGMSG.HUB_REQ_BAYUSED, [MGMSG.HUB_GET_BAYUSED]
+        )
         return get_msg.param1
 
     async def set_position_counter(self, position):
@@ -99,8 +105,9 @@ class Tdc(_Cube):
         :return: The value of the position counter.
         :rtype: int
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_POSCOUNTER,
-                                          [MGMSG.MOT_GET_POSCOUNTER], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_POSCOUNTER, [MGMSG.MOT_GET_POSCOUNTER], 1
+        )
         return st.unpack("<l", get_msg.data[2:])[0]
 
     async def set_encoder_counter(self, encoder_count):
@@ -121,8 +128,9 @@ class Tdc(_Cube):
         :return: The value of the encoder counter.
         :rtype: int
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_ENCCOUNTER,
-                                          [MGMSG.MOT_GET_ENCCOUNTER], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_ENCCOUNTER, [MGMSG.MOT_GET_ENCCOUNTER], 1
+        )
         return st.unpack("<l", get_msg.data[2:])[0]
 
     async def set_velocity_parameters(self, acceleration, max_velocity):
@@ -140,8 +148,9 @@ class Tdc(_Cube):
         :return: A 2 int tuple: (acceleration, max_velocity).
         :rtype: A 2 int tuple (int, int)
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_VELPARAMS,
-                                          [MGMSG.MOT_GET_VELPARAMS], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_VELPARAMS, [MGMSG.MOT_GET_VELPARAMS], 1
+        )
         return st.unpack("<LL", get_msg.data[6:])
 
     async def set_jog_parameters(self, mode, step_size, acceleration,

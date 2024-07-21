@@ -9,6 +9,7 @@ class Tpz(_Cube):
     or :py:meth:`get_tpz_io_settings()<Tpz.get_tpz_io_settings>` must
     be completed to finish initialising the driver.
     """
+
     def __init__(self, loop, serial_dev):
         _Cube.__init__(self, loop, serial_dev)
         self.voltage_limit = None
@@ -20,13 +21,14 @@ class Tpz(_Cube):
         if msg_id == MGMSG.HW_DISCONNECT:
             raise MsgError("Error: Please disconnect the TPZ001")
         elif msg_id == MGMSG.HW_RESPONSE:
-            raise MsgError("Hardware error, please disconnect "
-                           "and reconnect the TPZ001")
+            raise MsgError(
+                "Hardware error, please disconnect " "and reconnect the TPZ001"
+            )
         elif msg_id == MGMSG.HW_RICHRESPONSE:
-            (code, ) = st.unpack("<H", data[2:4])
-            raise MsgError("Hardware error {}: {}"
-                           .format(code,
-                                   data[4:].decode(encoding="ascii")))
+            (code,) = st.unpack("<H", data[2:4])
+            raise MsgError(
+                "Hardware error {}: {}".format(code, data[4:].decode(encoding="ascii"))
+            )
 
     async def set_position_control_mode(self, control_mode):
         """Set the control loop mode.
@@ -43,8 +45,9 @@ class Tpz(_Cube):
 
             0x04 for Closed Loop Smooth.
         """
-        await self.send(Message(MGMSG.PZ_SET_POSCONTROLMODE, param1=1,
-                                param2=control_mode))
+        await self.send(
+            Message(MGMSG.PZ_SET_POSCONTROLMODE, param1=1, param2=control_mode)
+        )
 
     async def get_position_control_mode(self):
         """Get the control loop mode.
@@ -61,8 +64,9 @@ class Tpz(_Cube):
 
         :rtype: int
         """
-        get_msg = await self.send_request(MGMSG.PZ_REQ_POSCONTROLMODE,
-                                          [MGMSG.PZ_GET_POSCONTROLMODE], 1)
+        get_msg = await self.send_request(
+            MGMSG.PZ_REQ_POSCONTROLMODE, [MGMSG.PZ_GET_POSCONTROLMODE], 1
+        )
         return get_msg.param2
 
     async def set_output_volts(self, voltage):
@@ -78,9 +82,10 @@ class Tpz(_Cube):
             method between the three values 75 V, 100 V and 150 V.
         """
         if voltage < 0 or voltage > self.voltage_limit:
-            raise ValueError("Voltage must be in range [0;{}]"
-                             .format(self.voltage_limit))
-        volt = int(voltage*32767/self.voltage_limit)
+            raise ValueError(
+                "Voltage must be in range [0;{}]".format(self.voltage_limit)
+            )
+        volt = int(voltage * 32767 / self.voltage_limit)
         payload = st.pack("<HH", 1, volt)
         await self.send(Message(MGMSG.PZ_SET_OUTPUTVOLTS, data=payload))
 
@@ -90,9 +95,10 @@ class Tpz(_Cube):
         :return: The output voltage.
         :rtype: float
         """
-        get_msg = await self.send_request(MGMSG.PZ_REQ_OUTPUTVOLTS,
-                                          [MGMSG.PZ_GET_OUTPUTVOLTS], 1)
-        return st.unpack("<H", get_msg.data[2:])[0]*self.voltage_limit/32767
+        get_msg = await self.send_request(
+            MGMSG.PZ_REQ_OUTPUTVOLTS, [MGMSG.PZ_GET_OUTPUTVOLTS], 1
+        )
+        return st.unpack("<H", get_msg.data[2:])[0] * self.voltage_limit / 32767
 
     async def set_output_position(self, position_sw):
         """Set output position of the piezo actuator.
@@ -116,8 +122,9 @@ class Tpz(_Cube):
             position.
         :rtype: int
         """
-        get_msg = await self.send_request(MGMSG.PZ_REQ_OUTPUTPOS,
-                                          [MGMSG.PZ_GET_OUTPUTPOS], 1)
+        get_msg = await self.send_request(
+            MGMSG.PZ_REQ_OUTPUTPOS, [MGMSG.PZ_GET_OUTPUTPOS], 1
+        )
         return st.unpack("<H", get_msg.data[2:])[0]
 
     async def set_input_volts_source(self, volt_src):
@@ -155,8 +162,9 @@ class Tpz(_Cube):
             method docstring for meaning of bits.
         :rtype: int
         """
-        get_msg = await self.send_request(MGMSG.PZ_REQ_INPUTVOLTSSRC,
-                                          [MGMSG.PZ_GET_INPUTVOLTSSRC], 1)
+        get_msg = await self.send_request(
+            MGMSG.PZ_REQ_INPUTVOLTSSRC, [MGMSG.PZ_GET_INPUTVOLTSSRC], 1
+        )
         return st.unpack("<H", get_msg.data[2:])[0]
 
     async def set_pi_constants(self, prop_const, int_const):
@@ -182,8 +190,9 @@ class Tpz(_Cube):
             term and the second element is the integral term.
         :rtype: a 2 int elements tuple : (int, int)
         """
-        get_msg = await self.send_request(MGMSG.PZ_REQ_PICONSTS,
-                                          [MGMSG.PZ_GET_PICONSTS], 1)
+        get_msg = await self.send_request(
+            MGMSG.PZ_REQ_PICONSTS, [MGMSG.PZ_GET_PICONSTS], 1
+        )
         return st.unpack("<HH", get_msg.data[2:])
 
     async def set_output_lut(self, lut_index, output):
@@ -226,7 +235,7 @@ class Tpz(_Cube):
             :py:meth:`set_tpz_io_settings<Tpz.set_tpz_io_settings>`
             method.
         """
-        volt = round(output*32767/self.voltage_limit)
+        volt = round(output * 32767 / self.voltage_limit)
         payload = st.pack("<HHH", 1, lut_index, volt)
         await self.send(Message(MGMSG.PZ_SET_OUTPUTLUT, data=payload))
 
@@ -237,14 +246,15 @@ class Tpz(_Cube):
             the voltage output value.
         :rtype: a 2 elements tuple (int, float)
         """
-        get_msg = await self.send_request(MGMSG.PZ_REQ_OUTPUTLUT,
-                                          [MGMSG.PZ_GET_OUTPUTLUT], 1)
+        get_msg = await self.send_request(
+            MGMSG.PZ_REQ_OUTPUTLUT, [MGMSG.PZ_GET_OUTPUTLUT], 1
+        )
         index, output = st.unpack("<Hh", get_msg.data[2:])
-        return index, output*self.voltage_limit/32767
+        return index, output * self.voltage_limit / 32767
 
-    async def set_output_lut_parameters(self, mode, cycle_length, num_cycles,
-                                        delay_time, precycle_rest,
-                                        postcycle_rest):
+    async def set_output_lut_parameters(
+        self, mode, cycle_length, num_cycles, delay_time, precycle_rest, postcycle_rest
+    ):
         """Set Waveform Generator Mode parameters.
 
         It is possible to use the controller in an arbitrary Waveform
@@ -304,9 +314,19 @@ class Tpz(_Cube):
             value in the cycle until the postcycle_rest time has expired.
         """
         # triggering is not supported by the TPZ device
-        payload = st.pack("<HHHLLLLHLH", 1, mode, cycle_length, num_cycles,
-                          delay_time, precycle_rest, postcycle_rest,
-                          0, 0, 0)
+        payload = st.pack(
+            "<HHHLLLLHLH",
+            1,
+            mode,
+            cycle_length,
+            num_cycles,
+            delay_time,
+            precycle_rest,
+            postcycle_rest,
+            0,
+            0,
+            0,
+        )
         await self.send(Message(MGMSG.PZ_SET_OUTPUTLUTPARAMS, data=payload))
 
     async def get_output_lut_parameters(self):
@@ -316,8 +336,11 @@ class Tpz(_Cube):
             num_cycles, delay_time, precycle_rest, postcycle_rest).
         :rtype: 6 int elements tuple
         """
-        get_msg = await self.send_request(MGMSG.PZ_REQ_OUTPUTLUTPARAMS,
-                                          [MGMSG.PZ_GET_OUTPUTLUTPARAMS], 1)
+        get_msg = await self.send_request(
+            MGMSG.PZ_REQ_OUTPUTLUTPARAMS,
+            [MGMSG.PZ_GET_OUTPUTLUTPARAMS],
+            1,
+        )
         return st.unpack("<HHLLLL", get_msg.data[2:22])
 
     async def start_lut_output(self):
@@ -352,8 +375,9 @@ class Tpz(_Cube):
         :return: The intensity as a value from 0 (Off) to 255 (brightest).
         :rtype: int
         """
-        get_msg = await self.send_request(MGMSG.PZ_REQ_TPZ_DISPSETTINGS,
-                                          [MGMSG.PZ_GET_TPZ_DISPSETTINGS], 1)
+        get_msg = await self.send_request(
+            MGMSG.PZ_REQ_TPZ_DISPSETTINGS, [MGMSG.PZ_GET_TPZ_DISPSETTINGS], 1
+        )
         return st.unpack("<H", get_msg.data)[0]
 
     async def set_tpz_io_settings(self, voltage_limit, hub_analog_input):
@@ -409,8 +433,9 @@ class Tpz(_Cube):
             the meaning of those parameters.
         :rtype: a 2 elements tuple (int, int)
         """
-        get_msg = await self.send_request(MGMSG.PZ_REQ_TPZ_IOSETTINGS,
-                                          [MGMSG.PZ_GET_TPZ_IOSETTINGS], 1)
+        get_msg = await self.send_request(
+            MGMSG.PZ_REQ_TPZ_IOSETTINGS, [MGMSG.PZ_GET_TPZ_IOSETTINGS], 1
+        )
         voltage_limit, hub_analog_input = st.unpack("<HH", get_msg.data[2:6])
         if voltage_limit == 1:
             voltage_limit = 75
@@ -422,6 +447,7 @@ class Tpz(_Cube):
             raise ValueError("Voltage limit should be in range [1; 3]")
         self.voltage_limit = voltage_limit
         return voltage_limit, hub_analog_input
+
 
 class TpzSim:
     def __init__(self):
@@ -467,15 +493,17 @@ class TpzSim:
 
     def set_output_lut(self, lut_index, output):
         if lut_index < 0 or lut_index > 512:
-            raise ValueError("LUT index should be in range [0;512] and not {}"
-                             .format(lut_index))
+            raise ValueError(
+                "LUT index should be in range [0;512] and not {}".format(lut_index)
+            )
         self.lut[lut_index] = output
 
     def get_output_lut(self):
         return 0, 0  # FIXME: the API description here doesn't make any sense
 
-    def set_output_lut_parameters(self, mode, cycle_length, num_cycles,
-                                  delay_time, precycle_rest, postcycle_rest):
+    def set_output_lut_parameters(
+        self, mode, cycle_length, num_cycles, delay_time, precycle_rest, postcycle_rest
+    ):
         self.mode = mode
         self.cycle_length = cycle_length
         self.num_cycles = num_cycles
@@ -484,8 +512,14 @@ class TpzSim:
         self.postcycle_rest = postcycle_rest
 
     def get_output_lut_parameters(self):
-        return (self.mode, self.cycle_length, self.num_cycles,
-                self.delay_time, self.precycle_rest, self.postcycle_rest)
+        return (
+            self.mode,
+            self.cycle_length,
+            self.num_cycles,
+            self.delay_time,
+            self.precycle_rest,
+            self.postcycle_rest
+        )
 
     def start_lut_output(self):
         pass

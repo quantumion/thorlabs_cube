@@ -28,9 +28,15 @@ class Kdc(Tdc):
         elif msg_id == MGMSG.HW_RESPONSE:
             raise MsgError("Hardware error, please disconnect and reconnect the KDC101")
         elif msg_id == MGMSG.HW_RICHRESPONSE:
-            (code, ) = st.unpack("<H", data[2:4])
-            raise MsgError(f"Hardware error {code}: {data[4:].decode(encoding='ascii')}")
-        elif msg_id in [MGMSG.MOT_MOVE_COMPLETED, MGMSG.MOT_MOVE_STOPPED, MGMSG.MOT_GET_DCSTATUSUPDATE]:
+            (code,) = st.unpack("<H", data[2:4])
+            raise MsgError(
+                f"Hardware error {code}: {data[4:].decode(encoding='ascii')}"
+            )
+        elif msg_id in [
+            MGMSG.MOT_MOVE_COMPLETED,
+            MGMSG.MOT_MOVE_STOPPED,
+            MGMSG.MOT_GET_DCSTATUSUPDATE
+        ]:
             if self.status_report_counter == 25:
                 self.status_report_counter = 0
                 await self.send(Message(MGMSG.MOT_ACK_DCSTATUSUPDATE))
@@ -53,8 +59,18 @@ class Kdc(Tdc):
         """
         raise NotImplementedError
 
-    async def set_mmi_parameters(self, mode: int, max_velocity: int, max_acceleration: int, direction: int,
-                                 position1: int, position2: int, brightness: int, timeout: int, dim: int):
+    async def set_mmi_parameters(
+        self,
+        mode: int,
+        max_velocity: int,
+        max_acceleration: int,
+        direction: int,
+        position1: int,
+        position2: int,
+        brightness: int,
+        timeout: int,
+        dim: int,
+    ):
         """Set the operating parameters of the top panel wheel (Joystick).
 
         :param mode: This parameter specifies the operating mode of the wheel/joy stick as follows:\n
@@ -95,8 +111,22 @@ class Kdc(Tdc):
         :param dim: The dim level, as a value from 0 (Off) to 10 (brightest) but is also limited by the brightness
                     parameter.
         """
-        payload = st.pack("<HHllHllHHHlHH", _CHANNEL, mode, max_velocity, max_acceleration, direction, position1,
-                          position2, brightness, timeout, dim, _RESERVED, _RESERVED, _RESERVED)
+        payload = st.pack(
+            "<HHllHllHHHlHH",
+            _CHANNEL,
+            mode,
+            max_velocity,
+            max_acceleration,
+            direction,
+            position1,
+            position2,
+            brightness,
+            timeout,
+            dim,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED
+        )
         await self.send(Message(MGMSG.MOT_SET_KCUBEMMIPARAMS, data=payload))
 
     async def get_mmi_parameters(self):
@@ -107,10 +137,16 @@ class Kdc(Tdc):
                  <Kdc.set_mmi_parameters>` for description.
         :rtype: A 9 int tuple
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEMMIPARAMS, [MGMSG.MOT_GET_KCUBEMMIPARAMS], _REQUEST_LENGTH)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_KCUBEMMIPARAMS,
+            [MGMSG.MOT_GET_KCUBEMMIPARAMS],
+            _REQUEST_LENGTH,
+        )
         return st.unpack("<HllHllHHH", get_msg.data[2:28])
 
-    async def set_trigger_io_config(self, mode1: int, polarity1: int, mode2: int, polarity2: int):
+    async def set_trigger_io_config(
+            self, mode1: int, polarity1: int, mode2: int, polarity2: int
+    ):
         """Set trigger intput/output parameters.
 
         The K-Cube motor controllers have two bidirectional trigger ports (TRIG1 and TRIG2) that can be used to read an
@@ -168,7 +204,16 @@ class Kdc(Tdc):
         :param mode2: TRIG2 operating mode
         :param polarity2: The active state of TRIG2 (i.e. logic high or logic low)
         """
-        payload = st.pack("<HHHHHQH", _CHANNEL, mode1, polarity1, mode2, polarity2, _RESERVED, _RESERVED)
+        payload = st.pack(
+            "<HHHHHQH",
+            _CHANNEL,
+            mode1,
+            polarity1,
+            mode2,
+            polarity2,
+            _RESERVED,
+            _RESERVED
+        )
         await self.send(Message(MGMSG.MOT_SET_KCUBETRIGIOCONFIG, data=payload))
 
     async def get_trigger_io_config(self):
@@ -178,13 +223,24 @@ class Kdc(Tdc):
                  :py:meth:`get_trigger_io_config()<Kdc.get_trigger_io_config>` for description.
         :rtype: A 4 int tuple
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBETRIGIOCONFIG, [MGMSG.MOT_GET_KCUBETRIGIOCONFIG],
-                                          _REQUEST_LENGTH)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_KCUBETRIGIOCONFIG,
+            [MGMSG.MOT_GET_KCUBETRIGIOCONFIG],
+            _REQUEST_LENGTH,
+        )
         return st.unpack("<HHHH", get_msg.data[2:10])
 
-    async def set_position_trigger_parameters(self, start_position_fwd: int, interval_fwd: int, num_pulses_fwd: int,
-                                              start_position_rev: int, interval_rev: int, num_pulses_rev: int,
-                                              pulse_width: int, num_cycles: int):
+    async def set_position_trigger_parameters(
+        self,
+        start_position_fwd: int,
+        interval_fwd: int,
+        num_pulses_fwd: int,
+        start_position_rev: int,
+        interval_rev: int,
+        num_pulses_rev: int,
+        pulse_width: int,
+        num_cycles: int,
+    ):
         """Set positioning trigger parameters.
 
         The K-Cube motor controllers have two bidirectional trigger ports (TRIG1 and TRIG2) that can be set to be used
@@ -221,8 +277,18 @@ class Kdc(Tdc):
         :param pulse_width: Trigger output pulse width (from 1 µs to 1000000 µs).
         :param num_cycles: Number of forward/reverse move cycles.
         """
-        payload = st.pack("<Hllllllll", _CHANNEL, start_position_fwd, interval_fwd, num_pulses_fwd, start_position_rev,
-                          interval_rev, num_pulses_rev, pulse_width, num_cycles)
+        payload = st.pack(
+            "<Hllllllll",
+            _CHANNEL,
+            start_position_fwd,
+            interval_fwd,
+            num_pulses_fwd,
+            start_position_rev,
+            interval_rev,
+            num_pulses_rev,
+            pulse_width,
+            num_cycles,
+        )
         await self.send(Message(MGMSG.MOT_SET_KCUBEPOSTRIGPARAMS), data=payload)
 
     async def get_position_trigger_parameters(self):
@@ -233,8 +299,11 @@ class Kdc(Tdc):
                  :py:meth:`set_position_trigger_parameters()<Kdc.set_position_trigger_parameters>` for description.
         :rtype: An 8 int tuple
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_KCUBEPOSTRIGPARAMS, [MGMSG.MOT_GET_KCUBEPOSTRIGPARAMS],
-                                          _REQUEST_LENGTH)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_KCUBEPOSTRIGPARAMS,
+            [MGMSG.MOT_GET_KCUBEPOSTRIGPARAMS],
+            _REQUEST_LENGTH,
+        )
         return st.unpack("<llllllll", get_msg.data[2:34])
 
 
@@ -245,8 +314,18 @@ class KdcSim(TdcSim):
     def get_digital_outputs_config(self):
         raise NotImplementedError
 
-    async def set_mmi_parameters(self, mode: int, max_velocity: int, max_acceleration: int, direction: int,
-                                 position1: int, position2: int, brightness: int, timeout: int, dim: int):
+    async def set_mmi_parameters(
+        self,
+        mode: int,
+        max_velocity: int,
+        max_acceleration: int,
+        direction: int,
+        position1: int,
+        position2: int,
+        brightness: int,
+        timeout: int,
+        dim: int,
+    ):
         self.mode = mode
         self.max_velocity = max_velocity
         self.max_acceleration = max_acceleration
@@ -254,14 +333,25 @@ class KdcSim(TdcSim):
         self.position1 = position1
         self.position2 = position2
         self.brightness = brightness
-        self.timeout= timeout
+        self.timeout = timeout
         self.dim = dim
 
     async def get_mmi_parameters(self):
-        return (self.mode, self.max_velocity, self.max_acceleration, self.direction, self.position1, self.position2,
-                self.brightness, self.timeout, self.dim,)
+        return (
+            self.mode,
+            self.max_velocity,
+            self.max_acceleration,
+            self.direction,
+            self.position1,
+            self.position2,
+            self.brightness,
+            self.timeout,
+            self.dim,
+        )
 
-    async def set_trigger_io_config(self, mode1: int, polarity1: int, mode2: int, polarity2: int):
+    async def set_trigger_io_config(
+            self, mode1: int, polarity1: int, mode2: int, polarity2: int
+    ):
         self.mode1 = mode1
         self.polarity1 = polarity1
         self.mode2 = mode2
@@ -270,9 +360,17 @@ class KdcSim(TdcSim):
     async def get_trigger_io_config(self):
         return (self.mode1, self.polarity1, self.mode2, self.polarity2)
 
-    async def set_position_trigger_parameters(self, start_position_fwd: int, interval_fwd: int, num_pulses_fwd: int,
-                                              start_position_rev: int, interval_rev: int, num_pulses_rev: int,
-                                              pulse_width: int, num_cycles: int):
+    async def set_position_trigger_parameters(
+        self,
+        start_position_fwd: int,
+        interval_fwd: int,
+        num_pulses_fwd: int,
+        start_position_rev: int,
+        interval_rev: int,
+        num_pulses_rev: int,
+        pulse_width: int,
+        num_cycles: int,
+    ):
         self.start_position_fwd = start_position_fwd
         self.interval_fwd = interval_fwd
         self.num_pulses_fwd = num_pulses_fwd
@@ -283,5 +381,13 @@ class KdcSim(TdcSim):
         self.num_cycles = num_cycles
 
     async def get_position_trigger_parameters(self):
-        return (self.start_position_fwd, self.interval_fwd,self. num_pulses_fwd, self.start_position_rev,
-                self.interval_rev, self.num_pulses_rev, self.pulse_width, self.num_cycles)
+        return (
+            self.start_position_fwd,
+            self.interval_fwd,
+            self.num_pulses_fwd,
+            self.start_position_rev,
+            self.interval_rev,
+            self.num_pulses_rev,
+            self.pulse_width,
+            self.num_cycles,
+        )

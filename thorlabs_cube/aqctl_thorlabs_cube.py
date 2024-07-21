@@ -14,12 +14,23 @@ from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
 
 def get_argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-P", "--product", required=True,
-                        help="type of the Thorlabs T/K-Cube device to control: tdc001/tpz00/kdc101")
-    parser.add_argument("-d", "--device", default=None,
-                        help="serial device. See documentation for how to specify a USB Serial Number.")
-    parser.add_argument("--simulation", action="store_true",
-                        help="Put the driver in simulation mode, even if --device is used.")
+    parser.add_argument(
+        "-P",
+        "--product",
+        required=True,
+        help="type of the Thorlabs T/K-Cube device to control: tdc001/tpz00/kdc101",
+    )
+    parser.add_argument(
+        "-d",
+        "--device",
+        default=None,
+        help="serial device. See documentation for how to specify a USB Serial Number.",
+    )
+    parser.add_argument(
+        "--simulation",
+        action="store_true",
+        help="Put the driver in simulation mode, even if --device is used.",
+    )
     common_args.simple_network_args(parser, 3255)
     common_args.verbosity_args(parser)
     return parser
@@ -30,7 +41,9 @@ def main():
     common_args.init_logger_from_args(args)
 
     if not args.simulation and args.device is None:
-        print("You need to specify either --simulation or -d/--device argument. Use --help for more information.")
+        print(
+            "You need to specify either --simulation or -d/--device argument. Use --help for more information."
+        )
         sys.exit(1)
 
     loop = asyncio.new_event_loop()
@@ -45,7 +58,9 @@ def main():
             elif product == "kdc101":
                 dev = KdcSim()
             else:
-                print("Invalid product string (-P/--product), choose from tdc001, tpz001, or kdc101")
+                print(
+                    "Invalid product string (-P/--product), choose from tdc001, tpz001, or kdc101"
+                )
                 sys.exit(1)
         else:
             if product == "tdc001":
@@ -56,15 +71,23 @@ def main():
             elif product == "kdc101":
                 dev = Kdc(loop, args.device)
             else:
-                print("Invalid product string (-P/--product), choose from tdc001, tpz001, or kdc101")
+                print(
+                    "Invalid product string (-P/--product), choose from tdc001, tpz001, or kdc101"
+                )
                 sys.exit(1)
 
         try:
-            simple_server_loop({product: dev}, common_args.bind_address_from_args(args), args.port, loop=loop)
+            simple_server_loop(
+                {product: dev},
+                common_args.bind_address_from_args(args),
+                args.port,
+                loop=loop,
+            )
         finally:
             dev.close()
     finally:
         loop.close()
+
 
 if __name__ == "__main__":
     main()
