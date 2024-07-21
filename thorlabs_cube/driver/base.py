@@ -1,11 +1,10 @@
-import logging
 import asyncio
+import logging
 import struct as st
 
 import asyncserial
 
-from thorlabs_cube.driver.message import MGMSG, MsgError, Message
-
+from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +110,7 @@ class _Cube:
             await self.hardware_request_information()
         except asyncio.CancelledError:
             raise
-        except:
+        except Exception:
             logger.warning("ping failed", exc_info=True)
             return False
         return True

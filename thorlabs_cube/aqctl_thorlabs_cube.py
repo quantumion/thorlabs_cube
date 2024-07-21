@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 
 import argparse
-import sys
 import asyncio
+import sys
 
-from sipyco.pc_rpc import simple_server_loop
 from sipyco import common_args
+from sipyco.pc_rpc import simple_server_loop
 
+from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
 from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
-from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
 
 
 def get_argparser():
@@ -24,7 +24,8 @@ def get_argparser():
         "-d",
         "--device",
         default=None,
-        help="serial device. See documentation for how to specify a USB Serial Number.",
+        help="serial device. See documentation for how to specify a USB Serial"
+        " Number.",
     )
     parser.add_argument(
         "--simulation",
@@ -42,7 +43,8 @@ def main():
 
     if not args.simulation and args.device is None:
         print(
-            "You need to specify either --simulation or -d/--device argument. Use --help for more information."
+            "You need to specify either --simulation or -d/--device argument. "
+            "Use --help for more information."
         )
         sys.exit(1)
 
@@ -59,7 +61,8 @@ def main():
                 dev = KdcSim()
             else:
                 print(
-                    "Invalid product string (-P/--product), choose from tdc001, tpz001, or kdc101"
+                    "Invalid product string (-P/--product),"
+                    " choose from tdc001, tpz001, or kdc101"
                 )
                 sys.exit(1)
         else:
@@ -72,7 +75,8 @@ def main():
                 dev = Kdc(loop, args.device)
             else:
                 print(
-                    "Invalid product string (-P/--product), choose from tdc001, tpz001, or kdc101"
+                    "Invalid product string (-P/--product),"
+                    " choose from tdc001, tpz001, or kdc101"
                 )
                 sys.exit(1)
 

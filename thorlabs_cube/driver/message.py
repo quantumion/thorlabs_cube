@@ -1,5 +1,5 @@
-from enum import Enum
 import struct as st
+from enum import Enum
 
 
 class MGMSG(Enum):
@@ -171,13 +171,22 @@ class Message:
         if self.has_data:
             return (
                 st.pack(
-                    "<HHBB", self.id.value, len(self.data), self.dest | 0x80, self.src
+                    "<HHBB",
+                    self.id.value,
+                    len(self.data),
+                    self.dest | 0x80,
+                    self.src,
                 )
                 + self.data
-            ) 
+            )
         else:
             return st.pack(
-                "<HBBBB", self.id.value, self.param1, self.param2, self.dest, self.src
+                "<HBBBB",
+                self.id.value,
+                self.param1,
+                self.param2,
+                self.dest,
+                self.src,
             )
 
     @property

@@ -1,7 +1,7 @@
 import struct as st
 
 from thorlabs_cube.driver.base import _Cube
-from thorlabs_cube.driver.message import MGMSG, MsgError, Message
+from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
 
 class Tpz(_Cube):
@@ -27,7 +27,10 @@ class Tpz(_Cube):
         elif msg_id == MGMSG.HW_RICHRESPONSE:
             (code,) = st.unpack("<H", data[2:4])
             raise MsgError(
-                "Hardware error {}: {}".format(code, data[4:].decode(encoding="ascii"))
+                "Hardware error {}: {}".format(
+                    code,
+                    data[4:].decode(encoding="ascii"),
+                )
             )
 
     async def set_position_control_mode(self, control_mode):
@@ -253,7 +256,13 @@ class Tpz(_Cube):
         return index, output * self.voltage_limit / 32767
 
     async def set_output_lut_parameters(
-        self, mode, cycle_length, num_cycles, delay_time, precycle_rest, postcycle_rest
+        self,
+        mode,
+        cycle_length,
+        num_cycles,
+        delay_time,
+        precycle_rest,
+        postcycle_rest,
     ):
         """Set Waveform Generator Mode parameters.
 
@@ -502,7 +511,13 @@ class TpzSim:
         return 0, 0  # FIXME: the API description here doesn't make any sense
 
     def set_output_lut_parameters(
-        self, mode, cycle_length, num_cycles, delay_time, precycle_rest, postcycle_rest
+        self,
+        mode,
+        cycle_length,
+        num_cycles,
+        delay_time,
+        precycle_rest,
+        postcycle_rest,
     ):
         self.mode = mode
         self.cycle_length = cycle_length
@@ -518,7 +533,7 @@ class TpzSim:
             self.num_cycles,
             self.delay_time,
             self.precycle_rest,
-            self.postcycle_rest
+            self.postcycle_rest,
         )
 
     def start_lut_output(self):

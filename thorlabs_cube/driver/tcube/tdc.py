@@ -1,7 +1,7 @@
 import struct as st
 
 from thorlabs_cube.driver.base import _Cube
-from thorlabs_cube.driver.message import MGMSG, MsgError, Message
+from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
 
 class Tdc(_Cube):
@@ -37,7 +37,10 @@ class Tdc(_Cube):
             else:
                 self.status_report_counter += 1
             # 'r' is a currently unused and reserved field
-            self.position, self.velocity, r, self.status = st.unpack("<LHHL", data[2:])
+            self.position, self.velocity, r, self.status = st.unpack(
+                "<LHHL",
+                data[2:],
+            )
 
     async def is_moving(self):
         status_bits = await self.get_status_bits()
@@ -45,7 +48,7 @@ class Tdc(_Cube):
 
     async def set_pot_parameters(
         self, zero_wnd, vel1, wnd1, vel2, wnd2, vel3, wnd3, vel4
-        ):
+    ):
         """Set pot parameters.
 
         :param zero_wnd: The deflection from the mid position (in ADC counts
@@ -153,8 +156,9 @@ class Tdc(_Cube):
         )
         return st.unpack("<LL", get_msg.data[6:])
 
-    async def set_jog_parameters(self, mode, step_size, acceleration,
-                                 max_velocity, stop_mode):
+    async def set_jog_parameters(
+        self, mode, step_size, acceleration, max_velocity, stop_mode
+    ):
         """Set the velocity jog parameters.
 
         :param mode: 1 for continuous jogging, 2 for single step jogging.
@@ -165,8 +169,16 @@ class Tdc(_Cube):
         :param stop_mode: 1 for immediate (abrupt) stop, 2 for profiled stop
             (with controlled deceleration).
         """
-        payload = st.pack("<HHLLLLH", 1, mode, step_size, 0, acceleration,
-                          max_velocity, stop_mode)
+        payload = st.pack(
+            "<HHLLLLH",
+            1,
+            mode,
+            step_size,
+            0,
+            acceleration,
+            max_velocity,
+            stop_mode,
+        )
         await self.send(Message(MGMSG.MOT_SET_JOGPARAMS, data=payload))
 
     async def get_jog_parameters(self):
@@ -176,10 +188,12 @@ class Tdc(_Cube):
             step_size, acceleration, max_velocity, stop_mode
         :rtype: A 5 int tuple.
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_JOGPARAMS,
-                                          [MGMSG.MOT_GET_JOGPARAMS], 1)
-        (jog_mode, step_size, _, acceleration, max_velocity,
-         stop_mode) = st.unpack("<HLLLLH", get_msg.data[2:])
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_JOGPARAMS, [MGMSG.MOT_GET_JOGPARAMS], 1
+        )
+        (jog_mode, step_size, _, acceleration, max_velocity, stop_mode) = st.unpack(
+            "<HLLLLH", get_msg.data[2:]
+        )
         return jog_mode, step_size, acceleration, max_velocity, stop_mode
 
     async def set_gen_move_parameters(self, backlash_distance):
@@ -197,8 +211,9 @@ class Tdc(_Cube):
         :return: The value of the backlash distance.
         :rtype: int
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_GENMOVEPARAMS,
-                                          [MGMSG.MOT_GET_GENMOVEPARAMS], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_GENMOVEPARAMS, [MGMSG.MOT_GET_GENMOVEPARAMS], 1
+        )
         return st.unpack("<l", get_msg.data[2:])[0]
 
     async def set_move_relative_parameters(self, relative_distance):
@@ -217,8 +232,9 @@ class Tdc(_Cube):
         :return: The relative distance move parameter.
         :rtype: int
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_MOVERELPARAMS,
-                                          [MGMSG.MOT_GET_MOVERELPARAMS], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_MOVERELPARAMS, [MGMSG.MOT_GET_MOVERELPARAMS], 1
+        )
         return st.unpack("<l", get_msg.data[2:])[0]
 
     async def set_move_absolute_parameters(self, absolute_position):
@@ -237,8 +253,9 @@ class Tdc(_Cube):
         :return: The absolute position to move.
         :rtype: int
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_MOVEABSPARAMS,
-                                          [MGMSG.MOT_GET_MOVEABSPARAMS], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_MOVEABSPARAMS, [MGMSG.MOT_GET_MOVEABSPARAMS], 1
+        )
         return st.unpack("<l", get_msg.data[2:])[0]
 
     async def set_home_parameters(self, home_velocity):
@@ -255,8 +272,9 @@ class Tdc(_Cube):
         :return: The homing velocity.
         :rtype: int
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_HOMEPARAMS,
-                                          [MGMSG.MOT_GET_HOMEPARAMS], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_HOMEPARAMS, [MGMSG.MOT_GET_HOMEPARAMS], 1
+        )
         return st.unpack("<L", get_msg.data[6:10])[0]
 
     async def move_home(self):
@@ -264,12 +282,20 @@ class Tdc(_Cube):
 
         This call is blocking until device is homed or move is stopped.
         """
-        await self.send_request(MGMSG.MOT_MOVE_HOME,
-                                [MGMSG.MOT_MOVE_HOMED, MGMSG.MOT_MOVE_STOPPED],
-                                1)
+        await self.send_request(
+            MGMSG.MOT_MOVE_HOME,
+            [MGMSG.MOT_MOVE_HOMED, MGMSG.MOT_MOVE_STOPPED],
+            1,
+        )
 
-    async def set_limit_switch_parameters(self, cw_hw_limit, ccw_hw_limit,
-            cw_sw_limit=0, ccw_sw_limit=0, sw_limit_mode=0x1):
+    async def set_limit_switch_parameters(
+        self,
+        cw_hw_limit,
+        ccw_hw_limit,
+        cw_sw_limit=0,
+        ccw_sw_limit=0,
+        sw_limit_mode=0x1,
+    ):
         """Set the limit switch parameters.
 
         :param cw_hw_limit: The operation of clockwise hardware limit switch
@@ -310,8 +336,15 @@ class Tdc(_Cube):
             0x80 Rotation Stage Limit (bitwise OR'd with one of the settings
             above) (Not applicable to TDC001 units)
         """
-        payload = st.pack("<HHHLLH", 1, cw_hw_limit, ccw_hw_limit,
-                          cw_sw_limit, ccw_sw_limit, sw_limit_mode)
+        payload = st.pack(
+            "<HHHLLH",
+            1,
+            cw_hw_limit,
+            ccw_hw_limit,
+            cw_sw_limit,
+            ccw_sw_limit,
+            sw_limit_mode,
+        )
         await self.send(Message(MGMSG.MOT_SET_LIMSWITCHPARAMS, data=payload))
 
     async def get_limit_switch_parameters(self):
@@ -325,8 +358,9 @@ class Tdc(_Cube):
          method.
         :rtype: A 5 int tuple.
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_LIMSWITCHPARAMS,
-                                          [MGMSG.MOT_GET_LIMSWITCHPARAMS], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_LIMSWITCHPARAMS, [MGMSG.MOT_GET_LIMSWITCHPARAMS], 1
+        )
         return st.unpack("<HHLLH", get_msg.data[2:])
 
     async def move_relative_memory(self):
@@ -337,10 +371,11 @@ class Tdc(_Cube):
         <Tdc.set_move_relative_parameters>`
         command.
         """
-        await self.send_request(MGMSG.MOT_MOVE_RELATIVE,
-                                [MGMSG.MOT_MOVE_COMPLETED,
-                                 MGMSG.MOT_MOVE_STOPPED],
-                                1)
+        await self.send_request(
+            MGMSG.MOT_MOVE_RELATIVE,
+            [MGMSG.MOT_MOVE_COMPLETED, MGMSG.MOT_MOVE_STOPPED],
+            1,
+        )
 
     async def move_relative(self, relative_distance):
         """Start a relative move
@@ -349,10 +384,11 @@ class Tdc(_Cube):
             counts.
         """
         payload = st.pack("<Hl", 1, relative_distance)
-        await self.send_request(MGMSG.MOT_MOVE_RELATIVE,
-                                [MGMSG.MOT_MOVE_COMPLETED,
-                                 MGMSG.MOT_MOVE_STOPPED],
-                                data=payload)
+        await self.send_request(
+            MGMSG.MOT_MOVE_RELATIVE,
+            [MGMSG.MOT_MOVE_COMPLETED, MGMSG.MOT_MOVE_STOPPED],
+            data=payload,
+        )
 
     async def move_absolute_memory(self):
         """Start an absolute move of distance in the controller's memory.
@@ -362,10 +398,11 @@ class Tdc(_Cube):
         <Tdc.set_move_absolute_parameters>`
         command.
         """
-        await self.send_request(MGMSG.MOT_MOVE_ABSOLUTE,
-                                [MGMSG.MOT_MOVE_COMPLETED,
-                                 MGMSG.MOT_MOVE_STOPPED],
-                                param1=1)
+        await self.send_request(
+            MGMSG.MOT_MOVE_ABSOLUTE,
+            [MGMSG.MOT_MOVE_COMPLETED, MGMSG.MOT_MOVE_STOPPED],
+            param1=1,
+        )
 
     async def move_absolute(self, absolute_distance):
         """Start an absolute move.
@@ -375,20 +412,23 @@ class Tdc(_Cube):
             counts.
         """
         payload = st.pack("<Hl", 1, absolute_distance)
-        await self.send_request(MGMSG.MOT_MOVE_ABSOLUTE,
-                                [MGMSG.MOT_MOVE_COMPLETED,
-                                 MGMSG.MOT_MOVE_STOPPED],
-                                data=payload)
+        await self.send_request(
+            MGMSG.MOT_MOVE_ABSOLUTE,
+            [MGMSG.MOT_MOVE_COMPLETED, MGMSG.MOT_MOVE_STOPPED],
+            data=payload,
+        )
 
     async def move_jog(self, direction):
         """Start a jog move.
 
         :param direction: The direction to jog. 1 is forward, 2 is backward.
         """
-        await self.send_request(MGMSG.MOT_MOVE_JOG,
-                                [MGMSG.MOT_MOVE_COMPLETED,
-                                 MGMSG.MOT_MOVE_STOPPED],
-                                param1=1, param2=direction)
+        await self.send_request(
+            MGMSG.MOT_MOVE_JOG,
+            [MGMSG.MOT_MOVE_COMPLETED, MGMSG.MOT_MOVE_STOPPED],
+            param1=1,
+            param2=direction,
+        )
 
     async def move_velocity(self, direction):
         """Start a move.
@@ -403,8 +443,7 @@ class Tdc(_Cube):
         :param direction: The direction to jog: 1 to move forward, 2 to move
             backward.
         """
-        await self.send(Message(MGMSG.MOT_MOVE_VELOCITY, param1=1,
-                                param2=direction))
+        await self.send(Message(MGMSG.MOT_MOVE_VELOCITY, param1=1, param2=direction))
 
     async def move_stop(self, stop_mode):
         """Stop any type of motor move.
@@ -417,13 +456,21 @@ class Tdc(_Cube):
             to stop in a controlled (profiled) manner.
         """
         if await self.is_moving():
-            await self.send_request(MGMSG.MOT_MOVE_STOP,
-                                    [MGMSG.MOT_MOVE_STOPPED,
-                                     MGMSG.MOT_MOVE_COMPLETED],
-                                    1, stop_mode)
+            await self.send_request(
+                MGMSG.MOT_MOVE_STOP,
+                [MGMSG.MOT_MOVE_STOPPED, MGMSG.MOT_MOVE_COMPLETED],
+                1,
+                stop_mode,
+            )
 
-    async def set_dc_pid_parameters(self, proportional, integral, differential,
-                                    integral_limit, filter_control=0x0F):
+    async def set_dc_pid_parameters(
+        self,
+        proportional,
+        integral,
+        differential,
+        integral_limit,
+        filter_control=0x0F,
+    ):
         """Set the position control loop parameters.
 
         :param proportional: The proportional gain, values in range [0; 32767].
@@ -437,8 +484,15 @@ class Tdc(_Cube):
             setting the corresponding bit to 1. By default, all parameters are
             applied, and this parameter is set to 0x0F (1111).
         """
-        payload = st.pack("<HLLLLH", 1, proportional, integral,
-                          differential, integral_limit, filter_control)
+        payload = st.pack(
+            "<HLLLLH",
+            1,
+            proportional,
+            integral,
+            differential,
+            integral_limit,
+            filter_control,
+        )
         await self.send(Message(MGMSG.MOT_SET_DCPIDPARAMS, data=payload))
 
     async def get_dc_pid_parameters(self):
@@ -451,8 +505,9 @@ class Tdc(_Cube):
             for precise description.
         :rtype: A 5 int tuple.
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_DCPIDPARAMS,
-                                          [MGMSG.MOT_GET_DCPIDPARAMS], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_DCPIDPARAMS, [MGMSG.MOT_GET_DCPIDPARAMS], 1
+        )
         return st.unpack("<LLLLH", get_msg.data[2:])
 
     async def set_av_modes(self, mode_bits):
@@ -476,8 +531,11 @@ class Tdc(_Cube):
         :return: The LED indicator mode bits.
         :rtype: int
         """
-        get_msg = self.send_request(MGMSG.MOT_REQ_AVMODES,
-                                    [MGMSG.MOT_GET_AVMODES], 1)
+        get_msg = self.send_request(
+            MGMSG.MOT_REQ_AVMODES,
+            [MGMSG.MOT_GET_AVMODES],
+            1,
+        )
         return st.unpack("<H", get_msg.data[2:])[0]
 
     async def set_button_parameters(self, mode, position1, position2):
@@ -499,8 +557,7 @@ class Tdc(_Cube):
         :param position2: The position (in encoder counts) to which the motor
             will move when the bottom button is pressed.
         """
-        payload = st.pack("<HHllHH", 1, mode, position1, position2,
-                          0, 0)
+        payload = st.pack("<HHllHH", 1, mode, position1, position2, 0, 0)
         await self.send(Message(MGMSG.MOT_SET_BUTTONPARAMS, data=payload))
 
     async def get_button_parameters(self):
@@ -512,8 +569,9 @@ class Tdc(_Cube):
             for description.
         :rtype: A 3 int tuple
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_BUTTONPARAMS,
-                                          [MGMSG.MOT_GET_BUTTONPARAMS], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_BUTTONPARAMS, [MGMSG.MOT_GET_BUTTONPARAMS], 1
+        )
         return st.unpack("<Hll", get_msg.data[2:12])
 
     async def set_eeprom_parameters(self, msg_id):
@@ -534,8 +592,9 @@ class Tdc(_Cube):
             velocity, status bits.
         :rtype: A 3 int tuple
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_DCSTATUSUPDATE,
-                                          [MGMSG.MOT_GET_DCSTATUSUPDATE], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_DCSTATUSUPDATE, [MGMSG.MOT_GET_DCSTATUSUPDATE], 1
+        )
         pos, vel, _, stat = st.unpack("<LHHL", get_msg.data[2:])
         return pos, vel, stat
 
@@ -545,8 +604,9 @@ class Tdc(_Cube):
         :return: The motor status.
         :rtype:
         """
-        get_msg = await self.send_request(MGMSG.MOT_REQ_STATUSBITS,
-                                          [MGMSG.MOT_GET_STATUSBITS], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_STATUSBITS, [MGMSG.MOT_GET_STATUSBITS], 1
+        )
         return st.unpack("<L", get_msg.data[2:])[0]
 
     async def suspend_end_of_move_messages(self):
@@ -572,6 +632,7 @@ class Tdc(_Cube):
         """
         await self.send(Message(MGMSG.MOT_RESUME_ENDOFMOVEMSGS))
 
+
 class TdcSim:
     def close(self):
         pass
@@ -579,8 +640,17 @@ class TdcSim:
     def module_identify(self):
         pass
 
-    def set_pot_parameters(self, zero_wnd, vel1, wnd1, vel2, wnd2, vel3,
-                           wnd3, vel4):
+    def set_pot_parameters(
+        self,
+        zero_wnd,
+        vel1,
+        wnd1,
+        vel2,
+        wnd2,
+        vel3,
+        wnd3,
+        vel4,
+    ):
         self.zero_wnd = zero_wnd
         self.vel1 = vel1
         self.wnd1 = wnd1
@@ -591,8 +661,16 @@ class TdcSim:
         self.vel4 = vel4
 
     def get_pot_parameters(self):
-        return (self.zero_wnd, self.vel1, self.wnd1, self.vel2, self.wnd2,
-                self.vel3, self.wnd3, self.vel4)
+        return (
+            self.zero_wnd,
+            self.vel1,
+            self.wnd1,
+            self.vel2,
+            self.wnd2,
+            self.vel3,
+            self.wnd3,
+            self.vel4,
+        )
 
     def hub_get_bay_used(self):
         return False
@@ -616,8 +694,9 @@ class TdcSim:
     def get_velocity_parameters(self):
         return self.acceleration, self.max_velocity
 
-    def set_jog_parameters(self, mode, step_size, acceleration,
-                           max_velocity, stop_mode):
+    def set_jog_parameters(
+        self, mode, step_size, acceleration, max_velocity, stop_mode
+    ):
         self.jog_mode = mode
         self.step_size = step_size
         self.acceleration = acceleration
@@ -625,8 +704,13 @@ class TdcSim:
         self.stop_mode = stop_mode
 
     def get_jog_parameters(self):
-        return (self.jog_mode, self.step_size, self.acceleration,
-                self.max_velocity, self.stop_mode)
+        return (
+            self.jog_mode,
+            self.step_size,
+            self.acceleration,
+            self.max_velocity,
+            self.stop_mode,
+        )
 
     def set_gen_move_parameters(self, backlash_distance):
         self.backlash_distance = backlash_distance
@@ -655,8 +739,14 @@ class TdcSim:
     def move_home(self):
         pass
 
-    def set_limit_switch_parameters(self, cw_hw_limit, ccw_hw_limit,
-            cw_sw_limit=0, ccw_sw_limit=0, sw_limit_mode=0x1):
+    def set_limit_switch_parameters(
+        self,
+        cw_hw_limit,
+        ccw_hw_limit,
+        cw_sw_limit=0,
+        ccw_sw_limit=0,
+        sw_limit_mode=0x1,
+    ):
         self.cw_hw_limit = cw_hw_limit
         self.ccw_hw_limit = ccw_hw_limit
         self.cw_sw_limit = cw_sw_limit
@@ -664,8 +754,13 @@ class TdcSim:
         self.sw_limit_mode = sw_limit_mode
 
     def get_limit_switch_parameters(self):
-        return (self.cw_hw_limit, self.ccw_hw_limit, self.cw_sw_limit,
-                self.ccw_sw_limit, self.sw_limit_mode)
+        return (
+            self.cw_hw_limit,
+            self.ccw_hw_limit,
+            self.cw_sw_limit,
+            self.ccw_sw_limit,
+            self.sw_limit_mode,
+        )
 
     def move_relative_memory(self):
         pass
@@ -688,8 +783,14 @@ class TdcSim:
     def move_stop(self, stop_mode):
         pass
 
-    def set_dc_pid_parameters(self, proportional, integral, differential,
-                              integral_limit, filter_control=0x0F):
+    def set_dc_pid_parameters(
+        self,
+        proportional,
+        integral,
+        differential,
+        integral_limit,
+        filter_control=0x0F,
+    ):
         self.proportional = proportional
         self.integral = integral
         self.differential = differential
@@ -697,8 +798,13 @@ class TdcSim:
         self.filter_control = filter_control
 
     def get_dc_pid_parameters(self):
-        return (self.proportional, self.integral, self.differential,
-                self.integral_limit, self.filter_control)
+        return (
+            self.proportional,
+            self.integral,
+            self.differential,
+            self.integral_limit,
+            self.filter_control,
+        )
 
     def set_av_modes(self, mode_bits):
         self.mode_bits = mode_bits
