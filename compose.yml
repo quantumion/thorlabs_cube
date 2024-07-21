@@ -1,3 +1,4 @@
+---
 # builds and runs the thorlabs t/kcube control services
 name: ablation_aim
 
@@ -8,14 +9,15 @@ services:
     ports:
       - 3255:3255
     devices:
-     - /dev/kdc101_z:/dev/ttyUSB0
+      - /dev/kdc101_z:/dev/ttyUSB0
     networks:
       - thorlabs_cube
     build:
       context: ./
       dockerfile: ./Dockerfile
-    # to run in simulation mode, include "--simulation" in the entrypoint command after port number
-    entrypoint: [ "aqctl_thorlabs_cube"]
+    # to run in simulation mode, include "--simulation"
+    # in the entrypoint command after port number
+    entrypoint: ["aqctl_thorlabs_cube"]
     command: ["-p", "3255", "-P", "kdc101", "-d", "/dev/ttyUSB0", "--bind", "*"]
 
   y_control:
@@ -24,13 +26,13 @@ services:
     ports:
       - 3256:3255
     devices:
-     - /dev/kdc101_y:/dev/ttyUSB0
+      - /dev/kdc101_y:/dev/ttyUSB0
     networks:
       - thorlabs_cube
     build:
       context: ./
       dockerfile: ./Dockerfile
-    entrypoint: [ "aqctl_thorlabs_cube"]
+    entrypoint: ["aqctl_thorlabs_cube"]
     command: ["-p", "3255", "-P", "kdc101", "-d", "/dev/ttyUSB0", "--bind", "*"]
 
 networks:
