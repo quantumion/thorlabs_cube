@@ -26,7 +26,7 @@ jobs:
       - name: Setup and run black
         uses: psf/black@stable
         with:
-          options: "--check --verbose"
+          options: "--diff --verbose"
           src: "./thorlabs_cube"
       - name: Setup and run isort
         uses: isort/isort-action@master
