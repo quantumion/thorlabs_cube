@@ -17,7 +17,7 @@ class Kdc(Tdc):
         """Initialize from TDC001 control class"""
         super().__init__(loop, serial_dev)
 
-    async def handle_message(self, msg: MGMSG):
+    async def handle_message(self, msg: Message):
         """Parse messages from the device.
         Minor adaptation from TDC001 method."""
         msg_id = msg.id
@@ -359,8 +359,10 @@ class Kdc(Tdc):
             num_cycles,
         )
         await self.send(
-            Message(MGMSG.MOT_SET_KCUBEPOSTRIGPARAMS),
-            data=payload,
+            Message(
+                MGMSG.MOT_SET_KCUBEPOSTRIGPARAMS,
+                data=payload,
+            )
         )
 
     async def get_position_trigger_parameters(self):
