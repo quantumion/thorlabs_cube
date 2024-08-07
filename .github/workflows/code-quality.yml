@@ -24,16 +24,16 @@ jobs:
         uses: psf/black@stable
         with:
           options: "--check --diff --verbose"
-          src: "./thorlabs_cube"
+          src: "./src/thorlabs_cube"
       - name: Setup and run isort
         uses: isort/isort-action@master
         with:
           isortVersion: "5.13.2"
-          sortPaths: "./thorlabs_cube"
+          sortPaths: "./src/thorlabs_cube"
           configuration: "--check-only --diff --profile black --filter-files"
       - name: Setup and run flake8
         run: |
-          flake8 ./thorlabs_cube
+          flake8 ./src/thorlabs_cube
       - name: yamllint
         uses: karancode/yamllint-github-action@v2.1.1
 
@@ -51,4 +51,4 @@ jobs:
           python -m pip install mypy==1.10.0
       - name: Run mypy
         run: |
-          mypy ./thorlabs_cube --ignore-missing-imports
+          mypy ./src/thorlabs_cube --ignore-missing-imports
