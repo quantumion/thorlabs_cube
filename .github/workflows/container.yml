@@ -3,7 +3,7 @@ name: Container
 
 on:
   push:
-    branches: ["master", "4-cicd-init"]
+    branches: ["master"]
   pull_request:
     branches: ["master", "4-cicd-init"]
 
