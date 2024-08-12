@@ -1,11 +1,11 @@
 ---
 name: Documentation
 
-on:
+on:  # yamllint disable-line rule:truthy
   push:
     branches: ["master"]
   pull_request:
-    branches: ["master", "4-cicd-init"]
+    branches: ["master"]
 
 jobs:
   build:
