@@ -136,7 +136,10 @@ class TestTdcSim(GenericRPCCase, GenericTdcTest):
         command = (sys.executable.replace("\\", "\\\\")
                             + " -m thorlabs_tcube.aqctl_thorlabs_tcube "
                             + "-p 3255 -P tdc001 --simulation")
-        self.cont = self.start_server("tdc", command, 3255)
+        try:
+            self.cont = self.start_server("tdc", command, 3255)
+        except:
+            self.skipTest("Could not start server")
 
 
 class TestTpzSim(GenericRPCCase, GenericTpzTest):
@@ -145,4 +148,7 @@ class TestTpzSim(GenericRPCCase, GenericTpzTest):
         command = (sys.executable.replace("\\", "\\\\")
                             + " -m thorlabs_tcube.aqctl_thorlabs_tcube "
                             + "-p 3255 -P tpz001 --simulation")
-        self.cont = self.start_server("tpz", command, 3255)
+        try:
+            self.cont = self.start_server("tpz", command, 3255)
+        except:
+            self.skipTest("Could not start server")

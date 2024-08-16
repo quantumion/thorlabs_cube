@@ -1,5 +1,6 @@
-from enum import Enum
 import struct as st
+from enum import Enum
+
 
 class MGMSG(Enum):
     HW_DISCONNECT = 0x0002
@@ -134,8 +135,7 @@ class MsgError(Exception):
 
 
 class Message:
-    def __init__(self, id, param1=0, param2=0, dest=0x50, src=0x01,
-                 data=None):
+    def __init__(self, id, param1=0, param2=0, dest=0x50, src=0x01, data=None):
         if data is not None:
             dest |= 0x80
         self.id = id
@@ -146,30 +146,48 @@ class Message:
         self.data = data
 
     def __str__(self):
-        return ("<Message {} p1=0x{:02x} p2=0x{:02x} "
-                "dest=0x{:02x} src=0x{:02x}>".format(
-                    self.id, self.param1, self.param2,
-                    self.dest, self.src))
+        return (
+            "<Message {} p1=0x{:02x} p2=0x{:02x} "
+            "dest=0x{:02x} src=0x{:02x}>".format(
+                self.id, self.param1, self.param2, self.dest, self.src
+            )
+        )
 
     @staticmethod
     def unpack(data):
         id, param1, param2, dest, src = st.unpack("<HBBBB", data[:6])
         data = data[6:]
         if dest & 0x80:
-                if data and len(data) != param1 | (param2 << 8):
-                    raise ValueError("If data are provided, param1 and param2"
-                                     " should contain the data length")
+            if data and len(data) != param1 | (param2 << 8):
+                raise ValueError(
+                    "If data are provided, param1 and param2"
+                    " should contain the data length"
+                )
         else:
-                data = None
+            data = None
         return Message(MGMSG(id), param1, param2, dest, src, data)
 
     def pack(self):
         if self.has_data:
-            return st.pack("<HHBB", self.id.value, len(self.data),
-                           self.dest | 0x80, self.src) + self.data
+            return (
+                st.pack(
+                    "<HHBB",
+                    self.id.value,
+                    len(self.data),
+                    self.dest | 0x80,
+                    self.src,
+                )
+                + self.data
+            )
         else:
-            return st.pack("<HBBBB", self.id.value,
-                           self.param1, self.param2, self.dest, self.src)
+            return st.pack(
+                "<HBBBB",
+                self.id.value,
+                self.param1,
+                self.param2,
+                self.dest,
+                self.src,
+            )
 
     @property
     def has_data(self):

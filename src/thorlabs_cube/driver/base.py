@@ -1,13 +1,13 @@
-import logging
 import asyncio
+import logging
 import struct as st
 
 import asyncserial
 
-from thorlabs_cube.driver.message import MGMSG, MsgError, Message
-
+from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
 logger = logging.getLogger(__name__)
+
 
 class _Cube:
     def __init__(self, loop, serial_dev):
@@ -26,7 +26,7 @@ class _Cube:
         logger.debug("received header: %s", header)
         data = b""
         if header[4] & 0x80:
-            (length, ) = st.unpack("<H", header[2:4])
+            (length,) = st.unpack("<H", header[2:4])
             data = await self.port.read(num_bytes=length)
         r = Message.unpack(header + data)
         logger.debug("receiving: %s", r)
@@ -36,8 +36,9 @@ class _Cube:
         # derived classes must implement this
         raise NotImplementedError
 
-    async def send_request(self, msgreq_id, wait_for_msgs, param1=0, param2=0,
-                           data=None):
+    async def send_request(
+        self, msgreq_id, wait_for_msgs, param1=0, param2=0, data=None
+    ):
         await self.send(Message(msgreq_id, param1, param2, data=data))
         msg = None
         while msg is None or msg.id not in wait_for_msgs:
@@ -56,20 +57,24 @@ class _Cube:
         else:
             activated = 2
 
-        await self.send(Message(MGMSG.MOD_SET_CHANENABLESTATE, param1=1,
-                        param2=activated))
+        await self.send(
+            Message(MGMSG.MOD_SET_CHANENABLESTATE, param1=1, param2=activated)
+        )
 
     async def get_channel_enable_state(self):
-        get_msg = await self.send_request(MGMSG.MOD_REQ_CHANENABLESTATE,
-                                          [MGMSG.MOD_GET_CHANENABLESTATE], 1)
+        get_msg = await self.send_request(
+            MGMSG.MOD_REQ_CHANENABLESTATE, [MGMSG.MOD_GET_CHANENABLESTATE], 1
+        )
         self.chan_enabled = get_msg.param2
         if self.chan_enabled == 1:
             self.chan_enabled = True
         elif self.chan_enabled == 2:
             self.chan_enabled = False
         else:
-            raise MsgError("Channel state response is invalid: neither "
-                           "1 nor 2: {}".format(self.chan_enabled))
+            raise MsgError(
+                "Channel state response is invalid: neither "
+                "1 nor 2: {}".format(self.chan_enabled)
+            )
         return self.chan_enabled
 
     async def module_identify(self):
@@ -95,8 +100,7 @@ class _Cube:
         await self.send(Message(MGMSG.HW_STOP_UPDATEMSGS))
 
     async def hardware_request_information(self):
-        return await self.send_request(MGMSG.HW_REQ_INFO,
-                                       [MGMSG.HW_GET_INFO])
+        return await self.send_request(MGMSG.HW_REQ_INFO, [MGMSG.HW_GET_INFO])
 
     def is_channel_enabled(self):
         return self.chan_enabled
@@ -106,7 +110,7 @@ class _Cube:
             await self.hardware_request_information()
         except asyncio.CancelledError:
             raise
-        except:
+        except Exception:
             logger.warning("ping failed", exc_info=True)
             return False
         return True
