@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""NDSP entrypoint script that initializes the device and start the control server"""
 
 import argparse
 import asyncio
@@ -88,7 +89,7 @@ def main():
                 loop=loop,
             )
         finally:
-            dev.close()
+            loop.run_until_complete(dev.close())
     finally:
         loop.close()
 
