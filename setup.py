@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="thorlabs_cube",
-    version="0.0.1",
+    version="0.0.2",
     url="https://github.com/quantumion/thorlabs_cube",
     description="ARTIQ controller for Thorlabs T/KCube devices",
     install_requires=[
