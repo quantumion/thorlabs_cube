@@ -53,19 +53,29 @@ class Tsc(_Cube):
     def hardware_stop_update_messages(self):
         return super().hardware_stop_update_messages()
     
+    def hardware_request_information(self):
+        return super().hardware_request_information() #need to change serialization format but should work after that
+    
     def is_channel_enabled(self):
         return super().is_channel_enabled()
     
     def ping(self):
         return super().ping()
     
+    async def set_channel_enable_state(self, activated):
+        return await super().set_channel_enable_state(activated)
+    
+    async def get_channel_enable_state(self):
+        return await super().get_channel_enable_state()
+    
     # functions from base class definition end
 
-    async def identify_used_bay(self):
+
+    async def get_bay_used(self):
         get_msg = await self.send_request(
-            MGMSG.HUB_REQ_BAYUSED, [MGMSG.MOT_GET_POSCOUNTER], 1
+            MGMSG.HUB_REQ_BAYUSED, [MGMSG.HUB_GET_BAYUSED], 1
         )
-        return st.unpack("<l", get_msg.id[2:])[0] #should give us the bay ident within the header
+        return 
     
 
     async def set_absolute_position(self, absolute_position):
@@ -112,18 +122,14 @@ class Tsc(_Cube):
         :return: The LED mode bits.
         """
         
-        #need to ask collin if I am doing this explicity and packing the channel identification or am I just putting a '1' since single channel
-        payload = st.pack("<H", 1)
-        
         # Send the request to get the current AV modes for the specified channel
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_AVMODES, 
             [MGMSG.MOT_GET_AVMODES], 
-            data=payload
+            1
         )
-        
-        # Unpack the ModeBits from the response
-        mode_bits = st.unpack("<l", get_msg.data[2:6])[0]
+    
+        mode_bits = get_msg.data[2:]
         return mode_bits
 
     async def set_button_parameters(self, mode, position1, position2, timeout1, timeout2):
