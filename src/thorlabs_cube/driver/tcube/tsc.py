@@ -164,10 +164,26 @@ class Tsc(_Cube):
             1
         )
         
-        # Unpack the response data (channel identity,mode, position1, position2, timeout1, timeout2)
+        # Unpack the response data (mode, position1, position2, timeout1, timeout2)
         mode, position1, position2, timeout1, timeout2 = st.unpack("<HllHH", get_msg.data[2:])
         
         return mode, position1, position2, timeout1, timeout2
+
+    async def set_eeprom_parameters(self, msg_id):
+        """Save the current parameters for the specified message in the EEPROM.
+
+        This function sends a request to the device to save the parameter settings 
+        of the specified message to the EEPROM memory, ensuring the settings are 
+        retained even after the device is powered off.
+
+        :param msg_id: The message ID of the message containing the parameters 
+                       that need to be saved in the EEPROM.
+        """
+
+        payload = st.pack("<HH",1,msg_id)
+
+        await self.send(Message(MGMSG.MOT_SET_EEPROMPARAMS,data=payload))
+
 
     async def set_sol_operating_mode(self, operating_mode):
         """Set the solenoid operating mode for the single channel.
