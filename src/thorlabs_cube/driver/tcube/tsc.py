@@ -68,8 +68,6 @@ class Tsc(_Cube):
         return st.unpack("<l", get_msg.id[2:])[0] #should give us the bay ident within the header
     
 
-    import struct as st
-
     async def set_absolute_position(self, absolute_position):
         """Move the motor to an absolute position.
         
