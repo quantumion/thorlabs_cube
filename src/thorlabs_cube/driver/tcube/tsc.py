@@ -3,6 +3,7 @@ import struct as st
 from thorlabs_cube.driver.base import _Cube
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
+_CHANNEL = 0x01
 
 class Tsc(_Cube):
     """TSC001 T-Cube Motor Controller class"""
@@ -75,7 +76,9 @@ class Tsc(_Cube):
         get_msg = await self.send_request(
             MGMSG.HUB_REQ_BAYUSED, [MGMSG.HUB_GET_BAYUSED], 1
         )
-        return 
+        
+        used_bay_ident = get_msg.id[2]
+        return used_bay_ident
     
 
     async def set_absolute_position(self, absolute_position):
@@ -143,7 +146,7 @@ class Tsc(_Cube):
         """
         
         # Pack the channel ID, mode, position1, position2, timeout1, and timeout2
-        payload = st.pack("<Hhlhlhl", 1, mode, position1, position2, timeout1, timeout2)
+        payload = st.pack("<HHllHH", 1, mode, position1, position2, timeout1, timeout2)
         
         # Send the message with the packed payload for MOT_SET_BUTTONPARAMS (0x04B6)
         await self.send(Message(MGMSG.MOT_SET_BUTTONPARAMS, data=payload))
@@ -154,18 +157,15 @@ class Tsc(_Cube):
         :return: A tuple containing (mode, position1, position2, timeout1, timeout2)
         """
         
-        # Pack the Channel ID for the request payload
-        payload = st.pack("<H", 1)
-        
         # Send the request for button parameters (MOT_REQ_BUTTONPARAMS 0x04B7)
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_BUTTONPARAMS,
             [MGMSG.MOT_GET_BUTTONPARAMS],
-            data=payload
+            1
         )
         
-        # Unpack the response data (mode, position1, position2, timeout1, timeout2)
-        mode, position1, position2, timeout1, timeout2 = st.unpack("<hlhlhl", get_msg.data[2:])
+        # Unpack the response data (channel identity,mode, position1, position2, timeout1, timeout2)
+        mode, position1, position2, timeout1, timeout2 = st.unpack("<HllHH", get_msg.data[2:])
         
         return mode, position1, position2, timeout1, timeout2
 
