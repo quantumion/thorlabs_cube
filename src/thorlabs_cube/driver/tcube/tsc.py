@@ -45,7 +45,7 @@ class Tsc(_Cube):
     # functions from base class definition start
     
     def module_identify(self):
-        pass
+        return super().module_identify()
     
     def hardware_start_update_messages(self, update_rate):
         return super().hardware_start_update_messages(update_rate)
@@ -168,11 +168,9 @@ class Tsc(_Cube):
 
         :param operating_mode: The operating mode to set (e.g., 1, 2, etc.).
         """
-        # Pack the fixed channel ID (1) and the operating mode
-        payload = st.pack("<BB", 1, operating_mode)
 
         # Send the message with the packed payload
-        await self.send(Message(MGMSG.MOT_SET_SOL_OPERATINGMODE, data=payload))
+        await self.send(Message(MGMSG.MOT_SET_SOL_OPERATINGMODE, param2=operating_mode))
 
 
     async def get_sol_operating_mode(self):
