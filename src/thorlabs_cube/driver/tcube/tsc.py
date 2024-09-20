@@ -44,7 +44,6 @@ class Tsc(_Cube):
                 data[2:], 
             )
 
-    # functions from base class definition start
     
     def module_identify(self):
         return super().module_identify()
@@ -56,7 +55,7 @@ class Tsc(_Cube):
         return super().hardware_stop_update_messages()
     
     def hardware_request_information(self):
-        return super().hardware_request_information() #need to change serialization format but should work after that
+        return super().hardware_request_information() #FIXME->need to change serialization format but should work after that
     
     def is_channel_enabled(self):
         return super().is_channel_enabled()
@@ -74,6 +73,11 @@ class Tsc(_Cube):
 
 
     async def get_bay_used(self):
+        """Identify which bay is being used by the controller on Thorlabs Hub
+        
+        :param absolute_position: The absolute position in encoder counts.
+                                E.g., 200,000 counts for 10 mm.
+        """
         get_msg = await self.send_request(
             MGMSG.HUB_REQ_BAYUSED, [MGMSG.HUB_GET_BAYUSED], 1
         )
@@ -172,7 +176,6 @@ class Tsc(_Cube):
             1
         )
         
-        # Unpack the response data (mode, position1, position2, timeout1, timeout2)
         mode, position1, position2, timeout1, timeout2 = st.unpack("<HllHH", get_msg.data[2:])
         
         return mode, position1, position2, timeout1, timeout2
@@ -193,6 +196,13 @@ class Tsc(_Cube):
         await self.send(Message(MGMSG.MOT_SET_EEPROMPARAMS,data=payload))
 
     async def get_status_update(self):
+        """Returns a status update on the specified motor channel
+        
+        This function sends a request to the device to return status updates of
+        position, encoder count, status bits on channel one as well as, for future use,
+        returns channel identity two and its associated data which is garbage right now
+    
+        """
 
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_STATUSUPDATE,
@@ -257,7 +267,6 @@ class Tsc(_Cube):
             data=payload
         )
         
-        # Unpack the OnTime, OffTime, and NumCycles from the response
         on_time, off_time, num_cycles = st.unpack("<LLL", get_msg.data[2:])
         
         return on_time, off_time, num_cycles
@@ -364,7 +373,7 @@ class TscSim():
     def set_eeprom_parameters(self, msg_id):
         self.msg_id = msg_id
 
-    def get_status_update(self):
+    def get_status_update(self): #TODO: not implemented yet for simulation, need to make the framework to mock this data
         return (
             self.position,
             self.encoder_count,
