@@ -4,6 +4,7 @@ from thorlabs_cube.driver.base import _Cube
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
 _CHANNEL = 0x01
+_RESERVED = 0x00
 
 class Tsc(_Cube):
     """TSC001 T-Cube Motor Controller class"""
@@ -31,6 +32,7 @@ class Tsc(_Cube):
             msg_id == MGMSG.MOT_MOVE_COMPLETED
             or msg_id == MGMSG.MOT_MOVE_STOPPED
             # might need to add one more check, yet to determine
+            #ATTENTION: OVER HERE YOU GOTTA USE THE MOT_GET_STATUSUPDATE
         ):
             if self.status_report_counter == 25:
                 self.status_report_counter = 0
@@ -40,7 +42,7 @@ class Tsc(_Cube):
             # # 'r' is a currently unused and reserved field
             # self.position, self.velocity, r, self.status = st.unpack(
             #     "<LHHL",
-            #     data[2:],
+            #     data[2:], 
             # )
 
     # functions from base class definition start
@@ -77,7 +79,7 @@ class Tsc(_Cube):
             MGMSG.HUB_REQ_BAYUSED, [MGMSG.HUB_GET_BAYUSED], 1
         )
         
-        used_bay_ident = get_msg.id[2]
+        used_bay_ident = get_msg.param1
         return used_bay_ident
     
 
@@ -184,6 +186,19 @@ class Tsc(_Cube):
 
         await self.send(Message(MGMSG.MOT_SET_EEPROMPARAMS,data=payload))
 
+    async def get_status_update(self):
+
+        get_msg = await self.send_request(
+            MGMSG.MOT_REQ_STATUSUPDATE,
+            [MGMSG.MOT_GET_STATUSUPDATE],
+            _CHANNEL
+        )
+
+        position,encoder_count,status_bits, chan_identity_two, _RESERVED, _RESERVED, _RESERVED = st.unpack("<HIIIHIII",get_msg.data[2:])
+
+        return position, encoder_count, status_bits, chan_identity_two
+    
+        #need to test this on the container with devices connected
 
     async def set_sol_operating_mode(self, operating_mode):
         """Set the solenoid operating mode for the single channel.
@@ -203,7 +218,6 @@ class Tsc(_Cube):
             [MGMSG.MOT_GET_SOL_OPERATINGMODE], 
             param1=1  # Fixed channel ID
         )
-        
         # The returned mode is in param2
         return get_msg.param2
     
@@ -251,7 +265,7 @@ class Tsc(_Cube):
         """
         
         # Send the message with Channel ID in param1 and Interlock Mode in param2
-        await self.send(Message(MGMSG.MOT_SET_SOL_INTERLOCKMODE, param1=1, param2=mode))
+        await self.send(Message(MGMSG.MOT_SET_SOL_INTERLOCKMODE, param2=mode))
 
     async def get_sol_interlock_mode(self):
         """Get the current solenoid interlock mode.
@@ -267,9 +281,10 @@ class Tsc(_Cube):
             [MGMSG.MOT_GET_SOL_INTERLOCKMODE],
             param1=1
         )
+
+        interlock_mode = get_msg.param2
         
-        # Return the interlock mode from param2
-        return get_msg.param2
+        return interlock_mode
 
     async def set_sol_state(self, state):
         """Set the solenoid state (ON or OFF).
@@ -280,7 +295,7 @@ class Tsc(_Cube):
         """
         
         # Send the message with Channel ID in param1 and State in param2
-        await self.send(Message(MGMSG.MOT_SET_SOL_STATE, param1=1, param2=state))
+        await self.send(Message(MGMSG.MOT_SET_SOL_STATE, param2=state))
 
     async def get_sol_state(self):
         """Get the current solenoid state.
@@ -304,4 +319,87 @@ class Tsc(_Cube):
 
 
 class TscSim():
-    pass
+    def module_identify(self):
+        pass
+
+    def get_bay_used(self):
+        return False
+    
+    def set_absolute_position(self, absolute_position):
+        self.absolute_position = absolute_position
+
+    def move_stop(self, stop_mode):
+        self.stop_mode = stop_mode
+
+    def set_av_modes(self, mode_bits):
+        self.mode_bits = mode_bits
+
+    def get_av_modes(self):
+        return (
+            self.mode_bits
+        )
+    
+    def set_button_parameters(self, mode, position1, position2, timeout1, timeout2):
+        self.mode = mode
+        self.position1 = position1
+        self.position2 = position2
+        self.timeout1 = timeout1
+        self.timeout2 = timeout2
+
+    def get_button_parameters(self):
+        return (
+            self.mode,
+            self.position1,
+            self.position2,
+            self.timeout1,
+            self.timeout2
+        )
+
+    def set_eeprom_parameters(self, msg_id):
+        self.msg_id = msg_id
+
+    def get_status_update(self):
+        return (
+            self.position,
+            self.encoder_count,
+            self.status_bits,
+            self.chan_identity_two
+        )
+
+    def set_sol_operating_mode(self, operating_mode):
+        self.operating_mode = operating_mode
+
+    def get_sol_operating_mode(self):
+        return (
+            self.operating_mode
+        )
+
+    def set_solenoid_cycle_parameters(self, on_time, off_time, num_cycles):
+        self.on_time = on_time
+        self.off_time = off_time
+        self.num_cycles = num_cycles
+
+    def get_solenoid_cycle_parameters(self):
+        return (
+            self.on_time,
+            self.off_time,
+            self.num_cycles
+        )
+
+    def set_sol_interlock_mode(self, mode):
+        self.interlock_mode = mode
+
+    def get_sol_interlock_mode(self):
+        return (
+            self.interlock_mode
+        )
+
+    def set_sol_state(self, state):
+        self.sol_state = state
+
+    def get_sol_state(self):
+        return (
+            self.sol_state
+        )
+
+
