@@ -30,20 +30,19 @@ class Tsc(_Cube):
             )
         elif (
             msg_id == MGMSG.MOT_MOVE_COMPLETED
-            or msg_id == MGMSG.MOT_MOVE_STOPPED
-            # might need to add one more check, yet to determine
-            #ATTENTION: OVER HERE YOU GOTTA USE THE MOT_GET_STATUSUPDATE
+            or msg_id == MGMSG.MOT_MOVE_STOP
+            or msg_id == MGMSG.MOT_GET_STATUSUPDATE
+
         ):
             if self.status_report_counter == 25:
                 self.status_report_counter = 0
                 await self.send(Message(MGMSG.MOT_MOVE_COMPLETED))
-            # else:
-            #     self.status_report_counter += 1
-            # # 'r' is a currently unused and reserved field
-            # self.position, self.velocity, r, self.status = st.unpack(
-            #     "<LHHL",
-            #     data[2:], 
-            # )
+            else:
+                self.status_report_counter += 1
+            self.position, self.encoder_count, self.status_bits, self.chan_identity_two, _RESERVED, _RESERVED, _RESERVED = st.unpack(
+                "<LLLHLLL",
+                data[2:], 
+            )
 
     # functions from base class definition start
     
@@ -93,7 +92,11 @@ class Tsc(_Cube):
         # Pack the Channel ID (2 bytes) and the Absolute Position (4 bytes)
         payload = st.pack("<Hl", 1, absolute_position)
         
-        await self.send(Message(MGMSG.MOT_MOVE_ABSOLUTE, data=payload))
+        await self.send_request(MGMSG.MOT_MOVE_ABSOLUTE,
+                                [MGMSG.MOT_MOVE_COMPLETED, MGMSG.MOT_MOVE_STOPPED],
+                                data=payload)
+
+    
 
 
     async def move_stop(self, stop_mode):
@@ -103,7 +106,10 @@ class Tsc(_Cube):
         """
 
         # Send the message with the command ID (0x0465), and put channel ID in param1 and stop mode in param2
-        await self.send(Message(MGMSG.MOT_MOVE_STOP, param1=1, param2=stop_mode))
+        await self.send_request("<BB",MGMSG.MOT_MOVE_STOP,
+                                [MGMSG.MOT_MOVE_STOPPED],
+                                param1=_CHANNEL,
+                                param2=stop_mode)
 
 
     async def set_av_modes(self, mode_bits):
