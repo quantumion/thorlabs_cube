@@ -65,7 +65,9 @@ class Ksc(Tsc):
     async def get_kcubemmi_params(self):
         """Get the KCube MMI (joystick) parameters.
 
-        :return: A tuple containing the joystick mode, max velocity, acceleration, direction sense, preset positions, display settings, and joystick sensitivity.
+        :return: A tuple containing the joystick mode, max velocity, 
+        acceleration, direction sense, preset positions, display 
+        settings, and joystick sensitivity.
         """
 
         # Pack the Channel ID for the request payload
@@ -162,7 +164,9 @@ class Ksc(Tsc):
     async def get_kcubepostrig_params(self):
         """Get the KCube post-trigger parameters.
 
-        :return: A tuple containing (start_pos_fwd, interval_fwd, num_pulses_fwd, start_pos_rev, interval_rev, num_pulses_rev, pulse_width, num_cycles).
+        :return: A tuple containing (start_pos_fwd, interval_fwd, 
+        num_pulses_fwd, start_pos_rev, interval_rev, num_pulses_rev, 
+        pulse_width, num_cycles).
         """
 
         payload = st.pack("<H", _CHANNEL)
