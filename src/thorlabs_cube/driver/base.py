@@ -11,6 +11,12 @@ logger = logging.getLogger(__name__)
 
 class _Cube:
     def __init__(self, loop, serial_dev):
+        """Initialize the _Cube base class.
+
+        Parameters:
+            loop: The event loop to use for asynchronous operations.
+            serial_dev: The serial device (e.g., port) to connect to.
+        """
         self.port = asyncserial.Serial(loop, serial_dev, baudrate=115200, rtscts=True)
 
     async def close(self):
@@ -18,10 +24,22 @@ class _Cube:
         await self.port.close()
 
     async def send(self, message):
+        """Send a message to the device.
+
+        Parameters:
+            message (Message): The message object to send.
+        """
         logger.debug("sending: %s", message)
         await self.port.write(message.pack())
 
     async def recv(self):
+        """Receive a message from the device.
+
+        Waits for a message from the device, reads and unpacks it.
+
+        Returns:
+            Message: The message object received from the device.
+        """
         header = await self.port.read(num_bytes=6)
         logger.debug("received header: %s", header)
         data = b""
@@ -33,12 +51,36 @@ class _Cube:
         return r
 
     async def handle_message(self, msg):
+        """Handle an incoming message.
+
+        This method should be implemented by derived classes to process incoming messages.
+
+        Parameters:
+            msg (Message): The message object received from the device.
+
+        Raises:
+            NotImplementedError: If not implemented in derived class.
+        """
         # derived classes must implement this
         raise NotImplementedError
 
     async def send_request(
         self, msgreq_id, wait_for_msgs, param1=0, param2=0, data=None
     ):
+        """Send a request message and wait for a response.
+
+        Sends a request message and waits until a response with an expected message ID is received.
+
+        Parameters:
+            msgreq_id (MGMSG): The message ID to send as a request.
+            wait_for_msgs (list of MGMSG): A list of message IDs to wait for in the response.
+            param1 (int, optional): The first parameter for the message. Defaults to 0.
+            param2 (int, optional): The second parameter for the message. Defaults to 0.
+            data (bytes, optional): Any additional data to include in the message. Defaults to None.
+
+        Returns:
+            Message: The received message that matches one of the IDs in wait_for_msgs.
+        """
         await self.send(Message(msgreq_id, param1, param2, data=data))
         msg = None
         while msg is None or msg.id not in wait_for_msgs:
@@ -62,6 +104,16 @@ class _Cube:
         )
 
     async def get_channel_enable_state(self):
+        """Get the enable state of the channel.
+
+        Requests and retrieves the channel enable state from the device.
+
+        Returns:
+            bool: True if the channel is enabled, False if disabled.
+
+        Raises:
+            MsgError: If the response is invalid.
+        """
         get_msg = await self.send_request(
             MGMSG.MOD_REQ_CHANENABLESTATE, [MGMSG.MOD_GET_CHANENABLESTATE], 1
         )
@@ -100,12 +152,31 @@ class _Cube:
         await self.send(Message(MGMSG.HW_STOP_UPDATEMSGS))
 
     async def hardware_request_information(self):
+        """Request hardware information from the device.
+
+        Sends a request for hardware information and waits for the response.
+
+        Returns:
+            Message: The hardware information message received.
+        """
         return await self.send_request(MGMSG.HW_REQ_INFO, [MGMSG.HW_GET_INFO])
 
     def is_channel_enabled(self):
+        """Check if the channel is enabled.
+
+        Returns:
+            bool: The current enable state of the channel.
+        """
         return self.chan_enabled
 
     async def ping(self):
+        """Check if the device is responsive.
+
+        Attempts to communicate with the device to confirm it is responsive.
+
+        Returns:
+            bool: True if the device responded, False otherwise.
+        """
         try:
             await self.hardware_request_information()
         except asyncio.CancelledError:

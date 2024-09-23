@@ -11,10 +11,28 @@ class Tpz(_Cube):
     """
 
     def __init__(self, loop, serial_dev):
+        """Initialize the TPZ001 T-Cube Piezo Controller.
+
+        This constructor initializes the base class and sets up the voltage limit.
+
+        Parameters:
+            loop: The event loop to use for asynchronous operations.
+            serial_dev: The serial device to communicate with.
+        """
         _Cube.__init__(self, loop, serial_dev)
         self.voltage_limit = None
 
     async def handle_message(self, msg):
+        """Handle incoming messages from the device.
+
+        Processes incoming messages and handles hardware errors appropriately.
+
+        Parameters:
+            msg: The message object received from the device.
+
+        Raises:
+            MsgError: If a hardware error message is received.
+        """
         msg_id = msg.id
         data = msg.data
 
@@ -390,7 +408,7 @@ class Tpz(_Cube):
         return st.unpack("<H", get_msg.data)[0]
 
     async def set_tpz_io_settings(self, voltage_limit, hub_analog_input):
-        """Set various I/O settings."
+        """Set various I/O settings.
 
         :param voltage_limit: The piezo actuator connected to the T-Cube has a
             specific maximum operating voltage. This parameter sets the maximum
@@ -460,47 +478,133 @@ class Tpz(_Cube):
 
 class TpzSim:
     def __init__(self):
+        """Initialize the TpzSim simulation class.
+
+        Sets default values for voltage limit and hub analog input.
+        """
         self.voltage_limit = 150
         self.hub_analog_input = 1
+        self.control_mode = 0x01  # Default to Open Loop
+        self.voltage = 0
+        self.position_sw = 0
+        self.volt_src = 0x00  # Software only
+        self.prop_const = 0
+        self.int_const = 0
+        self.lut = [0] * 513  # Initialize LUT with zeros
+        self.mode = 0
+        self.cycle_length = 0
+        self.num_cycles = 0
+        self.delay_time = 0
+        self.precycle_rest = 0
+        self.postcycle_rest = 0
+        self.intensity = 0
 
     def close(self):
+        """Close the simulated device.
+
+        Performs any necessary cleanup operations.
+        """
         pass
 
     def module_identify(self):
+        """Identify the module.
+
+        Simulates the identification of the module.
+        """
         pass
 
     def set_position_control_mode(self, control_mode):
+        """Set the control loop mode in the simulation.
+
+        Parameters:
+            control_mode (int): The control mode to set.
+        """
         self.control_mode = control_mode
 
     def get_position_control_mode(self):
+        """Get the control loop mode from the simulation.
+
+        Returns:
+            int: The current control mode.
+        """
         return self.control_mode
 
     def set_output_volts(self, voltage):
+        """Set the output voltage in the simulation.
+
+        Parameters:
+            voltage (float): The voltage to set.
+        """
         self.voltage = voltage
 
     def get_output_volts(self):
+        """Get the output voltage from the simulation.
+
+        Returns:
+            float: The current output voltage.
+        """
         return self.voltage
 
     def set_output_position(self, position_sw):
+        """Set the output position in the simulation.
+
+        Parameters:
+            position_sw (int): The position to set.
+        """
         self.position_sw = position_sw
 
     def get_output_position(self):
+        """Get the output position from the simulation.
+
+        Returns:
+            int: The current output position.
+        """
         return self.position_sw
 
     def set_input_volts_source(self, volt_src):
+        """Set the input voltage source in the simulation.
+
+        Parameters:
+            volt_src (int): The voltage source setting.
+        """
         self.volt_src = volt_src
 
     def get_input_volts_source(self):
+        """Get the input voltage source from the simulation.
+
+        Returns:
+            int: The current voltage source setting.
+        """
         return self.volt_src
 
     def set_pi_constants(self, prop_const, int_const):
+        """Set the PI constants in the simulation.
+
+        Parameters:
+            prop_const (int): Proportional constant.
+            int_const (int): Integral constant.
+        """
         self.prop_const = prop_const
         self.int_const = int_const
 
     def get_pi_constants(self):
+        """Get the PI constants from the simulation.
+
+        Returns:
+            tuple: A tuple containing prop_const and int_const.
+        """
         return self.prop_const, self.int_const
 
     def set_output_lut(self, lut_index, output):
+        """Set a value in the output LUT in the simulation.
+
+        Parameters:
+            lut_index (int): Index in the LUT to set.
+            output (float): Output value to set at the index.
+
+        Raises:
+            ValueError: If lut_index is out of range.
+        """
         if lut_index < 0 or lut_index > 512:
             raise ValueError(
                 "LUT index should be in range [0;512] and not {}".format(lut_index)
@@ -508,7 +612,13 @@ class TpzSim:
         self.lut[lut_index] = output
 
     def get_output_lut(self):
-        return 0, 0  # FIXME: the API description here doesn't make any sense
+        """Get a value from the output LUT in the simulation.
+
+        Returns:
+            tuple: A tuple containing the lut index and output value.
+        """
+        # Since there's no specific index provided, return default values
+        return 0, self.lut[0]
 
     def set_output_lut_parameters(
         self,
@@ -519,6 +629,16 @@ class TpzSim:
         precycle_rest,
         postcycle_rest,
     ):
+        """Set the LUT output parameters in the simulation.
+
+        Parameters:
+            mode (int): The output mode.
+            cycle_length (int): The length of each cycle.
+            num_cycles (int): The number of cycles to output.
+            delay_time (int): The delay time between samples.
+            precycle_rest (int): Delay before starting the LUT output.
+            postcycle_rest (int): Delay after completing the LUT output.
+        """
         self.mode = mode
         self.cycle_length = cycle_length
         self.num_cycles = num_cycles
@@ -527,6 +647,11 @@ class TpzSim:
         self.postcycle_rest = postcycle_rest
 
     def get_output_lut_parameters(self):
+        """Get the LUT output parameters from the simulation.
+
+        Returns:
+            tuple: A tuple containing mode, cycle_length, num_cycles, delay_time, precycle_rest, postcycle_rest.
+        """
         return (
             self.mode,
             self.cycle_length,
@@ -537,25 +662,56 @@ class TpzSim:
         )
 
     def start_lut_output(self):
+        """Simulate starting the LUT output."""
         pass
 
     def stop_lut_output(self):
+        """Simulate stopping the LUT output."""
         pass
 
     def set_eeprom_parameters(self, msg_id):
+        """Simulate saving parameters to EEPROM.
+
+        Parameters:
+            msg_id (int): The message ID of the parameters to save.
+        """
         pass
 
     def set_tpz_display_settings(self, intensity):
+        """Set the display intensity in the simulation.
+
+        Parameters:
+            intensity (int): The intensity value to set (0 to 255).
+        """
         self.intensity = intensity
 
     def get_tpz_display_settings(self):
+        """Get the display intensity from the simulation.
+
+        Returns:
+            int: The current display intensity.
+        """
         return self.intensity
 
     def set_tpz_io_settings(self, voltage_limit, hub_analog_input):
+        """Set the I/O settings in the simulation.
+
+        Parameters:
+            voltage_limit (int): The voltage limit (75, 100, or 150).
+            hub_analog_input (int): The hub analog input setting.
+
+        Raises:
+            ValueError: If voltage_limit is invalid.
+        """
         if voltage_limit not in [75, 100, 150]:
             raise ValueError("voltage_limit must be 75 V, 100 V or 150 V")
         self.voltage_limit = voltage_limit
         self.hub_analog_input = hub_analog_input
 
     def get_tpz_io_settings(self):
+        """Get the I/O settings from the simulation.
+
+        Returns:
+            tuple: A tuple containing voltage_limit and hub_analog_input.
+        """
         return self.voltage_limit, self.hub_analog_input
