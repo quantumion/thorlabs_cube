@@ -131,7 +131,6 @@ class MGMSG(Enum):
     PZ_GET_TPZ_IOSETTINGS = 0x07D6
 
 
-
 class Direction:
     def __init__(self, direction):
         if direction not in (1, 2):
