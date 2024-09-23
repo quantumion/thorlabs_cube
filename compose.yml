@@ -41,7 +41,7 @@ services:
         ports:
             - 3256:3255
         devices:
-            - /dev/kpz101:/dev/ttyUSB1
+            - /dev/ttyUSB1
         networks:
             - thorlabs_cube
         build:

@@ -65,7 +65,7 @@ def main():
             else:
                 print(
                     "Invalid product string (-P/--product),"
-                    " choose from tdc001, tpz001, or kdc101"
+                    " choose from tdc001, tpz001, or kdc101, kpz101"
                 )
                 sys.exit(1)
         else:
@@ -78,6 +78,7 @@ def main():
                 dev = Kdc(loop, args.device)
             elif product == "kpz101":
                 dev = Kpz(loop, args.device)
+                loop.run_until_complete(dev.get_tpz_io_settings())
             else:
                 print(
                     "Invalid product string (-P/--product),"
