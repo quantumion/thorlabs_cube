@@ -8,6 +8,7 @@ from sipyco import common_args
 from sipyco.pc_rpc import simple_server_loop
 
 from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
+from thorlabs_cube.driver.kcube.kpz import Kpz, KpzSim
 from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 
@@ -59,6 +60,8 @@ def main():
                 dev = TpzSim()
             elif product == "kdc101":
                 dev = KdcSim()
+            elif product == "kpz101":
+                dev = KpzSim()
             else:
                 print(
                     "Invalid product string (-P/--product),"
@@ -73,10 +76,12 @@ def main():
                 loop.run_until_complete(dev.get_tpz_io_settings())
             elif product == "kdc101":
                 dev = Kdc(loop, args.device)
+            elif product == "kpz101":
+                dev = Kpz(loop, args.device)
             else:
                 print(
                     "Invalid product string (-P/--product),"
-                    " choose from tdc001, tpz001, or kdc101"
+                    " choose from tdc001, tpz001, kdc101, kpz101"
                 )
                 sys.exit(1)
 
