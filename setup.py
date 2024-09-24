@@ -2,12 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name="thorlabs_cube",
-    version="0.0.1",
+    version="0.0.2",
     url="https://github.com/quantumion/thorlabs_cube",
     description="ARTIQ controller for Thorlabs T/KCube devices",
     install_requires=[
         "sipyco@git+https://github.com/m-labs/sipyco.git@v1.7",
-        "asyncserial==0.1.0",
+        "asyncserial@git+https://github.com/xvzf/asyncserial-py.git@1498bbc",
         "numpy==2.0.0",  # hidden sipyco dependency
     ],
     extras_require={
