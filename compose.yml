@@ -41,13 +41,13 @@ services:
         ports:
             - 3256:3255
         devices:
-            - /dev/ttyUSB1
+            - /dev/ttyUSB0
         networks:
             - thorlabs_cube
         build:
             context: ./
             dockerfile: ./Dockerfile
         entrypoint: [aqctl_thorlabs_cube]
-        command: [-p, '3255', -P, kpz101, -d, /dev/ttyUSB1, --bind, '*']
+        command: [-p, '3255', -P, kpz101, -d, /dev/ttyUSB0, --bind, '*']
 networks:
     thorlabs_cube:
