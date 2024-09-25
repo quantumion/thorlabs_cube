@@ -12,15 +12,15 @@ class Kpz(Tpz):
 
     async def set_kcubemmi_params(
         self,
-        js_mode,
-        js_volt_gearbox,
-        js_volt_step,
-        dir_sense,
-        preset_volt1,
-        preset_volt2,
-        disp_brightness,
-        disp_timeout,
-        disp_dim_level,
+        js_mode: int,
+        js_volt_gearbox: int,
+        js_volt_step: int,
+        dir_sense: int,
+        preset_volt1: int,
+        preset_volt2: int,
+        disp_brightness: int,
+        disp_timeout: int,
+        disp_dim_level: int,
     ):
         """Set the KCube MMI parameters.
 
@@ -66,7 +66,11 @@ class Kpz(Tpz):
         return st.unpack("<HHHLHLLHHHHHHH", get_msg.data[6:])
 
     async def set_trigio_config(
-        self, trig1_mode, trig1_polarity, trig2_mode, trig2_polarity
+        self, 
+        trig1_mode: int, 
+        trig1_polarity: int,
+        trig2_mode: int,
+        trig2_polarity: int
     ):
         """Set the TRIG1 and TRIG2 input/output configuration.
 
@@ -106,15 +110,15 @@ class KpzSim(TpzSim):
 
     def set_kcubemmi_params(
         self,
-        js_mode,
-        js_volt_gearbox,
-        js_volt_step,
-        dir_sense,
-        preset_volt1,
-        preset_volt2,
-        disp_brightness,
-        disp_timeout,
-        disp_dim_level,
+        js_mode: int,
+        js_volt_gearbox: int,
+        js_volt_step: int,
+        dir_sense: int,
+        preset_volt1: int,
+        preset_volt2: int,
+        disp_brightness: int,
+        disp_timeout: int,
+        disp_dim_level: int,
     ):
         """Set the KCube MMI parameters in simulation.
 
@@ -151,7 +155,13 @@ class KpzSim(TpzSim):
             _RESERVED,
         )
 
-    def set_trigio_config(self, trig1_mode, trig1_polarity, trig2_mode, trig2_polarity):
+    def set_trigio_config(
+        self, 
+        trig1_mode: int, 
+        trig1_polarity: int,
+        trig2_mode: int,
+        trig2_polarity: int
+        ):
         """Set the TRIG1 and TRIG2 configuration in simulation.
 
         This simulates setting the TRIG1 and TRIG2 modes and polarities.
