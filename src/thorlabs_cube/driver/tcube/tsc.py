@@ -365,7 +365,7 @@ class TscSim:
         self.timeout2 = timeout2
 
     def get_button_parameters(self):
-        return (self.mode, self.position1, self.position2, self.timeout1, self.timeout2)
+        return self.mode, self.position1, self.position2, self.timeout1, self.timeout2
 
     def set_eeprom_parameters(self, msg_id):
         self.msg_id = msg_id
