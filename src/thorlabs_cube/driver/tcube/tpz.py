@@ -484,20 +484,6 @@ class TpzSim:
         """
         self.voltage_limit = 150
         self.hub_analog_input = 1
-        self.control_mode = 0x01  # Default to Open Loop
-        self.voltage = 0
-        self.position_sw = 0
-        self.volt_src = 0x00  # Software only
-        self.prop_const = 0
-        self.int_const = 0
-        self.lut = [0] * 513  # Initialize LUT with zeros
-        self.mode = 0
-        self.cycle_length = 0
-        self.num_cycles = 0
-        self.delay_time = 0
-        self.precycle_rest = 0
-        self.postcycle_rest = 0
-        self.intensity = 0
 
     def close(self):
         """Close the simulated device.
