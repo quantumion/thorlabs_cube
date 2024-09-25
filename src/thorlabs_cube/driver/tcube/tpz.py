@@ -618,7 +618,7 @@ class TpzSim:
             tuple: A tuple containing the lut index and output value.
         """
         # Since there's no specific index provided, return default values
-        return 0, self.lut[0]
+        return 0, 0
 
     def set_output_lut_parameters(
         self,
