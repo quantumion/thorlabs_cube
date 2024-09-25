@@ -7,7 +7,7 @@ ENV PYTHONUNBUFFERED 1
 
 # Install base tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git=1:2.39.2-1.1 \
+    git=1:2.39.5-0+deb12u1 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN python -m pip install --no-cache-dir --upgrade pip==24.1
 
