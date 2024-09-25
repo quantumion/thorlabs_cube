@@ -52,33 +52,6 @@ class Tsc(_Cube):
                 data[2:],
             )
 
-    def module_identify(self):
-        return super().module_identify()
-
-    def hardware_start_update_messages(self, update_rate):
-        return super().hardware_start_update_messages(update_rate)
-
-    def hardware_stop_update_messages(self):
-        return super().hardware_stop_update_messages()
-
-    def hardware_request_information(self):
-        return (
-            super().hardware_request_information()
-        )  # FIXME->need to change serialization format but should work after that
-
-    def is_channel_enabled(self):
-        return super().is_channel_enabled()
-
-    def ping(self):
-        return super().ping()
-
-    async def set_channel_enable_state(self, activated):
-        return await super().set_channel_enable_state(activated)
-
-    async def get_channel_enable_state(self):
-        return await super().get_channel_enable_state()
-
-    # functions from base class definition end
 
     async def get_bay_used(self):
         """Identify which bay is being used by the controller on Thorlabs Hub
