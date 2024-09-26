@@ -119,11 +119,24 @@ class MGMSG(Enum):
 
 class Direction:
     def __init__(self, direction):
+        """Initialize the Direction object.
+
+        Parameters:
+            direction (int): The direction value, must be either 1 or 2.
+
+        Raises:
+            ValueError: If direction is not 1 or 2.
+        """
         if direction not in (1, 2):
             raise ValueError("Direction must be either 1 or 2")
         self.direction = direction
 
     def __str__(self):
+        """Return a string representation of the direction.
+
+        Returns:
+            str: 'forward' if direction is 1, 'backward' if direction is 2.
+        """
         if self.direction == 1:
             return "forward"
         else:
@@ -131,11 +144,25 @@ class Direction:
 
 
 class MsgError(Exception):
+    """Custom exception class for message errors."""
     pass
 
 
 class Message:
     def __init__(self, id, param1=0, param2=0, dest=0x50, src=0x01, data=None):
+        """Initialize a Message object.
+
+        Parameters:
+            id (MGMSG): The message ID.
+            param1 (int, optional): The first parameter. Defaults to 0.
+            param2 (int, optional): The second parameter. Defaults to 0.
+            dest (int, optional): The destination address. Defaults to 0x50.
+            src (int, optional): The source address. Defaults to 0x01.
+            data (bytes, optional): The message data. Defaults to None.
+
+        Notes:
+            If data is provided, the destination address will be modified to include the data flag.
+        """
         if data is not None:
             dest |= 0x80
         self.id = id
@@ -146,6 +173,11 @@ class Message:
         self.data = data
 
     def __str__(self):
+        """Return a string representation of the Message.
+
+        Returns:
+            str: A formatted string describing the message.
+        """
         return (
             "<Message {} p1=0x{:02x} p2=0x{:02x} "
             "dest=0x{:02x} src=0x{:02x}>".format(
@@ -155,6 +187,17 @@ class Message:
 
     @staticmethod
     def unpack(data):
+        """Unpack raw bytes into a Message object.
+
+        Parameters:
+            data (bytes): The raw bytes to unpack.
+
+        Returns:
+            Message: A Message object constructed from the raw data.
+
+        Raises:
+            ValueError: If data length does not match the expected size.
+        """
         id, param1, param2, dest, src = st.unpack("<HBBBB", data[:6])
         data = data[6:]
         if dest & 0x80:
@@ -168,6 +211,11 @@ class Message:
         return Message(MGMSG(id), param1, param2, dest, src, data)
 
     def pack(self):
+        """Pack the Message object into bytes.
+
+        Returns:
+            bytes: The packed message suitable for sending over a connection.
+        """
         if self.has_data:
             return (
                 st.pack(
@@ -191,11 +239,24 @@ class Message:
 
     @property
     def has_data(self):
+        """Check if the message contains data.
+
+        Returns:
+            bool: True if the message has data, False otherwise.
+        """
         return self.dest & 0x80
 
     @property
     def data_size(self):
+        """Get the size of the data payload.
+
+        Returns:
+            int: The size of the data payload.
+
+        Raises:
+            ValueError: If the message does not contain data.
+        """
         if self.has_data:
             return self.param1 | (self.param2 << 8)
         else:
-            raise ValueError
+            raise ValueError("Message does not contain data")

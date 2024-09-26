@@ -8,10 +8,25 @@ class Tdc(_Cube):
     """TDC001 T-Cube Motor Controller class"""
 
     def __init__(self, *args, **kwargs):
+        """Initialize the TDC001 T-Cube Motor Controller.
+
+        This constructor initializes the base class and sets up the status report counter.
+
+        Parameters:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         _Cube.__init__(self, *args, **kwargs)
         self.status_report_counter = 0
 
     async def handle_message(self, msg):
+        """Handle incoming messages from the device.
+
+        Processes the incoming message and updates the device state accordingly.
+
+        Parameters:
+            msg: The message object received from the device.
+        """
         msg_id = msg.id
         data = msg.data
 
@@ -43,6 +58,11 @@ class Tdc(_Cube):
             )
 
     async def is_moving(self):
+        """Check if the device is currently moving.
+
+        Returns:
+            bool: True if the device is moving, False otherwise.
+        """
         status_bits = await self.get_status_bits()
         return (status_bits & 0x2F0) != 0
 
@@ -635,9 +655,17 @@ class Tdc(_Cube):
 
 class TdcSim:
     def close(self):
+        """Close the simulated device.
+
+        Performs any necessary cleanup operations.
+        """
         pass
 
     def module_identify(self):
+        """Identify the module.
+
+        Simulates the identification of the module.
+        """
         pass
 
     def set_pot_parameters(
@@ -651,6 +679,18 @@ class TdcSim:
         wnd3,
         vel4,
     ):
+        """Set potentiometer parameters in the simulation.
+
+        Parameters:
+            zero_wnd: The deflection from the mid position (in ADC counts 0 to 127) before motion can start.
+            vel1: The velocity to move when between zero_wnd and wnd1.
+            wnd1: The deflection from the mid position to apply vel1.
+            vel2: The velocity to move when between wnd1 and wnd2.
+            wnd2: The deflection from the mid position to apply vel2.
+            vel3: The velocity to move when between wnd2 and wnd3.
+            wnd3: The deflection from the mid position to apply vel3.
+            vel4: The velocity to move when beyond wnd3.
+        """
         self.zero_wnd = zero_wnd
         self.vel1 = vel1
         self.wnd1 = wnd1
@@ -661,6 +701,11 @@ class TdcSim:
         self.vel4 = vel4
 
     def get_pot_parameters(self):
+        """Get potentiometer parameters from the simulation.
+
+        Returns:
+            tuple: An 8-element tuple containing zero_wnd, vel1, wnd1, vel2, wnd2, vel3, wnd3, vel4.
+        """
         return (
             self.zero_wnd,
             self.vel1,
@@ -673,30 +718,75 @@ class TdcSim:
         )
 
     def hub_get_bay_used(self):
+        """Check if the hub bay is used in the simulation.
+
+        Returns:
+            bool: False indicating the hub bay is not used in simulation.
+        """
         return False
 
     def set_position_counter(self, position):
+        """Set the position counter in the simulation.
+
+        Parameters:
+            position (int): The new position value to set.
+        """
         self.position = position
 
     def get_position_counter(self):
+        """Get the position counter value from the simulation.
+
+        Returns:
+            int: The current position value.
+        """
         return self.position
 
     def set_encoder_counter(self, encoder_count):
+        """Set the encoder counter in the simulation.
+
+        Parameters:
+            encoder_count (int): The new encoder count value to set.
+        """
         self.encoder_count = encoder_count
 
     def get_encoder_counter(self):
+        """Get the encoder counter value from the simulation.
+
+        Returns:
+            int: The current encoder count value.
+        """
         return self.encoder_count
 
     def set_velocity_parameters(self, acceleration, max_velocity):
+        """Set the velocity parameters in the simulation.
+
+        Parameters:
+            acceleration (int): The acceleration value to set.
+            max_velocity (int): The maximum velocity value to set.
+        """
         self.acceleration = acceleration
         self.max_velocity = max_velocity
 
     def get_velocity_parameters(self):
+        """Get the velocity parameters from the simulation.
+
+        Returns:
+            tuple: A tuple containing acceleration and max_velocity.
+        """
         return self.acceleration, self.max_velocity
 
     def set_jog_parameters(
         self, mode, step_size, acceleration, max_velocity, stop_mode
     ):
+        """Set the jog parameters in the simulation.
+
+        Parameters:
+            mode (int): Jog mode.
+            step_size (int): Jog step size.
+            acceleration (int): Acceleration value.
+            max_velocity (int): Maximum velocity value.
+            stop_mode (int): Stop mode.
+        """
         self.jog_mode = mode
         self.step_size = step_size
         self.acceleration = acceleration
@@ -704,6 +794,11 @@ class TdcSim:
         self.stop_mode = stop_mode
 
     def get_jog_parameters(self):
+        """Get the jog parameters from the simulation.
+
+        Returns:
+            tuple: A tuple containing jog_mode, step_size, acceleration, max_velocity, stop_mode.
+        """
         return (
             self.jog_mode,
             self.step_size,
@@ -713,30 +808,71 @@ class TdcSim:
         )
 
     def set_gen_move_parameters(self, backlash_distance):
+        """Set the general move parameters in the simulation.
+
+        Parameters:
+            backlash_distance (int): The backlash distance to set.
+        """
         self.backlash_distance = backlash_distance
 
     def get_gen_move_parameters(self):
+        """Get the general move parameters from the simulation.
+
+        Returns:
+            int: The backlash distance.
+        """
         return self.backlash_distance
 
     def set_move_relative_parameters(self, relative_distance):
+        """Set the relative move parameters in the simulation.
+
+        Parameters:
+            relative_distance (int): The relative distance to move.
+        """
         self.relative_distance = relative_distance
 
     def get_move_relative_parameters(self):
+        """Get the relative move parameters from the simulation.
+
+        Returns:
+            int: The relative distance to move.
+        """
         return self.relative_distance
 
     def set_move_absolute_parameters(self, absolute_position):
+        """Set the absolute move parameters in the simulation.
+
+        Parameters:
+            absolute_position (int): The absolute position to move to.
+        """
         self.absolute_position = absolute_position
 
     def get_move_absolute_parameters(self):
+        """Get the absolute move parameters from the simulation.
+
+        Returns:
+            int: The absolute position to move to.
+        """
         return self.absolute_position
 
     def set_home_parameters(self, home_velocity):
+        """Set the home parameters in the simulation.
+
+        Parameters:
+            home_velocity (int): The home velocity to set.
+        """
         self.home_velocity = home_velocity
 
     def get_home_parameters(self):
+        """Get the home parameters from the simulation.
+
+        Returns:
+            int: The home velocity.
+        """
         return self.home_velocity
 
     def move_home(self):
+        """Simulate moving the device to its home position."""
         pass
 
     def set_limit_switch_parameters(
@@ -747,6 +883,15 @@ class TdcSim:
         ccw_sw_limit=0,
         sw_limit_mode=0x1,
     ):
+        """Set the limit switch parameters in the simulation.
+
+        Parameters:
+            cw_hw_limit (int): Clockwise hardware limit setting.
+            ccw_hw_limit (int): Counter-clockwise hardware limit setting.
+            cw_sw_limit (int): Clockwise software limit.
+            ccw_sw_limit (int): Counter-clockwise software limit.
+            sw_limit_mode (int): Software limit mode.
+        """
         self.cw_hw_limit = cw_hw_limit
         self.ccw_hw_limit = ccw_hw_limit
         self.cw_sw_limit = cw_sw_limit
@@ -754,6 +899,11 @@ class TdcSim:
         self.sw_limit_mode = sw_limit_mode
 
     def get_limit_switch_parameters(self):
+        """Get the limit switch parameters from the simulation.
+
+        Returns:
+            tuple: A tuple containing cw_hw_limit, ccw_hw_limit, cw_sw_limit, ccw_sw_limit, sw_limit_mode.
+        """
         return (
             self.cw_hw_limit,
             self.ccw_hw_limit,
@@ -763,24 +913,51 @@ class TdcSim:
         )
 
     def move_relative_memory(self):
+        """Simulate a relative move using the stored parameters."""
         pass
 
     def move_relative(self, relative_distance):
+        """Simulate a relative move.
+
+        Parameters:
+            relative_distance (int): The distance to move.
+        """
         pass
 
     def move_absolute_memory(self):
+        """Simulate an absolute move using the stored parameters."""
         pass
 
     def move_absolute(self, absolute_distance):
+        """Simulate an absolute move.
+
+        Parameters:
+            absolute_distance (int): The position to move to.
+        """
         pass
 
     def move_jog(self, direction):
+        """Simulate a jog move.
+
+        Parameters:
+            direction (int): The direction to jog. 1 for forward, 2 for backward.
+        """
         pass
 
     def move_velocity(self, direction):
+        """Simulate a continuous move at a specified velocity.
+
+        Parameters:
+            direction (int): The direction to move. 1 for forward, 2 for backward.
+        """
         pass
 
     def move_stop(self, stop_mode):
+        """Simulate stopping the movement.
+
+        Parameters:
+            stop_mode (int): The stop mode. 1 for immediate stop, 2 for profiled stop.
+        """
         pass
 
     def set_dc_pid_parameters(
@@ -791,6 +968,15 @@ class TdcSim:
         integral_limit,
         filter_control=0x0F,
     ):
+        """Set the PID parameters in the simulation.
+
+        Parameters:
+            proportional (int): Proportional gain.
+            integral (int): Integral gain.
+            differential (int): Differential gain.
+            integral_limit (int): Integral limit.
+            filter_control (int): Filter control bits.
+        """
         self.proportional = proportional
         self.integral = integral
         self.differential = differential
@@ -798,6 +984,11 @@ class TdcSim:
         self.filter_control = filter_control
 
     def get_dc_pid_parameters(self):
+        """Get the PID parameters from the simulation.
+
+        Returns:
+            tuple: A tuple containing proportional, integral, differential, integral_limit, filter_control.
+        """
         return (
             self.proportional,
             self.integral,
@@ -807,30 +998,69 @@ class TdcSim:
         )
 
     def set_av_modes(self, mode_bits):
+        """Set the AV modes in the simulation.
+
+        Parameters:
+            mode_bits (int): The mode bits to set.
+        """
         self.mode_bits = mode_bits
 
     def get_av_modes(self):
+        """Get the AV modes from the simulation.
+
+        Returns:
+            int: The mode bits.
+        """
         return self.mode_bits
 
     def set_button_parameters(self, mode, position1, position2):
+        """Set the button parameters in the simulation.
+
+        Parameters:
+            mode (int): The button mode.
+            position1 (int): The position for the first button.
+            position2 (int): The position for the second button.
+        """
         self.mode = mode
         self.position1 = position1
         self.position2 = position2
 
     def get_button_parameters(self):
+        """Get the button parameters from the simulation.
+
+        Returns:
+            tuple: A tuple containing mode, position1, position2.
+        """
         return self.mode, self.position1, self.position2
 
     def set_eeprom_parameters(self, msg_id):
+        """Simulate saving parameters to EEPROM.
+
+        Parameters:
+            msg_id (int): The message ID of the parameters to save.
+        """
         pass
 
     def get_dc_status_update(self):
+        """Get the DC status update from the simulation.
+
+        Returns:
+            tuple: A tuple containing position, velocity, and status bits.
+        """
         return 0, 0, 0x80000400  # FIXME: not implemented yet for simulation
 
     def get_status_bits(self):
+        """Get the status bits from the simulation.
+
+        Returns:
+            int: The status bits.
+        """
         return 0x80000400  # FIXME: not implemented yet for simulation
 
     def suspend_end_of_move_messages(self):
+        """Simulate suspending end-of-move messages."""
         pass
 
     def resume_end_of_move_messages(self):
+        """Simulate resuming end-of-move messages."""
         pass
