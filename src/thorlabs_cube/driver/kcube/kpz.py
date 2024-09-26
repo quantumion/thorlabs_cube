@@ -33,10 +33,11 @@ class Kpz(Tpz):
         :param disp_brightness: The brightness of the display.
         :param disp_timeout: The timeout for display dimming.
         :param disp_dim_level: The dimming level for the display.
+        :param _RESERVED: Not necessary to interact with for users
         """
         payload = st.pack(
             "<HHHLHLLHHHHHHH",
-            1,
+            _CHANNEL,
             js_mode,
             js_volt_gearbox,
             js_volt_step,
@@ -56,12 +57,12 @@ class Kpz(Tpz):
     async def get_kcubemmi_params(self):
         """Get the KCube MMI parameters.
 
-        :return: A tuple containing joystick mode, voltage gearbox, voltage
-        step, direction sense, preset voltages, display brightness, timeout,
-        and dim level.
+        :return: A tuple containing the KCube MMI parameters such as joystick mode, 
+        voltage gearbox, voltage step, direction sense, preset voltages, display 
+        brightness, timeout,and dim level. Purpose descriptions found in set_kcubemmi_params()
         """
         get_msg = await self.send_request(
-            MGMSG.KPZ_REQ_KCUBEMMIPARAMS, [MGMSG.KPZ_GET_KCUBEMMIPARAMS], 1
+            MGMSG.KPZ_REQ_KCUBEMMIPARAMS, [MGMSG.KPZ_GET_KCUBEMMIPARAMS], _CHANNEL
         )
         return st.unpack("<HHHLHLLHHHHHHH", get_msg.data[6:])
 
@@ -74,6 +75,8 @@ class Kpz(Tpz):
     ):
         """Set the TRIG1 and TRIG2 input/output configuration.
 
+
+
         :param trig1_mode: The mode of TRIG1.
         :param trig1_polarity: The polarity of TRIG1.
         :param trig2_mode: The mode of TRIG2.
@@ -81,7 +84,7 @@ class Kpz(Tpz):
         """
         payload = st.pack(
             "<HHHHHHHHHHH",
-            1,
+            _CHANNEL,
             trig1_mode,
             trig1_polarity,
             trig2_mode,
@@ -98,10 +101,12 @@ class Kpz(Tpz):
     async def get_trigio_config(self):
         """Get the TRIG1 and TRIG2 input/output configuration.
 
-        :return: A tuple containing the configuration for TRIG1 and TRIG2 (mode, polarity).
+        :return: A tuple containing the Trigger IO
+        configuration parameters for TRIG1 and TRIG2 (mode, polarity).
+        Purpose description can be found in set_trigio_config()
         """
         get_msg = await self.send_request(
-            MGMSG.KPZ_REQ_KCUBETRIGIOCONFIG, [MGMSG.KPZ_GET_KCUBETRIGIOCONFIG], 1
+            MGMSG.KPZ_REQ_KCUBETRIGIOCONFIG, [MGMSG.KPZ_GET_KCUBETRIGIOCONFIG], _CHANNEL
         )
         return st.unpack("<HHHHHHHHHHH", get_msg.data[6:])
 
