@@ -57,8 +57,8 @@ class Kpz(Tpz):
     async def get_kcubemmi_params(self):
         """Get the KCube MMI parameters.
 
-        :return: A tuple containing the KCube MMI parameters such as joystick mode, 
-        voltage gearbox, voltage step, direction sense, preset voltages, display 
+        :return: A tuple containing the KCube MMI parameters such as joystick mode,
+        voltage gearbox, voltage step, direction sense, preset voltages, display
         brightness, timeout,and dim level. Purpose descriptions found in set_kcubemmi_params()
         """
         get_msg = await self.send_request(
@@ -67,11 +67,7 @@ class Kpz(Tpz):
         return st.unpack("<HHHLHLLHHHHHHH", get_msg.data[6:])
 
     async def set_trigio_config(
-        self, 
-        trig1_mode: int, 
-        trig1_polarity: int,
-        trig2_mode: int,
-        trig2_polarity: int
+        self, trig1_mode: int, trig1_polarity: int, trig2_mode: int, trig2_polarity: int
     ):
         """Set the TRIG1 and TRIG2 input/output configuration.
 
@@ -161,12 +157,8 @@ class KpzSim(TpzSim):
         )
 
     def set_trigio_config(
-        self, 
-        trig1_mode: int, 
-        trig1_polarity: int,
-        trig2_mode: int,
-        trig2_polarity: int
-        ):
+        self, trig1_mode: int, trig1_polarity: int, trig2_mode: int, trig2_polarity: int
+    ):
         """Set the TRIG1 and TRIG2 configuration in simulation.
 
         This simulates setting the TRIG1 and TRIG2 modes and polarities.
