@@ -3,9 +3,9 @@ import struct as st
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 from thorlabs_cube.driver.tcube.tsc import Tsc, TscSim
 
-_RESERVED = 0x0
-_CHANNEL = 0x01
-_REQUEST_LENGTH = 1
+_RESERVED: int = 0x0
+_CHANNEL: int = 0x01
+_REQUEST_LENGTH: int = 1
 
 
 class Ksc(Tsc):
@@ -15,17 +15,17 @@ class Ksc(Tsc):
 
     async def set_kcubemmi_params(
         self,
-        js_mode,
-        js_max_vel,
-        js_accn,
-        dir_sense,
-        preset_pos1,
-        preset_pos2,
-        preset_pos3,
-        disp_brightness,
-        disp_timeout,
-        disp_dim_level,
-        js_sensitivity,
+        js_mode: int,
+        js_max_vel: int,
+        js_accn: int,
+        dir_sense: int,
+        preset_pos1: int,
+        preset_pos2: int,
+        preset_pos3: int,
+        disp_brightness: int,
+        disp_timeout: int,
+        disp_dim_level: int,
+        js_sensitivity: int,
     ):
         """Set the KCube MMI (joystick) parameters.
 
@@ -42,7 +42,6 @@ class Ksc(Tsc):
         :param js_sensitivity: Joystick sensitivity.
         """
 
-        # Pack the Channel ID and all the other parameters
         payload = st.pack(
             "<HHLLLHHLLLLH",
             _CHANNEL,
@@ -70,7 +69,6 @@ class Ksc(Tsc):
         settings, and joystick sensitivity.
         """
 
-        # Pack the Channel ID for the request payload
         payload = st.pack("<H", _CHANNEL)
 
         # Send the request to get the current joystick parameters
@@ -81,7 +79,11 @@ class Ksc(Tsc):
         return st.unpack("<HLLLHHLLLLH", get_msg.data[2:])
 
     async def set_kcubetrigio_config(
-        self, trig1_mode, trig1_polarity, trig2_mode, trig2_polarity
+        self, 
+        trig1_mode: int, 
+        trig1_polarity: int, 
+        trig2_mode: int, 
+        trig2_polarity: int
     ):
         """Set the KCube trigger I/O configuration parameters.
 
@@ -90,10 +92,10 @@ class Ksc(Tsc):
         :param trig2_mode: Mode for Trigger 2 (input/output).
         :param trig2_polarity: Polarity for Trigger 2 (high/low).
         """
-        # Pack the Channel ID and trigger I/O parameters
+
         payload = st.pack(
             "<HBBBB",
-            _CHANNEL,  # Channel ID is hardcoded to 0x01
+            _CHANNEL,
             trig1_mode,
             trig1_polarity,
             trig2_mode,
@@ -106,9 +108,45 @@ class Ksc(Tsc):
     async def get_kcubetrigio_config(self):
         """Get the KCube trigger I/O configuration parameters.
 
-        :return: A tuple containing (trig1_mode, trig1_polarity, trig2_mode, trig2_polarity).
+        :return: A tuple containing the operating mode, and active state for
+        both Trigger 1 and Trigger 2. The active states can assume a High or Low
+        whereas, the operating modes can be both input and output respectively
+
+        Input State Operating Modes:
+
+            0x00 The trigger IO is disabled
+
+            0x01 General purpose logic input (read through status bits using the
+            MOT_GET_STATUSBITS message).
+
+            0x02 Input trigger for relative move.
+
+            0x03 Input trigger for absolute move.
+
+            0x04 Input trigger for home move.
+
+        Output State Operating Modes:
+
+            0x0A General purpose logic output (set using the MOD_SET_DIGOUTPUTS message).
+
+            0x0B Trigger output active (level) when motor 'in motion'. The output trigger goes high (5V)
+            or low (0V) (as set in the lTrig1Polarity and lTrig2Polarity parameters) when the stage is in
+            motion.
+
+            0x0C Trigger output active (level) when motor at 'max velocity'.
+
+            0x0D Trigger output active (pulsed) at pre-defined positions moving forward (set using
+            StartPosFwd, IntervalFwd, NumPulsesFwd and PulseWidth parameters in the
+            SetKCubePosTrigParams message). Only one Trigger port at a time can be set to this mode.
+
+            0x0E Trigger output active (pulsed) at pre-defined positions moving backwards (set using
+            StartPosRev, IntervalRev, NumPulsesRev and PulseWidth parameters in the
+            SetKCubePosTrigParams message). Only one Trigger port at a time can be set to this mode.
+            
+            0x0F Trigger output active (pulsed) at pre-defined positions moving forwards and
+            backward. Only one Trigger port at a time can be set to this mode.
         """
-        # Pack the Channel ID for the request
+
         payload = st.pack("<H", _CHANNEL)  # Channel ID is hardcoded to 0x01
 
         # Send the request to get the current trigger I/O configuration
@@ -121,18 +159,18 @@ class Ksc(Tsc):
         trig1_mode, trig1_polarity, trig2_mode, trig2_polarity = st.unpack(
             "<BBBB", get_msg.data[2:]
         )
-        return trig1_mode, trig1_polarity, trig2_mode, trig2_polarity
+        return st.unpack("<BBBB", get_msg.data[2:])
 
     async def set_kcubepostrig_params(
         self,
-        start_pos_fwd,
-        interval_fwd,
-        num_pulses_fwd,
-        start_pos_rev,
-        interval_rev,
-        num_pulses_rev,
-        pulse_width,
-        num_cycles,
+        start_pos_fwd: int,
+        interval_fwd: int,
+        num_pulses_fwd: int,
+        start_pos_rev: int,
+        interval_rev: int,
+        num_pulses_rev: int,
+        pulse_width: int,
+        num_cycles: int,
     ):
         """Set the KCube post-trigger parameters.
 
@@ -145,7 +183,7 @@ class Ksc(Tsc):
         :param pulse_width: Trigger output pulse width (from 1 μs to 1,000,000 μs).
         :param num_cycles: Number of forward/reverse cycles.
         """
-        # Pack the Channel ID and trigger parameters
+
         payload = st.pack(
             "<HLLLLLLLL",
             _CHANNEL,
@@ -181,7 +219,7 @@ class Ksc(Tsc):
         return st.unpack("<LLLLLLLL", get_msg.data[2:])
 
     class KscSim(TscSim):
-        async def set_kcubemmi_params(
+        def set_kcubemmi_params(
             self,
             js_mode: int,
             js_max_vel: int,
@@ -208,8 +246,7 @@ class Ksc(Tsc):
             self.disp_dim_level = disp_dim_level
             self.js_sensitivity = js_sensitivity
 
-        async def get_kcubemmi_params(self):
-            # Return all the stored parameters in the same order
+        def get_kcubemmi_params(self):
             return (
                 self.js_mode,
                 self.js_max_vel,
@@ -224,8 +261,12 @@ class Ksc(Tsc):
                 self.js_sensitivity,
             )
 
-        async def set_kcubetrigio_config(
-            self, trig1_mode, trig1_polarity, trig2_mode, trig2_polarity
+        def set_kcubetrigio_config(
+            self, 
+            trig1_mode: int, 
+            trig1_polarity: int, 
+            trig2_mode: int, 
+            trig2_polarity: int
         ):
             # Store trigger I/O configuration
             self.trig1_mode = trig1_mode
@@ -233,8 +274,7 @@ class Ksc(Tsc):
             self.trig2_mode = trig2_mode
             self.trig2_polarity = trig2_polarity
 
-        async def get_kcubetrigio_config(self):
-            # Return the stored trigger I/O configuration
+        def get_kcubetrigio_config(self):
             return (
                 self.trig1_mode,
                 self.trig1_polarity,
@@ -242,16 +282,16 @@ class Ksc(Tsc):
                 self.trig2_polarity,
             )
 
-        async def set_kcubepostrig_params(
+        def set_kcubepostrig_params(
             self,
-            start_pos_fwd,
-            interval_fwd,
-            num_pulses_fwd,
-            start_pos_rev,
-            interval_rev,
-            num_pulses_rev,
-            pulse_width,
-            num_cycles,
+            start_pos_fwd: int,
+            interval_fwd: int,
+            num_pulses_fwd: int,
+            start_pos_rev: int,
+            interval_rev: int,
+            num_pulses_rev: int,
+            pulse_width: int,
+            num_cycles: int,
         ):
             # Store post-trigger parameters
             self.start_pos_fwd = start_pos_fwd
@@ -263,8 +303,7 @@ class Ksc(Tsc):
             self.pulse_width = pulse_width
             self.num_cycles = num_cycles
 
-        async def get_kcubepostrig_params(self):
-            # Return the stored post-trigger parameters
+        def get_kcubepostrig_params(self):
             return (
                 self.start_pos_fwd,
                 self.interval_fwd,
