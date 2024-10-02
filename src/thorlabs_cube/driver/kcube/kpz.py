@@ -50,7 +50,7 @@ class Kpz(Tpz):
             _RESERVED,
             _RESERVED,
             _RESERVED,
-            _RESERVED
+            _RESERVED,
         )
         await self.send(Message(MGMSG.KPZ_SET_KCUBEMMIPARAMS, data=payload))
 
@@ -68,11 +68,7 @@ class Kpz(Tpz):
         return st.unpack("<HHHLHLLHHHHHHH", get_msg.data[6:])
 
     async def set_trigio_config(
-        self, 
-        trig1_mode: int, 
-        trig1_polarity: int, 
-        trig2_mode: int, 
-        trig2_polarity: int
+        self, trig1_mode: int, trig1_polarity: int, trig2_mode: int, trig2_polarity: int
     ):
         """Set the TRIG1 and TRIG2 input/output configuration.
 
