@@ -3,9 +3,8 @@ import struct as st
 from thorlabs_cube.driver.message import MGMSG, Message
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 
-_RESERVED = 0x0
-_CHANNEL = 0x01
-_REQUEST_LENGTH = 1
+_RESERVED: int = 0x0
+_CHANNEL: int = 0x01
 
 
 class Kpz(Tpz):
