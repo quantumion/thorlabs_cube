@@ -7,7 +7,7 @@ setup(
     description="ARTIQ controller for Thorlabs T/KCube devices",
     install_requires=[
         "sipyco@git+https://github.com/m-labs/sipyco.git@v1.8",
-        "asyncserial@git+https://github.com/xvzf/asyncserial-py.git@1498bbc",
+        "asyncserial@git+https://github.com/m-labs/asyncserial.git@v1.0",
     ],
     extras_require={
         "docs": [

@@ -11,23 +11,25 @@ logger = logging.getLogger(__name__)
 
 class _Cube:
     def __init__(self, loop, serial_dev):
-        self.port = asyncserial.Serial(loop, serial_dev, baudrate=115200, rtscts=True)
+        self.port = asyncserial.AsyncSerial(
+            loop, serial_dev, baudrate=115200, rtscts=True
+        )
 
-    async def close(self):
+    def close(self):
         """Close the device."""
-        await self.port.close()
+        self.port.close()
 
     async def send(self, message):
         logger.debug("sending: %s", message)
         await self.port.write(message.pack())
 
     async def recv(self):
-        header = await self.port.read(num_bytes=6)
+        header = await self.port.read_exactly(6)
         logger.debug("received header: %s", header)
         data = b""
         if header[4] & 0x80:
             (length,) = st.unpack("<H", header[2:4])
-            data = await self.port.read(num_bytes=length)
+            data = await self.port.read_exactly(length)
         r = Message.unpack(header + data)
         logger.debug("receiving: %s", r)
         return r
