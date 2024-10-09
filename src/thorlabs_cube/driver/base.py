@@ -10,10 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class _Cube:
-    def __init__(self, loop, serial_dev):
-        self.port = asyncserial.AsyncSerial(
-            loop, serial_dev, baudrate=115200, rtscts=True
-        )
+    def __init__(self, serial_dev):
+        self.port = asyncserial.AsyncSerial(serial_dev, baudrate=115200, rtscts=True)
 
     def close(self):
         """Close the device."""

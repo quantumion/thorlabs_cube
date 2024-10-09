@@ -68,12 +68,12 @@ def main():
                 sys.exit(1)
         else:
             if product == "tdc001":
-                dev = Tdc(loop, args.device)
+                dev = Tdc(args.device)
             elif product == "tpz001":
-                dev = Tpz(loop, args.device)
+                dev = Tpz(args.device)
                 loop.run_until_complete(dev.get_tpz_io_settings())
             elif product == "kdc101":
-                dev = Kdc(loop, args.device)
+                dev = Kdc(args.device)
             else:
                 print(
                     "Invalid product string (-P/--product),"
