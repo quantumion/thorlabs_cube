@@ -71,7 +71,6 @@ class Tsc(_Cube):
                                 E.g., 200,000 counts for 10 mm.
         """
 
-        # Pack the Channel ID (2 bytes) and the Absolute Position (4 bytes)
         payload = st.pack("<Hl", _CHANNEL, absolute_position)
 
         await self.send_request(
@@ -86,7 +85,6 @@ class Tsc(_Cube):
         :param stop_mode: The stop mode (1 for immediate stop, 2 for profiled stop).
         """
 
-        # Send the message with the command ID (0x0465), and put channel ID in param1 and stop mode in param2
         await self.send_request(
             "<BB",
             MGMSG.MOT_MOVE_STOP,
@@ -104,10 +102,8 @@ class Tsc(_Cube):
                         - 8 (LEDMODE_MOVING): LED is lit when the motor is moving.
         """
 
-        # Pack the Channel ID (2 bytes) and ModeBits (4 bytes)
         payload = st.pack("<Hl", _CHANNEL, mode_bits)
 
-        # Send the message with the packed payload for MOT_SET_AVMODES (0x04B3)
         await self.send(Message(MGMSG.MOT_SET_AVMODES, data=payload))
 
     async def get_av_modes(self):
@@ -116,7 +112,6 @@ class Tsc(_Cube):
         :return: The LED mode bits set 
         """
 
-        # Send the request to get the current AV modes for the specified channel
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_AVMODES, [MGMSG.MOT_GET_AVMODES], _CHANNEL
         )
@@ -136,10 +131,8 @@ class Tsc(_Cube):
         :param timeout2: Timeout in ms for position2.
         """
 
-        # Pack the channel ID, mode, position1, position2, timeout1, and timeout2
         payload = st.pack("<HHllHH", _CHANNEL, mode, position1, position2, timeout1, timeout2)
 
-        # Send the message with the packed payload for MOT_SET_BUTTONPARAMS (0x04B6)
         await self.send(Message(MGMSG.MOT_SET_BUTTONPARAMS, data=payload))
 
     async def get_button_parameters(self):
@@ -148,7 +141,6 @@ class Tsc(_Cube):
         :return: A tuple containing (mode, position1, position2, timeout1, timeout2)
         """
 
-        # Send the request for button parameters (MOT_REQ_BUTTONPARAMS 0x04B7)
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_BUTTONPARAMS, [MGMSG.MOT_GET_BUTTONPARAMS], _CHANNEL
         )
@@ -226,10 +218,8 @@ class Tsc(_Cube):
         :param num_cycles: Number of open/close cycles (0 for infinite, up to 1,000,000).
         """
 
-        # Pack the Channel ID, OnTime, OffTime, and NumCycles
         payload = st.pack("<HLLL", _CHANNEL, on_time, off_time, num_cycles)
 
-        # Send the message with the packed payload for MOT_SET_SOL_CYCLEPARAMS (0x04C3)
         await self.send(Message(MGMSG.MOT_SET_SOL_CYCLEPARAMS, data=payload))
 
     async def get_solenoid_cycle_parameters(self):
@@ -238,10 +228,9 @@ class Tsc(_Cube):
         :return: A tuple containing (on_time, off_time, num_cycles).
         """
 
-        # Pack the Channel ID for the request
         payload = st.pack("<H", _CHANNEL)
 
-        # Send the request to get the current solenoid cycle parameters
+
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_SOL_CYCLEPARAMS, [MGMSG.MOT_GET_SOL_CYCLEPARAMS], data=payload
         )
@@ -258,7 +247,6 @@ class Tsc(_Cube):
                     - 0x02 = SOLENOID_DISABLED (hardware interlock not required)
         """
 
-        # Send the message with Channel ID in param1 and Interlock Mode in param2
         await self.send(Message(MGMSG.MOT_SET_SOL_INTERLOCKMODE, param2=mode))
 
     async def get_sol_interlock_mode(self):
@@ -269,7 +257,6 @@ class Tsc(_Cube):
                 - 0x02 = SOLENOID_DISABLED (hardware interlock not required)
         """
 
-        # Send the request to get the current interlock mode
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_SOL_INTERLOCKMODE, [MGMSG.MOT_GET_SOL_INTERLOCKMODE], param1=_CHANNEL
         )
@@ -297,12 +284,10 @@ class Tsc(_Cube):
                 - 0x02 = SOLENOID_OFF (solenoid is deactivated).
         """
 
-        # Send the request to get the current solenoid state
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_SOL_STATE, [MGMSG.MOT_GET_SOL_STATE], param1=_CHANNEL
         )
 
-        # Return the solenoid state from param2
         return get_msg.param2
 
 
