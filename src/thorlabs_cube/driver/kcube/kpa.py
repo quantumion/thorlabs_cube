@@ -42,7 +42,12 @@ class Kpa(_Cube):
                 )
             )
 
-    async def set_loop_params(self, p_gain: int, i_gain: int, d_gain: int) -> None:
+    async def set_loop_params(
+        self,
+        p_gain: int,
+        i_gain: int,
+        d_gain: int
+    ) -> None:
         """Set proportional, integral, and differential feedback loop constants.
 
         :param p_gain: Proportional gain value.
@@ -81,7 +86,11 @@ class Kpa(_Cube):
         return st.unpack("<H", get_msg.data[2:])[0]
 
     async def set_quad_position_demand_params(
-        self, x_pos_min: int, x_pos_max: int, y_pos_min: int, y_pos_max: int
+        self,
+        x_pos_min: int,
+        x_pos_max: int,
+        y_pos_min: int,
+        y_pos_max: int
     ) -> None:
         """Set position demand parameters for the quad system.
 
@@ -114,7 +123,10 @@ class Kpa(_Cube):
         return st.unpack("<I", get_msg.data[6:10])[0]
 
     async def set_quad_display_settings(
-        self, disp_intensity: int, disp_mode: int, disp_dim_timeout: int
+        self,
+        disp_intensity: int,
+        disp_mode: int,
+        disp_dim_timeout: int
     ) -> None:
         """Set the display settings for the quad system.
 
@@ -135,7 +147,11 @@ class Kpa(_Cube):
         )
         return st.unpack("<HHH", get_msg.data[6:12])
 
-    async def set_quad_position_outputs(self, x_pos: int, y_pos: int) -> None:
+    async def set_quad_position_outputs(
+        self,
+        x_pos: int,
+        y_pos: int
+    ) -> None:
         """Set the X and Y position outputs.
 
         :param x_pos: X-axis position output value (-32768 to 32767).
@@ -286,7 +302,12 @@ class KpaSim:
         """Close the simulation instance."""
         pass
 
-    def set_loop_params(self, p_gain: int, i_gain: int, d_gain: int) -> None:
+    def set_loop_params(
+        self,
+        p_gain: int,
+        i_gain: int,
+        d_gain: int
+    ) -> None:
         """Set proportional, integral, and differential feedback loop constants.
 
         :param p_gain: Proportional gain value.
@@ -317,7 +338,11 @@ class KpaSim:
         return self.oper_mode
 
     def set_quad_position_demand_params(
-        self, x_pos_min: int, x_pos_max: int, y_pos_min: int, y_pos_max: int
+        self,
+        x_pos_min: int,
+        x_pos_max: int,
+        y_pos_min: int,
+        y_pos_max: int
     ) -> None:
         """Set position demand parameters for the quad system.
 
@@ -343,7 +368,10 @@ class KpaSim:
         return self.status_bits
 
     def set_quad_display_settings(
-        self, disp_intensity: int, disp_mode: int, disp_dim_timeout: int
+        self,
+        disp_intensity: int,
+        disp_mode: int,
+        disp_dim_timeout: int
     ) -> None:
         """Set the display settings for the quad system.
 
@@ -360,7 +388,11 @@ class KpaSim:
         """
         return self.display_settings
 
-    def set_quad_position_outputs(self, x_pos: int, y_pos: int) -> None:
+    def set_quad_position_outputs(
+        self,
+        x_pos: int,
+        y_pos: int
+    ) -> None:
         """Set the X and Y position outputs.
 
         :param x_pos: X-axis position output value (-32768 to 32767).
