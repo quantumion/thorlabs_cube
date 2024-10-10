@@ -64,9 +64,9 @@ def main():
             elif product == "kpa101":
                 dev = KpaSim()
             else:
-                print(
+                raise ValueError(
                     "Invalid product string (-P/--product),"
-                    " choose from tdc001, tpz001, or kdc101"
+                    " choose from tdc001, tpz001, kpa101, or kdc101"
                 )
                 sys.exit(1)
         else:
@@ -80,9 +80,9 @@ def main():
             elif product == "kpa101":
                 dev = Kpa(loop, args.device)
             else:
-                print(
+                raise ValueError(
                     "Invalid product string (-P/--product),"
-                    " choose from tdc001, tpz001, kdc101, kpa101"
+                    " choose from tdc001, tpz001, kdc101, or kpa101"
                 )
                 sys.exit(1)
 
