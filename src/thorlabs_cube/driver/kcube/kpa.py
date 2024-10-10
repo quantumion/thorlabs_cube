@@ -19,10 +19,10 @@ class Kpa(_Cube):
         data = msg.data
 
         if msg_id == MGMSG.HW_DISCONNECT:
-            raise MsgError("Error: Please disconnect the TPA101")
+            raise MsgError("Error: Please disconnect the KPA101")
         elif msg_id == MGMSG.HW_RESPONSE:
             raise MsgError(
-                "Hardware error, please disconnect " "and reconnect the TPA101"
+                "Hardware error, please disconnect " "and reconnect the KPA101"
             )
         elif msg_id == MGMSG.HW_RICHRESPONSE:
             (code,) = st.unpack("<H", data[2:4])
@@ -46,14 +46,11 @@ class Kpa(_Cube):
     async def get_loop_params(self) -> tuple[int, int, int]:
         """Get proportional, integral, and differential feedback loop constants."""
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_LOOPPARAMS, [MGMSG.QUAD_GET_LOOPPARAMS], 1
+            MGMSG.QUAD_REQ_LOOPPARAMS, [MGMSG.QUAD_GET_LOOPPARAMS], _CHANNEL
         )
         return st.unpack("<HHH", get_msg.data[2:])
 
-    async def set_quad_oper_mode(
-        self,
-        mode: int
-    ) -> None:
+    async def set_quad_oper_mode(self, mode: int) -> None:
         """Set the operating mode of the unit.
 
         :param mode: 1 for Monitor Mode, 2 for Open Loop, 3 for Closed Loop.
@@ -64,7 +61,7 @@ class Kpa(_Cube):
     async def get_quad_oper_mode(self) -> int:
         """Get the operating mode of the unit."""
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_OPERMODE, [MGMSG.QUAD_GET_OPERMODE], 1
+            MGMSG.QUAD_REQ_OPERMODE, [MGMSG.QUAD_GET_OPERMODE], _CHANNEL
         )
         return st.unpack("<H", get_msg.data[2:])[0]
 
@@ -82,14 +79,14 @@ class Kpa(_Cube):
     async def get_quad_position_demand_params(self) -> tuple[int, int, int, int]:
         """Get position demand parameters for the quad system."""
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_POSDEMANDPARAMS, [MGMSG.QUAD_GET_POSDEMANDPARAMS], 1
+            MGMSG.QUAD_REQ_POSDEMANDPARAMS, [MGMSG.QUAD_GET_POSDEMANDPARAMS], _CHANNEL
         )
         return st.unpack("<hhhh", get_msg.data[2:10])
 
     async def get_quad_status_bits(self) -> int:
         """Get the status bits of the control unit."""
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_STATUSBITS, [MGMSG.QUAD_GET_STATUSBITS], 1
+            MGMSG.QUAD_REQ_STATUSBITS, [MGMSG.QUAD_GET_STATUSBITS], _CHANNEL
         )
         return st.unpack("<I", get_msg.data[6:10])[0]
 
@@ -111,7 +108,7 @@ class Kpa(_Cube):
     async def get_quad_display_settings(self) -> tuple[int, int, int]:
         """Get the display settings for the quad system."""
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_DISPSETTINGS, [MGMSG.QUAD_GET_DISPSETTINGS], 1
+            MGMSG.QUAD_REQ_DISPSETTINGS, [MGMSG.QUAD_GET_DISPSETTINGS], _CHANNEL
         )
         return st.unpack("<HHH", get_msg.data[6:12])
 
@@ -131,7 +128,7 @@ class Kpa(_Cube):
     async def get_quad_position_outputs(self) -> tuple[int, int]:
         """Get the X and Y position outputs."""
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_POSOUTPUTS, [MGMSG.QUAD_GET_POSOUTPUTS], 1
+            MGMSG.QUAD_REQ_POSOUTPUTS, [MGMSG.QUAD_GET_POSOUTPUTS], _CHANNEL
         )
         return st.unpack("<hh", get_msg.data[6:12])
 
@@ -153,7 +150,7 @@ class Kpa(_Cube):
     async def get_quad_loop_params2(self) -> tuple[float, float, float, float, float, float, int, int]:
         """Get the extended loop parameters for the quad system."""
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_LOOPPARAMS2, [MGMSG.QUAD_GET_LOOPPARAMS2], 1
+            MGMSG.QUAD_REQ_LOOPPARAMS2, [MGMSG.QUAD_GET_LOOPPARAMS2], _CHANNEL
         )
         return st.unpack("<fffffffH", get_msg.data[6:36])
 
@@ -201,14 +198,11 @@ class Kpa(_Cube):
     async def get_trigger_config(self) -> tuple[int, int, int, int, int, int, int, int, int, int]:
         """Get trigger configuration for both TRIG1 and TRIG2."""
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_TRIGGERCONFIG, [MGMSG.QUAD_GET_TRIGGERCONFIG], 1
+            MGMSG.QUAD_REQ_TRIGGERCONFIG, [MGMSG.QUAD_GET_TRIGGERCONFIG], _CHANNEL
         )
         return st.unpack("<HHHHHHHHH", get_msg.data[6:24])
 
-    async def set_digital_outputs(
-        self,
-        dig_ops: int
-    ) -> None:
+    async def set_digital_outputs(self, dig_ops: int) -> None:
         """Set digital outputs for TRIG1 and TRIG2.
 
         :param dig_ops: Status of TRIG1 and TRIG2 outputs.
@@ -219,14 +213,11 @@ class Kpa(_Cube):
     async def get_digital_outputs(self) -> int:
         """Get digital outputs for TRIG1 and TRIG2."""
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_DIGOUTPUTS, [MGMSG.QUAD_GET_DIGOUTPUTS], 1
+            MGMSG.QUAD_REQ_DIGOUTPUTS, [MGMSG.QUAD_GET_DIGOUTPUTS], _CHANNEL
         )
         return st.unpack("<H", get_msg.data[6:8])[0]
 
-    async def set_eeprom_params(
-        self,
-        msg_id: int
-    ) -> None:
+    async def set_eeprom_params(self, msg_id: int) -> None:
         """Save the parameter settings for the specified message.
 
         :param msg_id: The message ID of the message containing the parameters to be saved.
@@ -263,10 +254,7 @@ class KpaSim:
     def get_loop_params(self) -> tuple[int, int, int]:
         return self.loop_params
 
-    def set_quad_oper_mode(
-        self,
-        mode: int
-    ) -> None:
+    def set_quad_oper_mode(self, mode: int) -> None:
         self.oper_mode = mode
 
     def get_quad_oper_mode(self) -> int:
@@ -343,10 +331,7 @@ class KpaSim:
     def get_trigger_config(self) -> tuple[int, int, int, int, int, int, int, int, int, int]:
         return self.trigger_config
 
-    def set_digital_outputs(
-        self,
-        dig_ops: int
-    ) -> None:
+    def set_digital_outputs(self, dig_ops: int) -> None:
         self.digital_outputs = dig_ops
 
     def get_digital_outputs(self) -> int:
