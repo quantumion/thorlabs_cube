@@ -58,7 +58,6 @@ class Ksc(Tsc):
             js_sensitivity,
         )
 
-        # Send the message with the packed payload for MOT_SET_KCUBEMMIPARAMS (0x0520)
         await self.send(Message(MGMSG.MOT_SET_KCUBEMMIPARAMS, data=payload))
 
     async def get_kcubemmi_params(self):
@@ -70,8 +69,6 @@ class Ksc(Tsc):
         """
 
         payload = st.pack("<H", _CHANNEL)
-
-        # Send the request to get the current joystick parameters
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBEMMIPARAMS, [MGMSG.MOT_GET_KCUBEMMIPARAMS], data=payload
         )
@@ -102,7 +99,6 @@ class Ksc(Tsc):
             trig2_polarity,
         )
 
-        # Send the message with the packed payload for MOT_SET_KCUBETRIGIOCONFIG (0x0523)
         await self.send(Message(MGMSG.MOT_SET_KCUBETRIGIOCONFIG, data=payload))
 
     async def get_kcubetrigio_config(self):
@@ -147,9 +143,8 @@ class Ksc(Tsc):
             backward. Only one Trigger port at a time can be set to this mode.
         """
 
-        payload = st.pack("<H", _CHANNEL)  # Channel ID is hardcoded to 0x01
+        payload = st.pack("<H", _CHANNEL)
 
-        # Send the request to get the current trigger I/O configuration
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBETRIGIOCONFIG,
             [MGMSG.MOT_GET_KCUBETRIGIOCONFIG],
@@ -209,7 +204,6 @@ class Ksc(Tsc):
 
         payload = st.pack("<H", _CHANNEL)
 
-        # Send the request to get the current post-trigger parameters
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBEPOSTRIGPARAMS,
             [MGMSG.MOT_GET_KCUBEPOSTRIGPARAMS],
@@ -233,7 +227,6 @@ class Ksc(Tsc):
             disp_dim_level: int,
             js_sensitivity: int,
         ):
-            # Store all the parameters in the simulated object
             self.js_mode = js_mode
             self.js_max_vel = js_max_vel
             self.js_accn = js_accn
@@ -268,7 +261,6 @@ class Ksc(Tsc):
             trig2_mode: int, 
             trig2_polarity: int
         ):
-            # Store trigger I/O configuration
             self.trig1_mode = trig1_mode
             self.trig1_polarity = trig1_polarity
             self.trig2_mode = trig2_mode
@@ -293,7 +285,6 @@ class Ksc(Tsc):
             pulse_width: int,
             num_cycles: int,
         ):
-            # Store post-trigger parameters
             self.start_pos_fwd = start_pos_fwd
             self.interval_fwd = interval_fwd
             self.num_pulses_fwd = num_pulses_fwd
