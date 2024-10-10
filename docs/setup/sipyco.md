@@ -1,42 +1,7 @@
-### Building and Running Docker to Test Changes
 
-1. Build the latest version of the current repository using Docker:
-
-    ```
-    sudo docker build -t <motor controller type>:latest .
-    ```
-
-2. Spin up the Docker container:
-
-    ```
-    sudo docker compose up
-    ```
-
-3. Use the `sipyco_rpctool` to invoke commands, replacing the default port (3255) with the container port (3256):
-
-    ```
-    sipyco_rpctool localhost 3256 call module_identify
-    ```
-
-   > **Note**: Port 3256 is used because the Docker container maps port 3255 (used by the motor controller) to the host's port 3256.
-
-### Procedure for Local Builds and Hardware Testing
-
-1. **Make changes** in your local repository or branch as needed.
-
-2. **Build the latest image** to reflect your repository's current state:
-
-    ```
-    sudo docker build -t tsc001:latest .
-    ```
-
-3. **Spin up the container**:
-
-    ```
-    sudo docker compose up
-    ```
-
-4. **Use `sipyco_rpctool`** to call functions on the motor controller and test your changes:
+###Container Based Testing
+1. Ensure Docker Container is up and running 
+2. **Use `sipyco_rpctool`** to call functions on the motor controller and test your changes:
 
     ```
     sipyco_rpctool localhost 3256 call <method_name>
@@ -44,15 +9,6 @@
 
    - Replace `<method_name>` with the desired method to invoke.
 
-### Notes
-
-- To **capture changes instantly**, use the following command:
-
-    ```
-    sudo docker-compose --build
-    ```
-
-  This command rebuilds the image and applies changes immediately.
 
 ### Example Usage
 
