@@ -337,8 +337,5 @@ class KpaSim:
     def get_digital_outputs(self) -> int:
         return self.digital_outputs
 
-    def set_eeprom_params(
-        self,
-        msg_id: int
-    ) -> None:
+    def set_eeprom_params(self, msg_id: int) -> None:
         pass
