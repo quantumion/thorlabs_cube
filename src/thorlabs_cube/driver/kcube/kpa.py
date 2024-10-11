@@ -29,18 +29,13 @@ class Kpa(_Cube):
 
         if msg_id == MGMSG.HW_DISCONNECT:
             raise MsgError("Error: Please disconnect the KPA101")
+        
         elif msg_id == MGMSG.HW_RESPONSE:
-            raise MsgError(
-                "Hardware error, please disconnect and reconnect the KPA101"
-            )
-        elif msg_id == MGMSG.HW_RICHRESPONSE:
-            (code,) = st.unpack("<H", data[2:4])
-            raise MsgError(
-                "Hardware error {}: {}".format(
-                    code,
-                    data[4:].decode(encoding="ascii"),
-                )
-            )
+            raise MsgError("Hardware error, please disconnect and reconnect the KPA101")
+        
+        else:
+            raise MsgError(f"Unhandled message ID: {msg_id}")
+
 
     async def set_loop_params(
         self,
@@ -488,9 +483,3 @@ class KpaSim:
         """
         return self.digital_outputs
 
-    def set_eeprom_params(self, msg_id: int) -> None:
-        """Save the parameter settings for the specified message.
-
-        :param msg_id: The message ID of the message containing the parameters to be saved.
-        """
-        pass
