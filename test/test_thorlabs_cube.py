@@ -129,6 +129,57 @@ class GenericTpzTest:
                 self.cont.set_tpz_io_settings(*test_vector)
                 self.assertEqual(test_vector, self.cont.get_tpz_io_settings())
 
+class GenericKpaTest:
+    def test_loop_params(self):
+        test_vector = 1, 2, 3
+        self.cont.set_loop_params(*test_vector)
+        self.assertEqual(test_vector, self.cont.get_loop_params())
+
+    def test_oper_mode(self):
+        test_vector = 1
+        self.cont.set_quad_oper_mode(test_vector)
+        self.assertEqual(test_vector, self.cont.get_quad_oper_mode())
+
+    def test_position_demand_params(self):
+        test_vector = 100, 200, 300, 400
+        self.cont.set_quad_position_demand_params(*test_vector)
+        self.assertEqual(test_vector, self.cont.get_quad_position_demand_params())
+
+    def test_status_bits(self):
+        test_vector = 0x1A2B3C4D
+        self.cont.set_quad_status_bits(test_vector)
+        self.assertEqual(test_vector, self.cont.get_quad_status_bits())
+
+    def test_display_settings(self):
+        test_vector = 150, 2, 30
+        self.cont.set_quad_display_settings(*test_vector)
+        self.assertEqual(test_vector, self.cont.get_quad_display_settings())
+
+    def test_position_outputs(self):
+        test_vector = -15000, 15000
+        self.cont.set_quad_position_outputs(*test_vector)
+        self.assertEqual(test_vector, self.cont.get_quad_position_outputs())
+
+    def test_loop_params2(self):
+        test_vector = 1.5, 2.5, 3.5, 100.0, 200.0, 1.0, 1, 0
+        self.cont.set_quad_loop_params2(*test_vector)
+        self.assertEqual(test_vector, self.cont.get_quad_loop_params2())
+
+    def test_trigger_config(self):
+        test_vector = 1, 0, 100, 200, 50, 2, 1, 150, 250, 75
+        self.cont.set_trigger_config(*test_vector)
+        self.assertEqual(test_vector, self.cont.get_trigger_config())
+
+    def test_digital_outputs(self):
+        test_vector = 0xFF
+        self.cont.set_digital_outputs(test_vector)
+        self.assertEqual(test_vector, self.cont.get_digital_outputs())
+
+    def test_eeprom_params(self):
+        test_vector = 0x0875
+        self.cont.set_eeprom_params(test_vector)
+        self.assertEqual(test_vector, self.cont.get_eeprom_params())
+
 
 class TestTdcSim(GenericRPCCase, GenericTdcTest):
     def setUp(self):
@@ -152,3 +203,16 @@ class TestTpzSim(GenericRPCCase, GenericTpzTest):
             self.cont = self.start_server("tpz", command, 3255)
         except:
             self.skipTest("Could not start server")
+
+class TestKpaSim(GenericRPCCase, GenericKpaTest):
+    def setUp(self):
+        GenericRPCCase.setUp(self)
+        command = (
+            sys.executable.replace("\\", "\\\\")
+            + " -m thorlabs_tcube.aqctl_thorlabs_tcube "
+            + "-p 3255 -P kpa101 --simulation"
+        )
+        try:
+            self.cont = self.start_server("kpa", command, 3255)
+        except Exception as e:
+            self.skipTest(f"Could not start server: {e}")
