@@ -1,0 +1,21 @@
+site_name: My Docs
+
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - yaml
+    - rust
+
+  
+nav:
+  - Home: index.md
+  - Setup:
+      - Overview: setup/overview.md
+      - Docker Setup: setup/docker.md
+      - Sipyco Usage: setup/sipyco.md
+  - Controllers:
+      - KPZ101: controllers/kpz101.md
+      - KDC101: controllers/kdc101.md
+      - KSC101: controllers/ksc101.md
+      - KPA101: controllers/kpa101.md
