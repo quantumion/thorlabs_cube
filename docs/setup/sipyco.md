@@ -1,5 +1,5 @@
 
-###Container Based Testing
+### Container Based Testing (Locallly)
 1. Ensure Docker Container is up and running 
 2. **Use `sipyco_rpctool`** to call functions on the motor controller and test your changes:
 

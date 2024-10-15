@@ -4,6 +4,8 @@ Welcome to the **Setup** section. This part of the documentation will guide you 
 
 ## API
 
+## API
+
 ### `thorlabs_cube.driver.message`
 
   - Contains driver messages and communication.

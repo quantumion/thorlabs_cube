@@ -31,17 +31,3 @@ The **KSC101** is a stepper motor controller designed for precision movement app
 The **KPA101** is an amplifier module used to boost control signals for various components. This section will help you understand how to set it up and utilize its features.
 
 [Go to KPA101 Page](./controllers/kpa101.md)
-
-<!-- ## Errors -->
-
-This section lists the most common errors across all modules and how to solve them.
-
-[Go to Errors Page](./controllers/errors.md)
-
-To configure the ARTIQ controller, use:
-
-```sh
-$ aqctl_thorlabs_cube --help
-```
-
-Refer to the argument parser documentation for more details.

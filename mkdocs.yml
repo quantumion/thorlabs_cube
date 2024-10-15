@@ -19,5 +19,3 @@ nav:
       - KDC101: controllers/kdc101.md
       - KSC101: controllers/ksc101.md
       - KPA101: controllers/kpa101.md
-  - Troubleshooting:
-      - Errors: controllers/errors.md

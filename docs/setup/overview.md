@@ -1,6 +1,7 @@
-# Overview
+# Setup
 
-## API
+Welcome to the **Setup** section. 
+
 
 ### `thorlabs_cube.driver.message`
 
