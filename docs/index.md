@@ -6,7 +6,7 @@ Welcome to **My Documentation Site**. This site provides comprehensive documenta
 
 Follow the instructions in this section to get your system up and running quickly. We'll guide you through the basic steps to configure and prepare the devices for use.
 
-[Go to Setup Page](./setup/platform.md)
+[Go to Setup Page](./setup/overview.md)
 
 <!-- ## KPZ101 -->
 
