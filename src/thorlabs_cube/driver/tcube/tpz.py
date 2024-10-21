@@ -1,9 +1,11 @@
 import struct as st
+from typing import Optional, Tuple
 
 from thorlabs_cube.driver.base import _Cube
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
 _CHANNEL = 0x01
+_RESERVED = 0x00
 
 
 class Tpz(_Cube):
@@ -12,11 +14,11 @@ class Tpz(_Cube):
     be completed to finish initialising the driver.
     """
 
-    def __init__(self, loop, serial_dev):
+    def __init__(self, loop, serial_dev) -> None:
         _Cube.__init__(self, loop, serial_dev)
-        self.voltage_limit = None
+        self.voltage_limit: Optional[int] = None
 
-    async def handle_message(self, msg):
+    async def handle_message(self, msg) -> None:
         msg_id = msg.id
         data = msg.data
 
@@ -35,7 +37,7 @@ class Tpz(_Cube):
                 )
             )
 
-    async def set_position_control_mode(self, control_mode):
+    async def set_position_control_mode(self, control_mode: int) -> None:
         """Set the control loop mode.
 
         When in closed-loop mode, position is maintained by a feedback signal
@@ -43,30 +45,18 @@ class Tpz(_Cube):
         equipped with position sensing.
 
         :param control_mode: 0x01 for Open Loop (no feedback).
-
             0x02 for Closed Loop (feedback employed).
-
             0x03 for Open Loop Smooth.
-
             0x04 for Closed Loop Smooth.
         """
         await self.send(
             Message(MGMSG.PZ_SET_POSCONTROLMODE, param1=_CHANNEL, param2=control_mode)
         )
 
-    async def get_position_control_mode(self):
+    async def get_position_control_mode(self) -> int:
         """Get the control loop mode.
 
         :return: Returns the control mode.
-
-            0x01 for Open Loop (no feedback).
-
-            0x02 for Closed Loop (feedback employed).
-
-            0x03 for Open Loop Smooth.
-
-            0x04 for Closed Loop Smooth.
-
         :rtype: int
         """
         get_msg = await self.send_request(
@@ -74,7 +64,7 @@ class Tpz(_Cube):
         )
         return get_msg.param2
 
-    async def set_output_volts(self, voltage):
+    async def set_output_volts(self, voltage: float) -> None:
         """Set output voltage applied to the piezo actuator.
 
         This command is only applicable in Open Loop mode. If called when in
@@ -86,6 +76,9 @@ class Tpz(_Cube):
             :py:meth:`set_tpz_io_settings()<Tpz.set_tpz_io_settings>`
             method between the three values 75 V, 100 V and 150 V.
         """
+        if self.voltage_limit is None:
+            raise ValueError("Voltage limit is not set")
+
         if voltage < 0 or voltage > self.voltage_limit:
             raise ValueError(
                 "Voltage must be in range [0;{}]".format(self.voltage_limit)
@@ -94,7 +87,7 @@ class Tpz(_Cube):
         payload = st.pack("<HH", _CHANNEL, volt)
         await self.send(Message(MGMSG.PZ_SET_OUTPUTVOLTS, data=payload))
 
-    async def get_output_volts(self):
+    async def get_output_volts(self) -> float:
         """Get the output voltage applied to the piezo actuator.
 
         :return: The output voltage.
@@ -103,9 +96,9 @@ class Tpz(_Cube):
         get_msg = await self.send_request(
             MGMSG.PZ_REQ_OUTPUTVOLTS, [MGMSG.PZ_GET_OUTPUTVOLTS], _CHANNEL
         )
-        return st.unpack("<H", get_msg.data[2:])[0] * self.voltage_limit / 65476
+        return st.unpack("<H", get_msg.data[2:])[0] * self.voltage_limit / 32767
 
-    async def set_output_position(self, position_sw):
+    async def set_output_position(self, position_sw: int) -> None:
         """Set output position of the piezo actuator.
 
         This command is only applicable in Closed Loop mode. If called when in
@@ -120,7 +113,7 @@ class Tpz(_Cube):
         payload = st.pack("<HH", _CHANNEL, position_sw)
         await self.send(Message(MGMSG.PZ_SET_OUTPUTPOS, data=payload))
 
-    async def get_output_position(self):
+    async def get_output_position(self) -> int:
         """Get output position of piezo actuator.
 
         :return: The output position of the piezo relative to the zero
@@ -132,7 +125,7 @@ class Tpz(_Cube):
         )
         return st.unpack("<H", get_msg.data[2:])[0]
 
-    async def set_input_volts_source(self, volt_src):
+    async def set_input_volts_source(self, volt_src: int) -> None:
         """Set the input source(s) which controls the output from the HV
         amplifier circuit (i.e. the drive to the piezo actuators).
 
@@ -140,7 +133,7 @@ class Tpz(_Cube):
             parameter to select the various analog sources:
 
             0x00 Software Only: Unit responds only to software inputs and the
-            HV amp output is that set using the :py:meth:`set_output_volts()
+            HV amp output is that set using the :py:meth:`set_output_volts()`
             <Tpz.set_output_volts>` method.
 
             0x01 External Signal: Unit sums the differential signal on the rear
@@ -158,7 +151,7 @@ class Tpz(_Cube):
         payload = st.pack("<HH", _CHANNEL, volt_src)
         await self.send(Message(MGMSG.PZ_SET_INPUTVOLTSSRC, data=payload))
 
-    async def get_input_volts_source(self):
+    async def get_input_volts_source(self) -> int:
         """Get the input source(s) which controls the output from the HV
         amplifier circuit.
 
@@ -172,7 +165,7 @@ class Tpz(_Cube):
         )
         return st.unpack("<H", get_msg.data[2:])[0]
 
-    async def set_pi_constants(self, prop_const, int_const):
+    async def set_pi_constants(self, prop_const: int, int_const: int) -> None:
         """Set the proportional and integration feedback loop constants.
 
         These parameters determine the response characteristics when operating
@@ -188,7 +181,7 @@ class Tpz(_Cube):
         payload = st.pack("<HHH", _CHANNEL, prop_const, int_const)
         await self.send(Message(MGMSG.PZ_SET_PICONSTS, data=payload))
 
-    async def get_pi_constants(self):
+    async def get_pi_constants(self) -> Tuple[int, int]:
         """Get the proportional and integration feedback loop constants.
 
         :return: Returns a tuple whose first element is the proportional
@@ -200,7 +193,7 @@ class Tpz(_Cube):
         )
         return st.unpack("<HH", get_msg.data[2:])
 
-    async def set_output_lut(self, lut_index, output):
+    async def set_output_lut(self, lut_index: int, output: float) -> None:
         """Set the ouput LUT values for WGM (Waveform Generator Mode).
 
         It is possible to use the controller in an arbitrary Waveform
@@ -225,7 +218,7 @@ class Tpz(_Cube):
         used to load the LUT array with the required output waveform. The
         applicable channel is specified by the Chan Ident parameter If only a
         sub set of the array is being used (as specified by the cyclelength
-        parameter of the :py:meth:`set_output_lut_parameters()
+        parameter of the :py:meth:`set_output_lut_parameters()`
         <Tpz.set_output_lut_parameters>`
         function), then only the first cyclelength values need to be set. In
         this manner, any arbitrary voltage waveform can be programmed into the
@@ -240,11 +233,14 @@ class Tpz(_Cube):
             :py:meth:`set_tpz_io_settings<Tpz.set_tpz_io_settings>`
             method.
         """
+        if self.voltage_limit is None:
+            raise ValueError("Voltage limit is not set")
+
         volt = round(output * 32767 / self.voltage_limit)
         payload = st.pack("<HHH", _CHANNEL, lut_index, volt)
         await self.send(Message(MGMSG.PZ_SET_OUTPUTLUT, data=payload))
 
-    async def get_output_lut(self):
+    async def get_output_lut(self) -> Tuple[int, float]:
         """Get the ouput LUT values for WGM (Waveform Generator Mode).
 
         :return: a tuple whose first element is the lut index and the second is
@@ -259,13 +255,13 @@ class Tpz(_Cube):
 
     async def set_output_lut_parameters(
         self,
-        mode,
-        cycle_length,
-        num_cycles,
-        delay_time,
-        precycle_rest,
-        postcycle_rest,
-    ):
+        mode: int,
+        cycle_length: int,
+        num_cycles: int,
+        delay_time: int,
+        precycle_rest: int,
+        postcycle_rest: int,
+    ) -> None:
         """Set Waveform Generator Mode parameters.
 
         It is possible to use the controller in an arbitrary Waveform
@@ -340,7 +336,7 @@ class Tpz(_Cube):
         )
         await self.send(Message(MGMSG.PZ_SET_OUTPUTLUTPARAMS, data=payload))
 
-    async def get_output_lut_parameters(self):
+    async def get_output_lut_parameters(self) -> Tuple[int, int, int, int, int, int]:
         """Get Waveform Generator Mode parameters.
 
         :return: a 6 int elements tuple whose members are (mode, cycle_length,
@@ -354,15 +350,15 @@ class Tpz(_Cube):
         )
         return st.unpack("<HHLLLL", get_msg.data[2:22])
 
-    async def start_lut_output(self):
+    async def start_lut_output(self) -> None:
         """Start the voltage waveform (LUT) outputs."""
         await self.send(Message(MGMSG.PZ_START_LUTOUTPUT, param1=_CHANNEL))
 
-    async def stop_lut_output(self):
+    async def stop_lut_output(self) -> None:
         """Stop the voltage waveform (LUT) outputs."""
         await self.send(Message(MGMSG.PZ_STOP_LUTOUTPUT, param1=_CHANNEL))
 
-    async def set_eeprom_parameters(self, msg_id):
+    async def set_eeprom_parameters(self, msg_id: int) -> None:
         """Save the parameter settings for the specified message.
 
         :param msg_id: The message ID of the message containing the parameters
@@ -371,7 +367,7 @@ class Tpz(_Cube):
         payload = st.pack("<HH", _CHANNEL, msg_id)
         await self.send(Message(MGMSG.PZ_SET_EEPROMPARAMS, data=payload))
 
-    async def set_tpz_display_settings(self, intensity):
+    async def set_tpz_display_settings(self, intensity: int) -> None:
         """Set the intensity of the LED display on the front of the TPZ unit.
 
         :param intensity: The intensity is set as a value from 0 (Off) to 255
@@ -380,7 +376,7 @@ class Tpz(_Cube):
         payload = st.pack("<H", intensity)
         await self.send(Message(MGMSG.PZ_SET_TPZ_DISPSETTINGS, data=payload))
 
-    async def get_tpz_display_settings(self):
+    async def get_tpz_display_settings(self) -> int:
         """Get the intensity of the LED display on the front of the TPZ unit.
 
         :return: The intensity as a value from 0 (Off) to 255 (brightest).
@@ -391,8 +387,10 @@ class Tpz(_Cube):
         )
         return st.unpack("<H", get_msg.data)[0]
 
-    async def set_tpz_io_settings(self, voltage_limit, hub_analog_input):
-        """Set various I/O settings."
+    async def set_tpz_io_settings(
+        self, voltage_limit: int, hub_analog_input: int
+    ) -> None:
+        """Set various I/O settings.
 
         :param voltage_limit: The piezo actuator connected to the T-Cube has a
             specific maximum operating voltage. This parameter sets the maximum
@@ -432,14 +430,16 @@ class Tpz(_Cube):
         else:
             raise ValueError("voltage_limit must be 75 V, 100 V or 150 V")
 
-        payload = st.pack("<HHHHH", _CHANNEL, voltage_limit, hub_analog_input, 0, 0)
+        payload = st.pack(
+            "<HHHHH", _CHANNEL, voltage_limit, hub_analog_input, _RESERVED, _RESERVED
+        )
         await self.send(Message(MGMSG.PZ_SET_TPZ_IOSETTINGS, data=payload))
 
-    async def get_tpz_io_settings(self):
+    async def get_tpz_io_settings(self) -> Tuple[int, int]:
         """Get various I/O settings.
 
         :return: Returns a tuple whose elements are the voltage limit and the
-            Hub analog input. Refer to :py:meth:`set_tpz_io_settings()
+            Hub analog input. Refer to :py:meth:`set_tpz_io_settings()`
             <Tpz.set_tpz_io_settings>` for
             the meaning of those parameters.
         :rtype: a 2 elements tuple (int, int)
@@ -461,74 +461,75 @@ class Tpz(_Cube):
 
 
 class TpzSim:
-    def __init__(self):
-        self.voltage_limit = 150
-        self.hub_analog_input = 1
+    def __init__(self) -> None:
+        self.voltage_limit: int = 150
+        self.hub_analog_input: int = 1
 
-    def close(self):
+    def close(self) -> None:
         pass
 
-    def module_identify(self):
+    def module_identify(self) -> None:
         pass
 
-    def set_position_control_mode(self, control_mode):
-        self.control_mode = control_mode
+    def set_position_control_mode(self, control_mode: int) -> None:
+        self.control_mode: int = control_mode
 
-    def get_position_control_mode(self):
+    def get_position_control_mode(self) -> int:
         return self.control_mode
 
-    def set_output_volts(self, voltage):
-        self.voltage = voltage
+    def set_output_volts(self, voltage: float) -> None:
+        self.voltage: float = voltage
 
-    def get_output_volts(self):
+    def get_output_volts(self) -> float:
         return self.voltage
 
-    def set_output_position(self, position_sw):
-        self.position_sw = position_sw
+    def set_output_position(self, position_sw: int) -> None:
+        self.position_sw: int = position_sw
 
-    def get_output_position(self):
+    def get_output_position(self) -> int:
         return self.position_sw
 
-    def set_input_volts_source(self, volt_src):
-        self.volt_src = volt_src
+    def set_input_volts_source(self, volt_src: int) -> None:
+        self.volt_src: int = volt_src
 
-    def get_input_volts_source(self):
+    def get_input_volts_source(self) -> int:
         return self.volt_src
 
-    def set_pi_constants(self, prop_const, int_const):
-        self.prop_const = prop_const
-        self.int_const = int_const
+    def set_pi_constants(self, prop_const: int, int_const: int) -> None:
+        self.prop_const: int = prop_const
+        self.int_const: int = int_const
 
-    def get_pi_constants(self):
+    def get_pi_constants(self) -> tuple[int, int]:
         return self.prop_const, self.int_const
 
-    def set_output_lut(self, lut_index, output):
+    def set_output_lut(self, lut_index: int, output: float) -> None:
         if lut_index < 0 or lut_index > 512:
             raise ValueError(
                 "LUT index should be in range [0;512] and not {}".format(lut_index)
             )
+        self.lut: list[float] = [0.0] * 513
         self.lut[lut_index] = output
 
-    def get_output_lut(self):
-        return 0, 0  # FIXME: the API description here doesn't make any sense
+    def get_output_lut(self) -> tuple[int, float]:
+        return 0, 0.0  # FIXME: the API description here doesn't make any sense
 
     def set_output_lut_parameters(
         self,
-        mode,
-        cycle_length,
-        num_cycles,
-        delay_time,
-        precycle_rest,
-        postcycle_rest,
-    ):
-        self.mode = mode
-        self.cycle_length = cycle_length
-        self.num_cycles = num_cycles
-        self.delay_time = delay_time
-        self.precycle_rest = precycle_rest
-        self.postcycle_rest = postcycle_rest
+        mode: int,
+        cycle_length: int,
+        num_cycles: int,
+        delay_time: int,
+        precycle_rest: int,
+        postcycle_rest: int,
+    ) -> None:
+        self.mode: int = mode
+        self.cycle_length: int = cycle_length
+        self.num_cycles: int = num_cycles
+        self.delay_time: int = delay_time
+        self.precycle_rest: int = precycle_rest
+        self.postcycle_rest: int = postcycle_rest
 
-    def get_output_lut_parameters(self):
+    def get_output_lut_parameters(self) -> tuple[int, int, int, int, int, int]:
         return (
             self.mode,
             self.cycle_length,
@@ -538,26 +539,26 @@ class TpzSim:
             self.postcycle_rest,
         )
 
-    def start_lut_output(self):
+    def start_lut_output(self) -> None:
         pass
 
-    def stop_lut_output(self):
+    def stop_lut_output(self) -> None:
         pass
 
-    def set_eeprom_parameters(self, msg_id):
+    def set_eeprom_parameters(self, msg_id: int) -> None:
         pass
 
-    def set_tpz_display_settings(self, intensity):
-        self.intensity = intensity
+    def set_tpz_display_settings(self, intensity: int) -> None:
+        self.intensity: int = intensity
 
-    def get_tpz_display_settings(self):
+    def get_tpz_display_settings(self) -> int:
         return self.intensity
 
-    def set_tpz_io_settings(self, voltage_limit, hub_analog_input):
+    def set_tpz_io_settings(self, voltage_limit: int, hub_analog_input: int) -> None:
         if voltage_limit not in [75, 100, 150]:
             raise ValueError("voltage_limit must be 75 V, 100 V or 150 V")
         self.voltage_limit = voltage_limit
         self.hub_analog_input = hub_analog_input
 
-    def get_tpz_io_settings(self):
+    def get_tpz_io_settings(self) -> tuple[int, int]:
         return self.voltage_limit, self.hub_analog_input
