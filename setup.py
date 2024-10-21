@@ -4,7 +4,7 @@ setup(
     name="thorlabs_cube",
     version="0.0.3",
     url="https://github.com/quantumion/thorlabs_cube",
-    description="ARTIQ controller for Thorlabs T/KCube devices",
+    description="ARTIQ NDSP for Thorlabs T/K-Cube controllers",
     install_requires=[
         "sipyco@git+https://github.com/m-labs/sipyco.git@v1.8",
         "asyncserial@git+https://github.com/m-labs/asyncserial.git@1.0",
