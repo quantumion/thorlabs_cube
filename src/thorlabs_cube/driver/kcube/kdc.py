@@ -13,9 +13,9 @@ class Kdc(Tdc):
     KDC101 K-Cube Brushed DC Servo Motor Controller class
     """
 
-    def __init__(self, loop, serial_dev: str):
+    def __init__(self, serial_dev: str):
         """Initialize from TDC001 control class"""
-        super().__init__(loop, serial_dev)
+        super().__init__(serial_dev)
 
     async def handle_message(self, msg: Message):
         """Parse messages from the device.
