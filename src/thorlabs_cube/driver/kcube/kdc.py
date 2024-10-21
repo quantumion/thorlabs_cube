@@ -152,7 +152,9 @@ class Kdc(Tdc):
         )
         await self.send(Message(MGMSG.MOT_SET_KCUBEMMIPARAMS, data=payload))
 
-    async def get_mmi_parameters(self) -> tuple[int, int, int, int, int, int, int, int, int]:
+    async def get_mmi_parameters(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int, int]:
         """Get the operating parameters of the top panel wheel (Joystick).
 
         :return: A 9 int tuple containing in this order: joystick mode,
@@ -365,7 +367,9 @@ class Kdc(Tdc):
             )
         )
 
-    async def get_position_trigger_parameters(self) -> tuple[int, int, int, int, int, int, int, int]:
+    async def get_position_trigger_parameters(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int]:
         """Get the positioning trigger parameters.
 
         :return: An 8 int tuple containing in this order: start_position_fwd,
@@ -412,7 +416,9 @@ class KdcSim(TdcSim):
         self.timeout = timeout
         self.dim = dim
 
-    async def get_mmi_parameters(self) -> tuple[int, int, int, int, int, int, int, int, int]:
+    async def get_mmi_parameters(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int, int]:
         return (
             self.mode,
             self.max_velocity,
@@ -456,7 +462,9 @@ class KdcSim(TdcSim):
         self.pulse_width = pulse_width
         self.num_cycles = num_cycles
 
-    async def get_position_trigger_parameters(self) -> tuple[int, int, int, int, int, int, int, int]:
+    async def get_position_trigger_parameters(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int]:
         return (
             self.start_position_fwd,
             self.interval_fwd,
