@@ -3,9 +3,9 @@ import struct as st
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 
-_RESERVED = 0x0
-_CHANNEL = 0x01
-_REQUEST_LENGTH = 1
+_RESERVED: int = 0x0
+_CHANNEL: int = 0x01
+_REQUEST_LENGTH: int = 1
 
 
 class Kdc(Tdc):
@@ -13,11 +13,11 @@ class Kdc(Tdc):
     KDC101 K-Cube Brushed DC Servo Motor Controller class
     """
 
-    def __init__(self, loop, serial_dev: str):
+    def __init__(self, serial_dev: str):
         """Initialize from TDC001 control class"""
-        super().__init__(loop, serial_dev)
+        super().__init__(serial_dev)
 
-    async def handle_message(self, msg: Message):
+    async def handle_message(self, msg: Message) -> None:
         """Parse messages from the device.
         Minor adaptation from TDC001 method."""
         msg_id = msg.id
@@ -70,7 +70,7 @@ class Kdc(Tdc):
         brightness: int,
         timeout: int,
         dim: int,
-    ):
+    ) -> None:
         """Set the operating parameters of the top panel wheel (Joystick).
 
         :param mode: This parameter specifies the operating mode of the
@@ -152,7 +152,9 @@ class Kdc(Tdc):
         )
         await self.send(Message(MGMSG.MOT_SET_KCUBEMMIPARAMS, data=payload))
 
-    async def get_mmi_parameters(self):
+    async def get_mmi_parameters(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int, int]:
         """Get the operating parameters of the top panel wheel (Joystick).
 
         :return: A 9 int tuple containing in this order: joystick mode,
@@ -171,7 +173,7 @@ class Kdc(Tdc):
 
     async def set_trigger_io_config(
         self, mode1: int, polarity1: int, mode2: int, polarity2: int
-    ):
+    ) -> None:
         """Set trigger intput/output parameters.
 
         The K-Cube motor controllers have two bidirectional trigger ports
@@ -265,7 +267,7 @@ class Kdc(Tdc):
         )
         await self.send(Message(MGMSG.MOT_SET_KCUBETRIGIOCONFIG, data=payload))
 
-    async def get_trigger_io_config(self):
+    async def get_trigger_io_config(self) -> tuple[int, int, int, int]:
         """Get trigger input/output parameters.
 
         :return: A 4 int tuple containing in this order: mode1, polarity1,
@@ -291,7 +293,7 @@ class Kdc(Tdc):
         num_pulses_rev: int,
         pulse_width: int,
         num_cycles: int,
-    ):
+    ) -> None:
         """Set positioning trigger parameters.
 
         The K-Cube motor controllers have two bidirectional trigger ports
@@ -365,7 +367,9 @@ class Kdc(Tdc):
             )
         )
 
-    async def get_position_trigger_parameters(self):
+    async def get_position_trigger_parameters(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int]:
         """Get the positioning trigger parameters.
 
         :return: An 8 int tuple containing in this order: start_position_fwd,
@@ -401,7 +405,7 @@ class KdcSim(TdcSim):
         brightness: int,
         timeout: int,
         dim: int,
-    ):
+    ) -> None:
         self.mode = mode
         self.max_velocity = max_velocity
         self.max_acceleration = max_acceleration
@@ -412,7 +416,9 @@ class KdcSim(TdcSim):
         self.timeout = timeout
         self.dim = dim
 
-    async def get_mmi_parameters(self):
+    async def get_mmi_parameters(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int, int]:
         return (
             self.mode,
             self.max_velocity,
@@ -427,13 +433,13 @@ class KdcSim(TdcSim):
 
     async def set_trigger_io_config(
         self, mode1: int, polarity1: int, mode2: int, polarity2: int
-    ):
+    ) -> None:
         self.mode1 = mode1
         self.polarity1 = polarity1
         self.mode2 = mode2
         self.polarity2 = polarity2
 
-    async def get_trigger_io_config(self):
+    async def get_trigger_io_config(self) -> tuple[int, int, int, int]:
         return (self.mode1, self.polarity1, self.mode2, self.polarity2)
 
     async def set_position_trigger_parameters(
@@ -446,7 +452,7 @@ class KdcSim(TdcSim):
         num_pulses_rev: int,
         pulse_width: int,
         num_cycles: int,
-    ):
+    ) -> None:
         self.start_position_fwd = start_position_fwd
         self.interval_fwd = interval_fwd
         self.num_pulses_fwd = num_pulses_fwd
@@ -456,7 +462,9 @@ class KdcSim(TdcSim):
         self.pulse_width = pulse_width
         self.num_cycles = num_cycles
 
-    async def get_position_trigger_parameters(self):
+    async def get_position_trigger_parameters(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int]:
         return (
             self.start_position_fwd,
             self.interval_fwd,

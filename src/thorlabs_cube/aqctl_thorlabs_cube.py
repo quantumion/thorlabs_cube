@@ -62,22 +62,20 @@ def main():
                 dev = KdcSim()
             else:
                 print(
-                    "Invalid product string (-P/--product),"
-                    " choose from tdc001, tpz001, or kdc101"
+                    "Invalid product string (-P/--product). Choose from tdc001, tpz001, or kdc101"
                 )
                 sys.exit(1)
         else:
             if product == "tdc001":
-                dev = Tdc(loop, args.device)
+                dev = Tdc(args.device)
             elif product == "tpz001":
-                dev = Tpz(loop, args.device)
+                dev = Tpz(args.device)
                 loop.run_until_complete(dev.get_tpz_io_settings())
             elif product == "kdc101":
-                dev = Kdc(loop, args.device)
+                dev = Kdc(args.device)
             else:
                 print(
-                    "Invalid product string (-P/--product),"
-                    " choose from tdc001, tpz001, or kdc101"
+                    "Invalid product string (-P/--product). Choose from tdc001, tpz001, or kdc101"
                 )
                 sys.exit(1)
 
@@ -89,7 +87,7 @@ def main():
                 loop=loop,
             )
         finally:
-            loop.run_until_complete(dev.close())
+            dev.close()
     finally:
         loop.close()
 
