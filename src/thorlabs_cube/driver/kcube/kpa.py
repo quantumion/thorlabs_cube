@@ -3,7 +3,6 @@ import struct as st
 from thorlabs_cube.driver.base import _Cube
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
-
 _CHANNEL: int = 0x01
 
 
@@ -18,6 +17,7 @@ class Kpa(_Cube):
         """
         _Cube.__init__(self, loop, serial_dev)
         self.loop_params = None
+        self.status_report_counter = 0
 
     async def handle_message(self, msg: Message) -> None:
         """Handle incoming messages from the KPA101 device.
@@ -29,20 +29,33 @@ class Kpa(_Cube):
 
         if msg_id == MGMSG.HW_DISCONNECT:
             raise MsgError("Error: Please disconnect the KPA101")
-        
+
         elif msg_id == MGMSG.HW_RESPONSE:
             raise MsgError("Hardware error, please disconnect and reconnect the KPA101")
-        
+
+        elif msg_id == MGMSG.QUAD_GET_STATUSUPDATE:
+            x_diff, y_diff, sum_val, x_pos, y_pos, status_bits = st.unpack(
+                "<hhIhhI", data[6:20]
+            )
+
+            # Update internal state variables with the extracted values
+            self.x_diff = x_diff
+            self.y_diff = y_diff
+            self.sum_val = sum_val
+            self.x_pos = x_pos
+            self.y_pos = y_pos
+            self.status_bits = status_bits
+
+            if self.status_report_counter == 25:
+                self.status_report_counter = 0
+                await self.send(Message(MGMSG.QUAD_ACK_STATUSUPDATE))
+            else:
+                self.status_report_counter += 1
+
         else:
             raise MsgError(f"Unhandled message ID: {msg_id}")
 
-
-    async def set_loop_params(
-        self,
-        p_gain: int,
-        i_gain: int,
-        d_gain: int
-    ) -> None:
+    async def set_loop_params(self, p_gain: int, i_gain: int, d_gain: int) -> None:
         """Set proportional, integral, and differential feedback loop constants.
 
         :param p_gain: Proportional gain value.
@@ -81,11 +94,7 @@ class Kpa(_Cube):
         return st.unpack("<H", get_msg.data[2:])[0]
 
     async def set_quad_position_demand_params(
-        self,
-        x_pos_min: int,
-        x_pos_max: int,
-        y_pos_min: int,
-        y_pos_max: int
+        self, x_pos_min: int, x_pos_max: int, y_pos_min: int, y_pos_max: int
     ) -> None:
         """Set position demand parameters for the quad system.
 
@@ -118,10 +127,7 @@ class Kpa(_Cube):
         return st.unpack("<I", get_msg.data[6:10])[0]
 
     async def set_quad_display_settings(
-        self,
-        disp_intensity: int,
-        disp_mode: int,
-        disp_dim_timeout: int
+        self, disp_intensity: int, disp_mode: int, disp_dim_timeout: int
     ) -> None:
         """Set the display settings for the quad system.
 
@@ -142,11 +148,7 @@ class Kpa(_Cube):
         )
         return st.unpack("<HHH", get_msg.data[6:12])
 
-    async def set_quad_position_outputs(
-        self,
-        x_pos: int,
-        y_pos: int
-    ) -> None:
+    async def set_quad_position_outputs(self, x_pos: int, y_pos: int) -> None:
         """Set the X and Y position outputs.
 
         :param x_pos: X-axis position output value (-32768 to 32767).
@@ -174,7 +176,7 @@ class Kpa(_Cube):
         notch_freq: float,
         filter_q: float,
         notch_on: int,
-        deriv_filter_on: int
+        deriv_filter_on: int,
     ) -> None:
         """Set the extended loop parameters for the quad system.
 
@@ -187,13 +189,26 @@ class Kpa(_Cube):
         :param notch_on: Notch filter on/off flag.
         :param deriv_filter_on: Derivative filter on/off flag.
         """
-        payload = st.pack("<fffffffH", p_gain, i_gain, d_gain, d_cutoff_freq, notch_freq, filter_q, notch_on, deriv_filter_on)
+        payload = st.pack(
+            "<fffffffH",
+            p_gain,
+            i_gain,
+            d_gain,
+            d_cutoff_freq,
+            notch_freq,
+            filter_q,
+            notch_on,
+            deriv_filter_on,
+        )
         await self.send(Message(MGMSG.QUAD_SET_LOOPPARAMS2, data=payload))
 
-    async def get_quad_loop_params2(self) -> tuple[float, float, float, float, float, float, int, int]:
+    async def get_quad_loop_params2(
+        self,
+    ) -> tuple[float, float, float, float, float, float, int, int]:
         """Get the extended loop parameters for the quad system.
 
-        :return: A tuple containing p_gain, i_gain, d_gain, d_cutoff_freq, notch_freq, filter_q, notch_on, deriv_filter_on.
+        :return: A tuple containing p_gain, i_gain, d_gain, d_cutoff_freq,
+        notch_freq, filter_q, notch_on, deriv_filter_on.
         """
         get_msg = await self.send_request(
             MGMSG.QUAD_REQ_LOOPPARAMS2, [MGMSG.QUAD_GET_LOOPPARAMS2], _CHANNEL
@@ -211,7 +226,7 @@ class Kpa(_Cube):
         trig2_polarity: int,
         trig2_sum_min: int,
         trig2_sum_max: int,
-        trig2_diff_threshold: int
+        trig2_diff_threshold: int,
     ) -> None:
         """Set trigger configuration for both TRIG1 and TRIG2.
 
@@ -241,7 +256,9 @@ class Kpa(_Cube):
         )
         await self.send(Message(MGMSG.QUAD_SET_TRIGGERCONFIG, data=payload))
 
-    async def get_trigger_config(self) -> tuple[int, int, int, int, int, int, int, int, int, int]:
+    async def get_trigger_config(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int, int, int]:
         """Get trigger configuration for both TRIG1 and TRIG2.
 
         :return: A tuple containing trigger configuration parameters for TRIG1 and TRIG2.
@@ -282,7 +299,7 @@ class KpaSim:
     """Simulation class for KPA101."""
 
     def __init__(self):
-        
+
         self.loop_params = (0, 0, 0)
         self.oper_mode = 1
         self.pos_demand_params = (0, 0, 0, 0)
@@ -296,12 +313,7 @@ class KpaSim:
     def close(self):
         pass
 
-    def set_loop_params(
-        self,
-        p_gain: int,
-        i_gain: int,
-        d_gain: int
-    ) -> None:
+    def set_loop_params(self, p_gain: int, i_gain: int, d_gain: int) -> None:
 
         self.loop_params = (p_gain, i_gain, d_gain)
 
@@ -315,11 +327,7 @@ class KpaSim:
         return self.oper_mode
 
     def set_quad_position_demand_params(
-        self,
-        x_pos_min: int,
-        x_pos_max: int,
-        y_pos_min: int,
-        y_pos_max: int
+        self, x_pos_min: int, x_pos_max: int, y_pos_min: int, y_pos_max: int
     ) -> None:
 
         self.pos_demand_params = (x_pos_min, x_pos_max, y_pos_min, y_pos_max)
@@ -333,10 +341,7 @@ class KpaSim:
         return self.status_bits
 
     def set_quad_display_settings(
-        self,
-        disp_intensity: int,
-        disp_mode: int,
-        disp_dim_timeout: int
+        self, disp_intensity: int, disp_mode: int, disp_dim_timeout: int
     ) -> None:
 
         self.display_settings = (disp_intensity, disp_mode, disp_dim_timeout)
@@ -344,11 +349,7 @@ class KpaSim:
     def get_quad_display_settings(self) -> tuple[int, int, int]:
         return self.display_settings
 
-    def set_quad_position_outputs(
-        self,
-        x_pos: int,
-        y_pos: int
-    ) -> None:
+    def set_quad_position_outputs(self, x_pos: int, y_pos: int) -> None:
 
         self.position_outputs = (x_pos, y_pos)
 
@@ -364,12 +365,23 @@ class KpaSim:
         notch_freq: float,
         filter_q: float,
         notch_on: int,
-        deriv_filter_on: int
+        deriv_filter_on: int,
     ) -> None:
-        
-        self.loop_params2 = (p_gain, i_gain, d_gain, d_cutoff_freq, notch_freq, filter_q, notch_on, deriv_filter_on)
 
-    def get_quad_loop_params2(self) -> tuple[float, float, float, float, float, float, int, int]:
+        self.loop_params2 = (
+            p_gain,
+            i_gain,
+            d_gain,
+            d_cutoff_freq,
+            notch_freq,
+            filter_q,
+            notch_on,
+            deriv_filter_on,
+        )
+
+    def get_quad_loop_params2(
+        self,
+    ) -> tuple[float, float, float, float, float, float, int, int]:
         return self.loop_params2
 
     def set_trigger_config(
@@ -383,13 +395,25 @@ class KpaSim:
         trig2_polarity: int,
         trig2_sum_min: int,
         trig2_sum_max: int,
-        trig2_diff_threshold: int
+        trig2_diff_threshold: int,
     ) -> None:
-        
-        self.trigger_config = (trig1_mode, trig1_polarity, trig1_sum_min, trig1_sum_max, trig1_diff_threshold,
-                               trig2_mode, trig2_polarity, trig2_sum_min, trig2_sum_max, trig2_diff_threshold)
 
-    def get_trigger_config(self) -> tuple[int, int, int, int, int, int, int, int, int, int]:
+        self.trigger_config = (
+            trig1_mode,
+            trig1_polarity,
+            trig1_sum_min,
+            trig1_sum_max,
+            trig1_diff_threshold,
+            trig2_mode,
+            trig2_polarity,
+            trig2_sum_min,
+            trig2_sum_max,
+            trig2_diff_threshold,
+        )
+
+    def get_trigger_config(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int, int, int]:
         return self.trigger_config
 
     def set_digital_outputs(self, dig_ops: int) -> None:
@@ -397,4 +421,3 @@ class KpaSim:
 
     def get_digital_outputs(self) -> int:
         return self.digital_outputs
-
