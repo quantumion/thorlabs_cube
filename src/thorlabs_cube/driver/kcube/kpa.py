@@ -1,3 +1,4 @@
+import asyncio
 import struct as st
 
 from thorlabs_cube.driver.base import _Cube
@@ -9,7 +10,7 @@ _CHANNEL: int = 0x01
 class Kpa(_Cube):
     """KPA101 driver implementation."""
 
-    def __init__(self, loop, serial_dev) -> None:
+    def __init__(self, loop: asyncio.AbstractEventLoop, serial_dev: str) -> None:
         """Initialize the KPA101 driver.
 
         :param loop: Event loop for asynchronous operations.
@@ -24,8 +25,8 @@ class Kpa(_Cube):
 
         :param msg: Message object received from the device.
         """
-        msg_id = msg.id
-        data = msg.data
+        msg_id: MGMSG = msg.id
+        data: bytes = msg.data
 
         if msg_id == MGMSG.HW_DISCONNECT:
             raise MsgError("Error: Please disconnect the KPA101")
