@@ -4,6 +4,8 @@ import unittest
 
 from sipyco.test.generic_rpc import GenericRPCCase
 
+_RESERVED: int = 0x0
+
 
 class GenericTdcTest:
     def test_pot_parameters(self):
@@ -130,15 +132,29 @@ class GenericKpzTest:
     def test_kcubemmi_params(self):
         test_vector = (1, 2, 3, 4, 5, 6, 7, 8, 9)
         self.cont.set_kcubemmi_params(*test_vector)
-        expected_result = (*test_vector, 0, 0, 0, 0)  # Adding reserved bytes for comparison
+        expected_result = (
+            *test_vector,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+        )  # Adding reserved bytes for comparison
         self.assertEqual(expected_result, self.cont.get_kcubemmi_params())
-
 
     def test_trigio_config(self):
         test_vector = (1, 0, 2, 1)
         self.cont.set_trigio_config(*test_vector)
-        expected_result = (*test_vector, 0, 0, 0, 0, 0, 0)  # Adding reserved bytes for comparison
+        expected_result = (
+            *test_vector,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+        )  # Adding reserved bytes for comparison
         self.assertEqual(expected_result, self.cont.get_trigio_config())
+
 
 class TestTdcSim(GenericRPCCase, GenericTdcTest):
     def setUp(self):
