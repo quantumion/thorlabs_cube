@@ -126,6 +126,18 @@ class GenericTpzTest:
                 self.assertEqual(test_vector, self.cont.get_tpz_io_settings())
 
 
+class GenericKpzTest:
+    def test_kcubemmi_params(self):
+        test_vector = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+        self.cont.set_kcubemmi_params(*test_vector)
+        self.assertEqual(test_vector, self.cont.get_kcubemmi_params())
+
+    def test_trigio_config(self):
+        test_vector = (1, 0, 2, 1)
+        self.cont.set_trigio_config(*test_vector)
+        self.assertEqual(test_vector, self.cont.get_trigio_config())
+
+
 class TestTdcSim(GenericRPCCase, GenericTdcTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
@@ -150,5 +162,19 @@ class TestTpzSim(GenericRPCCase, GenericTpzTest):
         )
         try:
             self.cont = self.start_server("tpz", command, 3255)
+        except:
+            self.skipTest("Could not start server")
+
+
+class TestKpzSim(GenericRPCCase, GenericKpzTest):
+    def setUp(self):
+        GenericRPCCase.setUp(self)
+        command = (
+            sys.executable.replace("\\", "\\\\")
+            + " -m thorlabs_cube.aqctl_thorlabs_cube "
+            + "-p 3255 -P kpz101 --simulation"
+        )
+        try:
+            self.cont = self.start_server("kpz", command, 3255)
         except:
             self.skipTest("Could not start server")
