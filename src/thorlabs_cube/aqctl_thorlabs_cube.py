@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""NDSP entrypoint script that initializes the device and start the control server"""
 
 import argparse
 import asyncio
@@ -63,28 +64,29 @@ def main():
             elif product == "kpz101":
                 dev = KpzSim()
             else:
-                print(
+                raise ValueError
                     "Invalid product string (-P/--product),"
                     " choose from tdc001, tpz001, or kdc101, kpz101"
                 )
                 sys.exit(1)
         else:
             if product == "tdc001":
-                dev = Tdc(loop, args.device)
+                dev = Tdc(args.device)
             elif product == "tpz001":
-                dev = Tpz(loop, args.device)
+                dev = Tpz(args.device)
                 loop.run_until_complete(dev.get_tpz_io_settings())
             elif product == "kdc101":
+
                 dev = Kdc(loop, args.device)
             elif product == "kpz101":
                 dev = Kpz(loop, args.device)
                 loop.run_until_complete(dev.get_tpz_io_settings())
             else:
-                print(
+                raise ValueError
                     "Invalid product string (-P/--product),"
                     " choose from tdc001, tpz001, kdc101, kpz101"
                 )
-                sys.exit(1)
+         
 
         try:
             simple_server_loop(
