@@ -17,4 +17,4 @@ COPY . .
 RUN python -m pip install --no-cache-dir .
 
 ENTRYPOINT ["aqctl_thorlabs_cube"]
-CMD ["-p", "3255", "-P", "kdc101", "-d", "/dev/ttyUSB0", "--bind", "*"]
+CMD ["-p", "3255", "-P", "kpz101", "-d", "/dev/ttyUSB0", "--bind", "*"]
