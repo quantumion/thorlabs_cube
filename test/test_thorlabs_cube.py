@@ -128,15 +128,14 @@ class GenericTpzTest:
 
 class GenericKpzTest:
     def test_kcubemmi_params(self):
-        test_vector = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+        test_vector = (1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0)
         self.cont.set_kcubemmi_params(*test_vector)
         self.assertEqual(test_vector, self.cont.get_kcubemmi_params())
 
     def test_trigio_config(self):
-        test_vector = (1, 0, 2, 1)
+        test_vector = (1, 0, 2, 1, 0, 0, 0, 0, 0, 0)
         self.cont.set_trigio_config(*test_vector)
         self.assertEqual(test_vector, self.cont.get_trigio_config())
-
 
 class TestTdcSim(GenericRPCCase, GenericTdcTest):
     def setUp(self):
