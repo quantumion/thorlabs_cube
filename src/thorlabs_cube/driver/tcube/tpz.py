@@ -1,6 +1,8 @@
 import struct as st
 from typing import Optional, Tuple
 
+import asyncserial
+
 from thorlabs_cube.driver.base import _Cube
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
@@ -14,8 +16,8 @@ class Tpz(_Cube):
     be completed to finish initialising the driver.
     """
 
-    def __init__(self, loop, serial_dev) -> None:
-        _Cube.__init__(self, loop, serial_dev)
+    def __init__(self, serial_dev) -> None:
+        self.port = asyncserial.AsyncSerial(serial_dev, baudrate=115200, rtscts=True)
         self.voltage_limit: Optional[int] = None
 
     async def handle_message(self, msg) -> None:

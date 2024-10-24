@@ -64,7 +64,7 @@ def main():
             elif product == "kpz101":
                 dev = KpzSim()
             else:
-                raise ValueError
+                raise ValueError(
                     "Invalid product string (-P/--product),"
                     " choose from tdc001, tpz001, or kdc101, kpz101"
                 )
@@ -82,11 +82,10 @@ def main():
                 dev = Kpz(loop, args.device)
                 loop.run_until_complete(dev.get_tpz_io_settings())
             else:
-                raise ValueError
+                raise ValueError(
                     "Invalid product string (-P/--product),"
                     " choose from tdc001, tpz001, kdc101, kpz101"
                 )
-         
 
         try:
             simple_server_loop(
