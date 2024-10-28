@@ -5,6 +5,18 @@ from thorlabs_cube.driver.base import _Cube
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
 _CHANNEL: int = 0x01
+_RESERVED: int = 0x00
+
+QUAD_LOOP_PARAMS_SUB_ID: int = 0x01
+QUAD_READINGS_SUB_ID: int = 0x03
+QUAD_POSITION_DEMAND_PARAMS_SUB_ID: int = 0x05
+QUAD_OPER_MODE_SUB_ID: int = 0x07
+QUAD_STATUS_BITS_SUB_ID: int = 0x09
+QUAD_DISP_SETTINGS_SUB_ID: int = 0x0B
+QUAD_POSITION_DEMAND_OUTPUTS_SUB_ID: int = 0x0D
+QUAD_LOOP_PARAMS2_SUB_ID: int = 0x0E
+QUAD_KPA_TRIGIO_SUB_ID: int = 0x0F
+QUAD_KPA_DIGOPS_SUB_ID: int = 0x10
 
 
 class Kpa(_Cube):
@@ -63,26 +75,28 @@ class Kpa(_Cube):
         :param i_gain: Integral gain value.
         :param d_gain: Differential gain value.
         """
-        payload = st.pack("<HHH", p_gain, i_gain, d_gain)
-        await self.send(Message(MGMSG.QUAD_SET_LOOPPARAMS, data=payload))
+        payload = st.pack("<HHHH", QUAD_LOOP_PARAMS_SUB_ID, p_gain, i_gain, d_gain)
+        await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_loop_params(self) -> tuple[int, int, int]:
         """Get proportional, integral, and differential feedback loop constants.
 
         :return: A tuple containing p_gain, i_gain, and d_gain values.
         """
+
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_LOOPPARAMS, [MGMSG.QUAD_GET_LOOPPARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
         )
-        return st.unpack("<HHH", get_msg.data[2:])
+        return st.unpack("<HHHH", get_msg.data[2:])
 
     async def set_quad_oper_mode(self, mode: int) -> None:
         """Set the operating mode of the unit.
 
         :param mode: 1 for Monitor Mode, 2 for Open Loop, 3 for Closed Loop.
         """
-        payload = st.pack("<H", mode)
-        await self.send(Message(MGMSG.QUAD_SET_OPERMODE, data=payload))
+
+        payload = st.pack("<HH", QUAD_OPER_MODE_SUB_ID, mode)
+        await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_quad_oper_mode(self) -> int:
         """Get the operating mode of the unit.
@@ -90,12 +104,20 @@ class Kpa(_Cube):
         :return: The current operating mode of the unit.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_OPERMODE, [MGMSG.QUAD_GET_OPERMODE], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
         )
-        return st.unpack("<H", get_msg.data[2:])[0]
+        return st.unpack("<HH", get_msg.data[2:])[0]
 
     async def set_quad_position_demand_params(
-        self, x_pos_min: int, x_pos_max: int, y_pos_min: int, y_pos_max: int
+        self,
+        x_pos_min: int,
+        x_pos_max: int,
+        y_pos_min: int,
+        y_pos_max: int,
+        low_volt_output_route: int,
+        open_loop_pos_demands: int,
+        x_pos_demand_feedback_sense: int,
+        y_pos_demand_feedback_sense: int,
     ) -> None:
         """Set position demand parameters for the quad system.
 
@@ -103,9 +125,24 @@ class Kpa(_Cube):
         :param x_pos_max: Maximum X-axis position demand.
         :param y_pos_min: Minimum Y-axis position demand.
         :param y_pos_max: Maximum Y-axis position demand.
+        :param low_volt_output_route: LV output signal routing
+        :param open_loop_pos_demands: Open loop position demands configuration
+        :param x_pos_demand_feedback_sense: Signal sense and gain for X-axis output
+        :param y_pos_demand_feedback_sense: Signal sense and gain for Y-axis output
         """
-        payload = st.pack("<hhhh", x_pos_min, x_pos_max, y_pos_min, y_pos_max)
-        await self.send(Message(MGMSG.QUAD_SET_POSDEMANDPARAMS, data=payload))
+        payload = st.pack(
+            "<hhhhhhhhh",
+            QUAD_POSITION_DEMAND_PARAMS_SUB_ID,
+            x_pos_min,
+            x_pos_max,
+            y_pos_min,
+            y_pos_max,
+            low_volt_output_route,
+            open_loop_pos_demands,
+            x_pos_demand_feedback_sense,
+            y_pos_demand_feedback_sense,
+        )
+        await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_quad_position_demand_params(self) -> tuple[int, int, int, int]:
         """Get position demand parameters for the quad system.
@@ -113,9 +150,9 @@ class Kpa(_Cube):
         :return: A tuple containing x_pos_min, x_pos_max, y_pos_min, and y_pos_max.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_POSDEMANDPARAMS, [MGMSG.QUAD_GET_POSDEMANDPARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
         )
-        return st.unpack("<hhhh", get_msg.data[2:10])
+        return st.unpack("<hhhhhhhhh", get_msg.data[2:17])
 
     async def get_quad_status_bits(self) -> int:
         """Get the status bits of the control unit.
@@ -123,9 +160,20 @@ class Kpa(_Cube):
         :return: Status bits of the control unit.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_STATUSBITS, [MGMSG.QUAD_GET_STATUSBITS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
         )
-        return st.unpack("<I", get_msg.data[6:10])[0]
+        return st.unpack("<HF", get_msg.data[2:5])[0]
+
+    async def get_quad_readings(self) -> tuple[int, int, int, int, int]:
+        """Get the status bits of the quad readings.
+
+        :return: Status bits of the quad reading.
+        """
+
+        get_msg = await self.send_request(
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+        )
+        return st.unpack("hhHhh", get_msg.data[2:11])
 
     async def set_quad_display_settings(
         self, disp_intensity: int, disp_mode: int, disp_dim_timeout: int
@@ -136,8 +184,15 @@ class Kpa(_Cube):
         :param disp_mode: Display mode (1 for Difference, 2 for Position).
         :param disp_dim_timeout: Dim timeout value as per documentation.
         """
-        payload = st.pack("<HHH", disp_intensity, disp_mode, disp_dim_timeout)
-        await self.send(Message(MGMSG.QUAD_SET_DISPSETTINGS, data=payload))
+
+        payload = st.pack(
+            "<HHHH",
+            QUAD_DISP_SETTINGS_SUB_ID,
+            disp_intensity,
+            disp_mode,
+            disp_dim_timeout,
+        )
+        await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_quad_display_settings(self) -> tuple[int, int, int]:
         """Get the display settings for the quad system.
@@ -145,9 +200,9 @@ class Kpa(_Cube):
         :return: A tuple containing disp_intensity, disp_mode, and disp_dim_timeout.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_DISPSETTINGS, [MGMSG.QUAD_GET_DISPSETTINGS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
         )
-        return st.unpack("<HHH", get_msg.data[6:12])
+        return st.unpack("<HHH", get_msg.data[2:7])
 
     async def set_quad_position_outputs(self, x_pos: int, y_pos: int) -> None:
         """Set the X and Y position outputs.
@@ -155,8 +210,8 @@ class Kpa(_Cube):
         :param x_pos: X-axis position output value (-32768 to 32767).
         :param y_pos: Y-axis position output value (-32768 to 32767).
         """
-        payload = st.pack("<hh", x_pos, y_pos)
-        await self.send(Message(MGMSG.QUAD_SET_POSOUTPUTS, data=payload))
+        payload = st.pack("<HHH", QUAD_POSITION_DEMAND_OUTPUTS_SUB_ID, x_pos, y_pos)
+        await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_quad_position_outputs(self) -> tuple[int, int]:
         """Get the X and Y position outputs.
@@ -164,9 +219,9 @@ class Kpa(_Cube):
         :return: A tuple containing x_pos and y_pos.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_POSOUTPUTS, [MGMSG.QUAD_GET_POSOUTPUTS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
         )
-        return st.unpack("<hh", get_msg.data[6:12])
+        return st.unpack("<HHH", get_msg.data[2:5])
 
     async def set_quad_loop_params2(
         self,
@@ -191,7 +246,8 @@ class Kpa(_Cube):
         :param deriv_filter_on: Derivative filter on/off flag.
         """
         payload = st.pack(
-            "<fffffffH",
+            "<HFFFFFFHH",
+            QUAD_POSITION_DEMAND_OUTPUTS_SUB_ID,
             p_gain,
             i_gain,
             d_gain,
@@ -201,7 +257,7 @@ class Kpa(_Cube):
             notch_on,
             deriv_filter_on,
         )
-        await self.send(Message(MGMSG.QUAD_SET_LOOPPARAMS2, data=payload))
+        await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_quad_loop_params2(
         self,
@@ -212,9 +268,9 @@ class Kpa(_Cube):
         notch_freq, filter_q, notch_on, deriv_filter_on.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_LOOPPARAMS2, [MGMSG.QUAD_GET_LOOPPARAMS2], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
         )
-        return st.unpack("<fffffffH", get_msg.data[6:36])
+        return st.unpack("<HFFFFFFHH", get_msg.data[2:29])
 
     async def set_trigger_config(
         self,
@@ -243,7 +299,7 @@ class Kpa(_Cube):
         :param trig2_diff_threshold: TRIG2 differential threshold.
         """
         payload = st.pack(
-            "<HHHHHHHHH",
+            "<HHHHHHHHHHHHH",
             trig1_mode,
             trig1_polarity,
             trig1_sum_min,
@@ -254,8 +310,11 @@ class Kpa(_Cube):
             trig2_sum_min,
             trig2_sum_max,
             trig2_diff_threshold,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
         )
-        await self.send(Message(MGMSG.QUAD_SET_TRIGGERCONFIG, data=payload))
+        await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_trigger_config(
         self,
@@ -265,17 +324,17 @@ class Kpa(_Cube):
         :return: A tuple containing trigger configuration parameters for TRIG1 and TRIG2.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_TRIGGERCONFIG, [MGMSG.QUAD_GET_TRIGGERCONFIG], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
         )
-        return st.unpack("<HHHHHHHHH", get_msg.data[6:24])
+        return st.unpack("<HHHHHHHHHHHHH", get_msg.data[2:27])
 
     async def set_digital_outputs(self, dig_ops: int) -> None:
         """Set digital outputs for TRIG1 and TRIG2.
 
         :param dig_ops: Status of TRIG1 and TRIG2 outputs.
         """
-        payload = st.pack("<H", dig_ops)
-        await self.send(Message(MGMSG.QUAD_SET_DIGOUTPUTS, data=payload))
+        payload = st.pack("<HHH", QUAD_KPA_DIGOPS_SUB_ID, dig_ops, _RESERVED)
+        await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_digital_outputs(self) -> int:
         """Get digital outputs for TRIG1 and TRIG2.
@@ -283,9 +342,9 @@ class Kpa(_Cube):
         :return: Status of TRIG1 and TRIG2 outputs.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_DIGOUTPUTS, [MGMSG.QUAD_GET_DIGOUTPUTS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
         )
-        return st.unpack("<H", get_msg.data[6:8])[0]
+        return st.unpack("<HHH", get_msg.data[2:5])[0]
 
     async def set_eeprom_params(self, msg_id: int) -> None:
         """Save the parameter settings for the specified message.
@@ -293,7 +352,7 @@ class Kpa(_Cube):
         :param msg_id: The message ID of the message containing the parameters to be saved.
         """
         payload = st.pack("<H", msg_id)
-        await self.send(Message(MGMSG.QUAD_SET_EEPROM_PARAMS, data=payload))
+        await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
 
 class KpaSim:
