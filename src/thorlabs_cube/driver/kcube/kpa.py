@@ -6,7 +6,6 @@ from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
 _CHANNEL: int = 0x01
 _RESERVED: int = 0x00
-
 QUAD_LOOP_PARAMS_SUB_ID: int = 0x01
 QUAD_READINGS_SUB_ID: int = 0x03
 QUAD_POSITION_DEMAND_PARAMS_SUB_ID: int = 0x05
@@ -361,14 +360,15 @@ class KpaSim:
     def __init__(self):
 
         self.loop_params = (0, 0, 0)
+        self.quad_readings = (0, 0, 0, 0, 0)
+        self.pos_demand_params = (0, 0, 0, 0, 2, 0, 0, 0)
         self.oper_mode = 1
-        self.pos_demand_params = (0, 0, 0, 0)
-        self.status_bits = 0
-        self.display_settings = (0, 1, 0)
+        self.status_bits = 0x00000001
+        self.display_settings = (255, 1, 2570)
         self.position_outputs = (0, 0)
-        self.loop_params2 = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0)
+        self.loop_params2 = (0, 0, 0, 0, 0, 0.1, 2, 2)
         self.trigger_config = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-        self.digital_outputs = 0
+        self.digital_outputs = 0x00
 
     def close(self):
         pass
