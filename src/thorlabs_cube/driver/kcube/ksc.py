@@ -1,6 +1,6 @@
 import struct as st
 
-from thorlabs_cube.driver.message import MGMSG, Message, MsgError
+from thorlabs_cube.driver.message import MGMSG, Message
 from thorlabs_cube.driver.tcube.tsc import Tsc, TscSim
 
 _RESERVED: int = 0x0
@@ -76,11 +76,7 @@ class Ksc(Tsc):
         return st.unpack("<HLLLHHLLLLH", get_msg.data[2:])
 
     async def set_kcubetrigio_config(
-        self, 
-        trig1_mode: int, 
-        trig1_polarity: int, 
-        trig2_mode: int, 
-        trig2_polarity: int
+        self, trig1_mode: int, trig1_polarity: int, trig2_mode: int, trig2_polarity: int
     ):
         """Set the KCube trigger I/O configuration parameters.
 
@@ -138,7 +134,7 @@ class Ksc(Tsc):
             0x0E Trigger output active (pulsed) at pre-defined positions moving backwards (set using
             StartPosRev, IntervalRev, NumPulsesRev and PulseWidth parameters in the
             SetKCubePosTrigParams message). Only one Trigger port at a time can be set to this mode.
-            
+
             0x0F Trigger output active (pulsed) at pre-defined positions moving forwards and
             backward. Only one Trigger port at a time can be set to this mode.
         """
@@ -255,11 +251,11 @@ class Ksc(Tsc):
             )
 
         def set_kcubetrigio_config(
-            self, 
-            trig1_mode: int, 
-            trig1_polarity: int, 
-            trig2_mode: int, 
-            trig2_polarity: int
+            self,
+            trig1_mode: int,
+            trig1_polarity: int,
+            trig2_mode: int,
+            trig2_polarity: int,
         ):
             self.trig1_mode = trig1_mode
             self.trig1_polarity = trig1_polarity

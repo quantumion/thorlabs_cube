@@ -21,9 +21,7 @@ class Tsc(_Cube):
         if msg_id == MGMSG.HW_DISCONNECT:
             raise MsgError("Error: Please disconnect the TDC001")
         elif msg_id == MGMSG.HW_RESPONSE:
-            raise MsgError(
-                "Hardware error, please disconnect and reconnect the TDC001"
-            )
+            raise MsgError("Hardware error, please disconnect and reconnect the TDC001")
         elif msg_id == MGMSG.HW_RICHRESPONSE:
             (code,) = st.unpack("<H", data[2:4])
             raise MsgError(
@@ -52,10 +50,9 @@ class Tsc(_Cube):
                 data[2:],
             )
 
-
     async def get_bay_used(self):
         """Identify which bay is being used by the controller on Thorlabs Hub
-            
+
         :return: Integer representing the bay being used on the Thorlabs Hub
         """
         get_msg = await self.send_request(
@@ -109,7 +106,7 @@ class Tsc(_Cube):
     async def get_av_modes(self):
         """Get the current LED indicator mode bits set by set_av_modes(self, mode_bits)
 
-        :return: The LED mode bits set 
+        :return: The LED mode bits set
         """
 
         get_msg = await self.send_request(
@@ -131,7 +128,9 @@ class Tsc(_Cube):
         :param timeout2: Timeout in ms for position2.
         """
 
-        payload = st.pack("<HHllHH", _CHANNEL, mode, position1, position2, timeout1, timeout2)
+        payload = st.pack(
+            "<HHllHH", _CHANNEL, mode, position1, position2, timeout1, timeout2
+        )
 
         await self.send(Message(MGMSG.MOT_SET_BUTTONPARAMS, data=payload))
 
@@ -199,7 +198,7 @@ class Tsc(_Cube):
 
     async def get_sol_operating_mode(self):
         """Get the current solenoid operating mode for the single channel.
-        
+
         :return: operating mode of solenoid represented by an integer
         """
         get_msg = await self.send_request(
@@ -230,7 +229,6 @@ class Tsc(_Cube):
 
         payload = st.pack("<H", _CHANNEL)
 
-
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_SOL_CYCLEPARAMS, [MGMSG.MOT_GET_SOL_CYCLEPARAMS], data=payload
         )
@@ -258,7 +256,9 @@ class Tsc(_Cube):
         """
 
         get_msg = await self.send_request(
-            MGMSG.MOT_REQ_SOL_INTERLOCKMODE, [MGMSG.MOT_GET_SOL_INTERLOCKMODE], param1=_CHANNEL
+            MGMSG.MOT_REQ_SOL_INTERLOCKMODE,
+            [MGMSG.MOT_GET_SOL_INTERLOCKMODE],
+            param1=_CHANNEL,
         )
 
         interlock_mode = get_msg.param2
@@ -274,7 +274,7 @@ class Tsc(_Cube):
         """
 
         # Send the message with Channel ID in param1 and State in param2
-        await self.send(Message(MGMSG.MOT_SET_SOL_STATE, param1= _CHANNEL, param2= state))
+        await self.send(Message(MGMSG.MOT_SET_SOL_STATE, param1=_CHANNEL, param2=state))
 
     async def get_sol_state(self):
         """Get the current solenoid state.
