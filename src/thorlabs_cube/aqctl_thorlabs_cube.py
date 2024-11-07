@@ -9,9 +9,10 @@ from sipyco import common_args
 from sipyco.pc_rpc import simple_server_loop
 
 from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
-from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
-from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 from thorlabs_cube.driver.kcube.kpa import Kpa, KpaSim
+from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
+from thorlabs_cube.driver.tcube.tpa import Tpa, TpaSim
+from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 
 
 def get_argparser():
@@ -61,6 +62,8 @@ def main():
                 dev = TpzSim()
             elif product == "kdc101":
                 dev = KdcSim()
+            elif product == "tpa101":
+                dev = TpaSim()
             elif product == "kpa101":
                 dev = KpaSim()
             else:
@@ -75,11 +78,15 @@ def main():
                 dev = Tpz(args.device)
                 loop.run_until_complete(dev.get_tpz_io_settings())
             elif product == "kdc101":
-
                 dev = Kdc(args.device)
+            elif product == "tpa101":
+                dev = Tpa(args.device)
+            elif product == "kpa101":
+                dev = Kpa(args.device)
             else:
-                print(
-                    "Invalid product string (-P/--product). Choose from tdc001, tpz001, or kdc101"
+                raise ValueError(
+                    "Invalid product string (-P/--product),"
+                    " choose from tdc001, tpz001, kpa101, or kdc101"
                 )
 
         try:

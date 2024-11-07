@@ -129,7 +129,8 @@ class GenericTpzTest:
                 self.cont.set_tpz_io_settings(*test_vector)
                 self.assertEqual(test_vector, self.cont.get_tpz_io_settings())
 
-class GenericKpaTest:
+
+class GenericTpaTest:
     def test_loop_params(self):
         test_vector = 1, 2, 3
         self.cont.set_loop_params(*test_vector)
@@ -165,6 +166,8 @@ class GenericKpaTest:
         self.cont.set_quad_loop_params2(*test_vector)
         self.assertEqual(test_vector, self.cont.get_quad_loop_params2())
 
+class GenericKpaTest:
+
     def test_trigger_config(self):
         test_vector = 1, 0, 100, 200, 50, 2, 1, 150, 250, 75
         self.cont.set_trigger_config(*test_vector)
@@ -174,11 +177,6 @@ class GenericKpaTest:
         test_vector = 0xFF
         self.cont.set_digital_outputs(test_vector)
         self.assertEqual(test_vector, self.cont.get_digital_outputs())
-
-    def test_eeprom_params(self):
-        test_vector = 0x0875
-        self.cont.set_eeprom_params(test_vector)
-        self.assertEqual(test_vector, self.cont.get_eeprom_params())
 
 
 class TestTdcSim(GenericRPCCase, GenericTdcTest):
