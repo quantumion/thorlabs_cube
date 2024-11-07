@@ -76,10 +76,9 @@ def main():
                 dev = Tpz(args.device)
                 loop.run_until_complete(dev.get_tpz_io_settings())
             elif product == "kdc101":
-
-                dev = Kdc(loop, args.device)
+                dev = Kdc(args.device)
             elif product == "kpz101":
-                dev = Kpz(loop, args.device)
+                dev = Kpz(args.device)
                 loop.run_until_complete(dev.get_tpz_io_settings())
             else:
                 raise ValueError(

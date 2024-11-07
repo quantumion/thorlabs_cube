@@ -1,13 +1,11 @@
 import struct as st
-from typing import Optional, Tuple
-
-import asyncserial
+from typing import Optional
 
 from thorlabs_cube.driver.base import _Cube
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
-_CHANNEL = 0x01
-_RESERVED = 0x00
+_CHANNEL: int = 0x01
+_RESERVED: int = 0x00
 
 
 class Tpz(_Cube):
@@ -17,7 +15,7 @@ class Tpz(_Cube):
     """
 
     def __init__(self, serial_dev) -> None:
-        self.port = asyncserial.AsyncSerial(serial_dev, baudrate=115200, rtscts=True)
+        _Cube.__init__(self, serial_dev)
         self.voltage_limit: Optional[int] = None
 
     async def handle_message(self, msg) -> None:
@@ -59,6 +57,10 @@ class Tpz(_Cube):
         """Get the control loop mode.
 
         :return: Returns the control mode.
+            0x01 for Open Loop (no feedback).
+            0x02 for Closed Loop (feedback employed).
+            0x03 for Open Loop Smooth.
+            0x04 for Closed Loop Smooth.
         :rtype: int
         """
         get_msg = await self.send_request(
@@ -183,7 +185,7 @@ class Tpz(_Cube):
         payload = st.pack("<HHH", _CHANNEL, prop_const, int_const)
         await self.send(Message(MGMSG.PZ_SET_PICONSTS, data=payload))
 
-    async def get_pi_constants(self) -> Tuple[int, int]:
+    async def get_pi_constants(self) -> tuple[int, int]:
         """Get the proportional and integration feedback loop constants.
 
         :return: Returns a tuple whose first element is the proportional
@@ -242,7 +244,7 @@ class Tpz(_Cube):
         payload = st.pack("<HHH", _CHANNEL, lut_index, volt)
         await self.send(Message(MGMSG.PZ_SET_OUTPUTLUT, data=payload))
 
-    async def get_output_lut(self) -> Tuple[int, float]:
+    async def get_output_lut(self) -> tuple[int, float]:
         """Get the ouput LUT values for WGM (Waveform Generator Mode).
 
         :return: a tuple whose first element is the lut index and the second is
@@ -338,7 +340,7 @@ class Tpz(_Cube):
         )
         await self.send(Message(MGMSG.PZ_SET_OUTPUTLUTPARAMS, data=payload))
 
-    async def get_output_lut_parameters(self) -> Tuple[int, int, int, int, int, int]:
+    async def get_output_lut_parameters(self) -> tuple[int, int, int, int, int, int]:
         """Get Waveform Generator Mode parameters.
 
         :return: a 6 int elements tuple whose members are (mode, cycle_length,
@@ -437,7 +439,7 @@ class Tpz(_Cube):
         )
         await self.send(Message(MGMSG.PZ_SET_TPZ_IOSETTINGS, data=payload))
 
-    async def get_tpz_io_settings(self) -> Tuple[int, int]:
+    async def get_tpz_io_settings(self) -> tuple[int, int]:
         """Get various I/O settings.
 
         :return: Returns a tuple whose elements are the voltage limit and the

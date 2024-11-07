@@ -1,5 +1,4 @@
 import struct as st
-from typing import Tuple
 
 from thorlabs_cube.driver.message import MGMSG, Message
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
@@ -55,7 +54,7 @@ class Kpz(Tpz):
 
     async def get_kcubemmi_params(
         self,
-    ) -> Tuple[int, int, int, int, int, int, int, int, int, int, int, int, int]:
+    ) -> tuple[int, int, int, int, int, int, int, int, int, int, int, int, int]:
         """Get the KCube MMI parameters.
 
         :return: A tuple containing the KCube MMI parameters such as joystick mode,
@@ -96,7 +95,7 @@ class Kpz(Tpz):
 
     async def get_trigio_config(
         self,
-    ) -> Tuple[int, int, int, int, int, int, int, int, int, int, int]:
+    ) -> tuple[int, int, int, int, int, int, int, int, int, int, int]:
         """Get the TRIG1 and TRIG2 input/output configuration.
 
         :return: A tuple containing the Trigger IO
@@ -139,7 +138,7 @@ class KpzSim(TpzSim):
 
     def get_kcubemmi_params(
         self,
-    ) -> Tuple[int, int, int, int, int, int, int, int, int, int, int, int, int]:
+    ) -> tuple[int, int, int, int, int, int, int, int, int, int, int, int, int]:
         """Get the KCube MMI parameters in simulation.
 
         This returns the simulated parameters for the joystick, voltages, and display.
@@ -174,7 +173,7 @@ class KpzSim(TpzSim):
 
     def get_trigio_config(
         self,
-    ) -> Tuple[int, int, int, int, int, int, int, int, int, int]:
+    ) -> tuple[int, int, int, int, int, int, int, int, int, int]:
         """Get the TRIG1 and TRIG2 configuration in simulation.
 
         This returns the simulated configuration for the TRIG1 and TRIG2 modes and polarities.
