@@ -3,15 +3,15 @@ import struct as st
 from thorlabs_cube.driver.message import MGMSG, Message
 from thorlabs_cube.driver.tcube.tsc import Tsc, TscSim
 
-_RESERVED: int = 0x0
-_CHANNEL: int = 0x01
-_REQUEST_LENGTH: int = 1
-
 
 class Ksc(Tsc):
     """
     KDC101 K-Cube Brushed DC Servo Motor Controller class
     """
+
+    def __init__(self, serial_dev: str):
+        """Initialize from KSC101 control class"""
+        super().__init__(serial_dev)
 
     async def set_kcubemmi_params(
         self,
@@ -44,7 +44,7 @@ class Ksc(Tsc):
 
         payload = st.pack(
             "<HHLLLHHLLLLH",
-            _CHANNEL,
+            self._CHANNEL,
             js_mode,
             js_max_vel,
             js_accn,
@@ -68,7 +68,7 @@ class Ksc(Tsc):
         settings, and joystick sensitivity.
         """
 
-        payload = st.pack("<H", _CHANNEL)
+        payload = st.pack("<H", self._CHANNEL)
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBEMMIPARAMS, [MGMSG.MOT_GET_KCUBEMMIPARAMS], data=payload
         )
@@ -88,7 +88,7 @@ class Ksc(Tsc):
 
         payload = st.pack(
             "<HBBBB",
-            _CHANNEL,
+            self._CHANNEL,
             trig1_mode,
             trig1_polarity,
             trig2_mode,
@@ -139,7 +139,7 @@ class Ksc(Tsc):
             backward. Only one Trigger port at a time can be set to this mode.
         """
 
-        payload = st.pack("<H", _CHANNEL)
+        payload = st.pack("<H", self._CHANNEL)
 
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBETRIGIOCONFIG,
@@ -177,7 +177,7 @@ class Ksc(Tsc):
 
         payload = st.pack(
             "<HLLLLLLLL",
-            _CHANNEL,
+            self._CHANNEL,
             start_pos_fwd,
             interval_fwd,
             num_pulses_fwd,
@@ -198,7 +198,7 @@ class Ksc(Tsc):
         pulse_width, num_cycles).
         """
 
-        payload = st.pack("<H", _CHANNEL)
+        payload = st.pack("<H", self._CHANNEL)
 
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBEPOSTRIGPARAMS,
@@ -208,96 +208,97 @@ class Ksc(Tsc):
 
         return st.unpack("<LLLLLLLL", get_msg.data[2:])
 
-    class KscSim(TscSim):
-        def set_kcubemmi_params(
-            self,
-            js_mode: int,
-            js_max_vel: int,
-            js_accn: int,
-            dir_sense: int,
-            preset_pos1: int,
-            preset_pos2: int,
-            preset_pos3: int,
-            disp_brightness: int,
-            disp_timeout: int,
-            disp_dim_level: int,
-            js_sensitivity: int,
-        ):
-            self.js_mode = js_mode
-            self.js_max_vel = js_max_vel
-            self.js_accn = js_accn
-            self.dir_sense = dir_sense
-            self.preset_pos1 = preset_pos1
-            self.preset_pos2 = preset_pos2
-            self.preset_pos3 = preset_pos3
-            self.disp_brightness = disp_brightness
-            self.disp_timeout = disp_timeout
-            self.disp_dim_level = disp_dim_level
-            self.js_sensitivity = js_sensitivity
 
-        def get_kcubemmi_params(self):
-            return (
-                self.js_mode,
-                self.js_max_vel,
-                self.js_accn,
-                self.dir_sense,
-                self.preset_pos1,
-                self.preset_pos2,
-                self.preset_pos3,
-                self.disp_brightness,
-                self.disp_timeout,
-                self.disp_dim_level,
-                self.js_sensitivity,
-            )
+class KscSim(TscSim):
+    def set_kcubemmi_params(
+        self,
+        js_mode: int,
+        js_max_vel: int,
+        js_accn: int,
+        dir_sense: int,
+        preset_pos1: int,
+        preset_pos2: int,
+        preset_pos3: int,
+        disp_brightness: int,
+        disp_timeout: int,
+        disp_dim_level: int,
+        js_sensitivity: int,
+    ):
+        self.js_mode = js_mode
+        self.js_max_vel = js_max_vel
+        self.js_accn = js_accn
+        self.dir_sense = dir_sense
+        self.preset_pos1 = preset_pos1
+        self.preset_pos2 = preset_pos2
+        self.preset_pos3 = preset_pos3
+        self.disp_brightness = disp_brightness
+        self.disp_timeout = disp_timeout
+        self.disp_dim_level = disp_dim_level
+        self.js_sensitivity = js_sensitivity
 
-        def set_kcubetrigio_config(
-            self,
-            trig1_mode: int,
-            trig1_polarity: int,
-            trig2_mode: int,
-            trig2_polarity: int,
-        ):
-            self.trig1_mode = trig1_mode
-            self.trig1_polarity = trig1_polarity
-            self.trig2_mode = trig2_mode
-            self.trig2_polarity = trig2_polarity
+    def get_kcubemmi_params(self):
+        return (
+            self.js_mode,
+            self.js_max_vel,
+            self.js_accn,
+            self.dir_sense,
+            self.preset_pos1,
+            self.preset_pos2,
+            self.preset_pos3,
+            self.disp_brightness,
+            self.disp_timeout,
+            self.disp_dim_level,
+            self.js_sensitivity,
+        )
 
-        def get_kcubetrigio_config(self):
-            return (
-                self.trig1_mode,
-                self.trig1_polarity,
-                self.trig2_mode,
-                self.trig2_polarity,
-            )
+    def set_kcubetrigio_config(
+        self,
+        trig1_mode: int,
+        trig1_polarity: int,
+        trig2_mode: int,
+        trig2_polarity: int,
+    ):
+        self.trig1_mode = trig1_mode
+        self.trig1_polarity = trig1_polarity
+        self.trig2_mode = trig2_mode
+        self.trig2_polarity = trig2_polarity
 
-        def set_kcubepostrig_params(
-            self,
-            start_pos_fwd: int,
-            interval_fwd: int,
-            num_pulses_fwd: int,
-            start_pos_rev: int,
-            interval_rev: int,
-            num_pulses_rev: int,
-            pulse_width: int,
-            num_cycles: int,
-        ):
-            self.start_pos_fwd = start_pos_fwd
-            self.interval_fwd = interval_fwd
-            self.num_pulses_fwd = num_pulses_fwd
-            self.start_pos_rev = start_pos_rev
-            self.interval_rev = interval_rev
-            self.num_pulses_rev = num_pulses_rev
-            self.pulse_width = pulse_width
-            self.num_cycles = num_cycles
+    def get_kcubetrigio_config(self):
+        return (
+            self.trig1_mode,
+            self.trig1_polarity,
+            self.trig2_mode,
+            self.trig2_polarity,
+        )
 
-        def get_kcubepostrig_params(self):
-            return (
-                self.start_pos_fwd,
-                self.interval_fwd,
-                self.num_pulses_fwd,
-                self.start_pos_rev,
-                self.interval_rev,
-                self.num_pulses_rev,
-                self.pulse_width,
-                self.num_cycles,
-            )
+    def set_kcubepostrig_params(
+        self,
+        start_pos_fwd: int,
+        interval_fwd: int,
+        num_pulses_fwd: int,
+        start_pos_rev: int,
+        interval_rev: int,
+        num_pulses_rev: int,
+        pulse_width: int,
+        num_cycles: int,
+    ):
+        self.start_pos_fwd = start_pos_fwd
+        self.interval_fwd = interval_fwd
+        self.num_pulses_fwd = num_pulses_fwd
+        self.start_pos_rev = start_pos_rev
+        self.interval_rev = interval_rev
+        self.num_pulses_rev = num_pulses_rev
+        self.pulse_width = pulse_width
+        self.num_cycles = num_cycles
+
+    def get_kcubepostrig_params(self):
+        return (
+            self.start_pos_fwd,
+            self.interval_fwd,
+            self.num_pulses_fwd,
+            self.start_pos_rev,
+            self.interval_rev,
+            self.num_pulses_rev,
+            self.pulse_width,
+            self.num_cycles,
+        )

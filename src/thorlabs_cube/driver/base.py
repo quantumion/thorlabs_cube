@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class _Cube:
+    _CHANNEL: int = 0x01
+    _RESERVED: int = 0x00
+
     def __init__(self, serial_dev):
         self.port = asyncserial.AsyncSerial(serial_dev, baudrate=115200, rtscts=True)
 
