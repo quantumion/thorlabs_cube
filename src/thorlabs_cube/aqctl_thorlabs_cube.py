@@ -66,7 +66,7 @@ def main():
                 dev = KscSim()
             else:
                 raise ValueError(
-                    "Invalid product string (-P/--product). Choose from tdc001, tpz001, or kdc101"
+                    "Invalid product string (-P/--product). Choose from tdc001, tsc001, tpz001, kdc101 or ksc101"
                 )
         else:
             if product == "tdc001":
@@ -82,7 +82,7 @@ def main():
                 dev = Ksc(args.device)
             else:
                 raise ValueError(
-                    "Invalid product string (-P/--product). Choose from tdc001, tpz001, or kdc101"
+                    "Invalid product string (-P/--product). Choose from tdc001, tsc001, tpz001, kdc101 or ksc101"
                 )
 
         try:

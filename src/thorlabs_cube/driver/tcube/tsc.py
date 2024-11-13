@@ -8,10 +8,10 @@ class Tsc(_Cube):
     """TSC001 T-Cube Motor Controller class"""
 
     def __init__(self, *args, **kwargs):
-        _Cube.__init__(self, *args, **kwargs)
+        super().__init__(self, *args, **kwargs)
         self.status_report_counter = 0
 
-    async def handle_message(self, msg):
+    async def handle_message(self, msg) -> None:
         msg_id = msg.id
         data = msg.data
 
@@ -39,15 +39,15 @@ class Tsc(_Cube):
                 self.encoder_count,
                 self.status_bits,
                 self.chan_identity_two,
-                _RESERVED,
-                _RESERVED,
-                _RESERVED,
+                _,
+                _,
+                _,
             ) = st.unpack(
                 "<LLLHLLL",
                 data[2:],
             )
 
-    async def get_bay_used(self):
+    async def get_bay_used(self) -> int:
         """Identify which bay is being used by the controller on Thorlabs Hub
 
         :return: Integer representing the bay being used on the Thorlabs Hub
@@ -58,7 +58,7 @@ class Tsc(_Cube):
 
         return get_msg.param1
 
-    async def set_absolute_position(self, absolute_position: int):
+    async def set_absolute_position(self, absolute_position: int) -> None:
         """Move the motor to an absolute position.
 
         :param absolute_position: The absolute position in encoder counts.
@@ -72,7 +72,7 @@ class Tsc(_Cube):
             data=payload,
         )
 
-    async def move_stop(self, stop_mode: int):
+    async def move_stop(self, stop_mode: int) -> None:
         """Stop any type of motor move (relative, absolute, homing, or velocity).
 
         :param stop_mode: The stop mode (1 for immediate stop, 2 for profiled stop).
@@ -84,7 +84,7 @@ class Tsc(_Cube):
             param2=stop_mode,
         )
 
-    async def set_av_modes(self, mode_bits: int):
+    async def set_av_modes(self, mode_bits: int) -> None:
         """Set the LED indicator modes based on the provided mode_bits.
 
         :param mode_bits: A bitmask indicating which modes to enable:
@@ -95,7 +95,7 @@ class Tsc(_Cube):
         payload = st.pack("<Hl", self._CHANNEL, mode_bits)
         await self.send(Message(MGMSG.MOT_SET_AVMODES, data=payload))
 
-    async def get_av_modes(self):
+    async def get_av_modes(self) -> int:
         """Get the current LED indicator mode bits set by set_av_modes(self, mode_bits)
 
         :return: The LED mode bits set
@@ -108,7 +108,7 @@ class Tsc(_Cube):
 
     async def set_button_parameters(
         self, mode: int, position1: int, position2: int, timeout1: int, timeout2: int
-    ):
+    ) -> None:
         """Set button parameters for the front panel buttons.
 
         :param mode: Mode for the buttons (1 for jog, 2 for position mode).
@@ -123,7 +123,7 @@ class Tsc(_Cube):
 
         await self.send(Message(MGMSG.MOT_SET_BUTTONPARAMS, data=payload))
 
-    async def get_button_parameters(self):
+    async def get_button_parameters(self) -> tuple[int, int, int, int, int]:
         """Get the current button parameters.
 
         :return: A tuple containing (mode, position1, position2, timeout1, timeout2)
@@ -134,7 +134,7 @@ class Tsc(_Cube):
 
         return st.unpack("<HllHH", get_msg.data[2:])
 
-    async def set_eeprom_parameters(self, msg_id: int):
+    async def set_eeprom_parameters(self, msg_id: int) -> None:
         """Save the current parameters for the specified message in the EEPROM.
 
         This function sends a request to the device to save the parameter settings
@@ -148,15 +148,14 @@ class Tsc(_Cube):
 
         await self.send(Message(MGMSG.MOT_SET_EEPROMPARAMS, data=payload))
 
-    async def get_status_update(self):
+    async def get_status_update(self) -> tuple[int, int, int, int]:
         """Returns a status update on the specified motor channel
 
         This function sends a request to the device to return status updates of
         position, encoder count, status bits on channel one as well as, for future use,
         returns channel identity two and its associated data which is garbage right now
 
-        :return: integers defining the status bits
-
+        :return: A tuple containing (position, encoder_count, status_bits, chan_identity_two)
         """
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_STATUSUPDATE, [MGMSG.MOT_GET_STATUSUPDATE], self._CHANNEL
@@ -166,24 +165,24 @@ class Tsc(_Cube):
             encoder_count,
             status_bits,
             chan_identity_two,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
+            _,
+            _,
+            _,
         ) = st.unpack("<HIIIHIII", get_msg.data[2:])
 
         return position, encoder_count, status_bits, chan_identity_two
 
-    async def set_sol_operating_mode(self, operating_mode: int):
+    async def set_sol_operating_mode(self, operating_mode: int) -> None:
         """Set the solenoid operating mode for the single channel.
 
         :param operating_mode: The operating mode to set (e.g., 1, 2, etc.).
         """
         await self.send(Message(MGMSG.MOT_SET_SOL_OPERATINGMODE, param2=operating_mode))
 
-    async def get_sol_operating_mode(self):
+    async def get_sol_operating_mode(self) -> int:
         """Get the current solenoid operating mode for the single channel.
 
-        :return: operating mode of solenoid represented by an integer
+        :return: Operating mode of solenoid represented by an integer
         """
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_SOL_OPERATINGMODE,
@@ -195,7 +194,7 @@ class Tsc(_Cube):
 
     async def set_solenoid_cycle_parameters(
         self, on_time: int, off_time: int, num_cycles: int
-    ):
+    ) -> None:
         """Set the solenoid cycle parameters.
 
         :param on_time: Time (in ms) the solenoid stays on (100ms to 10,000ms).
@@ -205,7 +204,7 @@ class Tsc(_Cube):
         payload = st.pack("<HLLL", self._CHANNEL, on_time, off_time, num_cycles)
         await self.send(Message(MGMSG.MOT_SET_SOL_CYCLEPARAMS, data=payload))
 
-    async def get_solenoid_cycle_parameters(self):
+    async def get_solenoid_cycle_parameters(self) -> tuple[int, int, int]:
         """Get the current solenoid cycle parameters.
 
         :return: A tuple containing (on_time, off_time, num_cycles).
@@ -217,7 +216,7 @@ class Tsc(_Cube):
 
         return st.unpack("<LLL", get_msg.data[2:])
 
-    async def set_sol_interlock_mode(self, mode: int):
+    async def set_sol_interlock_mode(self, mode: int) -> None:
         """Set the solenoid interlock mode.
 
         :param mode: Interlock mode, where:
@@ -226,7 +225,7 @@ class Tsc(_Cube):
         """
         await self.send(Message(MGMSG.MOT_SET_SOL_INTERLOCKMODE, param2=mode))
 
-    async def get_sol_interlock_mode(self):
+    async def get_sol_interlock_mode(self) -> int:
         """Get the current solenoid interlock mode.
 
         :return: The interlock mode, where:
@@ -241,7 +240,7 @@ class Tsc(_Cube):
 
         return get_msg.param2
 
-    async def set_sol_state(self, state: int):
+    async def set_sol_state(self, state: int) -> None:
         """Set the solenoid state (ON or OFF).
 
         :param state: The solenoid state, where:
@@ -252,7 +251,7 @@ class Tsc(_Cube):
             Message(MGMSG.MOT_SET_SOL_STATE, param1=self._CHANNEL, param2=state)
         )
 
-    async def get_sol_state(self):
+    async def get_sol_state(self) -> int:
         """Get the current solenoid state.
 
         :return: The solenoid state, where:
@@ -267,42 +266,50 @@ class Tsc(_Cube):
 
 
 class TscSim:
-    def module_identify(self):
+    def __init__(self, position, encoder_count, status_bits, chan_identity_two) -> None:
+        self.position = position
+        self.encoder_count = encoder_count
+        self.status_bits = status_bits
+        self.chan_identity_two = chan_identity_two
+
+    def module_identify(self) -> None:
         pass
 
-    def get_bay_used(self):
+    def get_bay_used(self) -> int:
         return 0
 
-    def set_absolute_position(self, absolute_position: int):
+    def set_absolute_position(self, absolute_position: int) -> None:
         self.absolute_position = absolute_position
 
-    def move_stop(self, stop_mode: int):
+    def move_stop(self, stop_mode: int) -> None:
         self.stop_mode = stop_mode
 
-    def set_av_modes(self, mode_bits: int):
+    def set_av_modes(self, mode_bits: int) -> None:
         self.mode_bits = mode_bits
 
-    def get_av_modes(self):
+    def get_av_modes(self) -> int:
         return self.mode_bits
 
     def set_button_parameters(
         self, mode: int, position1: int, position2: int, timeout1: int, timeout2: int
-    ):
+    ) -> None:
         self.mode = mode
         self.position1 = position1
         self.position2 = position2
         self.timeout1 = timeout1
         self.timeout2 = timeout2
 
-    def get_button_parameters(self):
+    def get_button_parameters(self) -> tuple[int, int, int, int, int]:
         return self.mode, self.position1, self.position2, self.timeout1, self.timeout2
 
-    def set_eeprom_parameters(self, msg_id: int):
+    def set_eeprom_parameters(self, msg_id: int) -> None:
         self.msg_id = msg_id
 
     def get_status_update(
         self,
-    ):  # TODO: not implemented yet for simulation, need to make the framework to mock this data
+    ) -> tuple[
+        int, int, int, int
+    ]:  # TODO: not implemented yet for simulation, need to make the framework to mock this data
         return (
             self.position,
             self.encoder_count,
@@ -310,30 +317,30 @@ class TscSim:
             self.chan_identity_two,
         )
 
-    def set_sol_operating_mode(self, operating_mode: int):
+    def set_sol_operating_mode(self, operating_mode: int) -> None:
         self.operating_mode = operating_mode
 
-    def get_sol_operating_mode(self):
+    def get_sol_operating_mode(self) -> int:
         return self.operating_mode
 
     def set_solenoid_cycle_parameters(
         self, on_time: int, off_time: int, num_cycles: int
-    ):
+    ) -> None:
         self.on_time = on_time
         self.off_time = off_time
         self.num_cycles = num_cycles
 
-    def get_solenoid_cycle_parameters(self):
+    def get_solenoid_cycle_parameters(self) -> tuple[int, int, int]:
         return (self.on_time, self.off_time, self.num_cycles)
 
-    def set_sol_interlock_mode(self, mode: int):
+    def set_sol_interlock_mode(self, mode: int) -> None:
         self.interlock_mode = mode
 
-    def get_sol_interlock_mode(self):
+    def get_sol_interlock_mode(self) -> int:
         return self.interlock_mode
 
-    def set_sol_state(self, state: int):
+    def set_sol_state(self, state: int) -> None:
         self.sol_state = state
 
-    def get_sol_state(self):
+    def get_sol_state(self) -> int:
         return self.sol_state

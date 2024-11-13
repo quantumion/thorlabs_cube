@@ -193,7 +193,7 @@ class GenericTscTest:
         self.cont.set_sol_state(test_state)
         self.assertEqual(test_state, self.cont.get_sol_state())
 
-class GenericKscTest:
+class GenericKscTest(GenericTscTest):
     def test_kcubemmi_params(self):
         test_vector = (
             1,
