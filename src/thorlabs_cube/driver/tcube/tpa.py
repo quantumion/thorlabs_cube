@@ -1,17 +1,14 @@
 import struct as st
 
 from thorlabs_cube.driver.base import _Cube
-from thorlabs_cube.driver.message import MGMSG, SUBMSG, Message, MsgError
-
-_CHANNEL: int = 0x01
-_RESERVED: int = 0x00
+from thorlabs_cube.driver.message import MGMSG, QUADMSG, Message, MsgError
 
 
 class Tpa(_Cube):
     """TPA101 driver implementation."""
 
     def __init__(self, serial_dev: str) -> None:
-        """Initialize the KPA101 driver.
+        """Initialize the TPA101 driver.
 
         :param serial_dev: Serial device identifier.
         """
@@ -20,7 +17,7 @@ class Tpa(_Cube):
         self.status_report_counter = 0
 
     async def handle_message(self, msg: Message) -> None:
-        """Handle incoming messages from the KPA101 device.
+        """Handle incoming messages from the TPA101 device.
 
         :param msg: Message object received from the device.
         """
@@ -28,10 +25,10 @@ class Tpa(_Cube):
         data: bytes = msg.data
 
         if msg_id == MGMSG.HW_DISCONNECT:
-            raise MsgError("Error: Please disconnect the KPA101")
+            raise MsgError("Error: Please disconnect the TPA101")
 
         elif msg_id == MGMSG.HW_RESPONSE:
-            raise MsgError("Hardware error, please disconnect and reconnect the KPA101")
+            raise MsgError("Hardware error, please disconnect and reconnect the TPA101")
 
         elif msg_id == MGMSG.QUAD_GET_STATUSUPDATE:
             x_diff, y_diff, sum_val, x_pos, y_pos, status_bits = st.unpack(
@@ -63,7 +60,7 @@ class Tpa(_Cube):
         :param d_gain: Differential gain value.
         """
         payload = st.pack(
-            "<HHHH", SUBMSG.QUAD_LOOP_PARAMS_SUB_ID, p_gain, i_gain, d_gain
+            "<HHHH", QUADMSG.QUAD_LOOP_PARAMS_SUB_ID, p_gain, i_gain, d_gain
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
@@ -74,7 +71,7 @@ class Tpa(_Cube):
         """
 
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
         )
         return st.unpack("<HHHH", get_msg.data[2:])
 
@@ -84,7 +81,7 @@ class Tpa(_Cube):
         :param mode: 1 for Monitor Mode, 2 for Open Loop, 3 for Closed Loop.
         """
 
-        payload = st.pack("<HH", SUBMSG.QUAD_OPER_MODE_SUB_ID, mode)
+        payload = st.pack("<HH", QUADMSG.QUAD_OPER_MODE_SUB_ID, mode)
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_quad_oper_mode(self) -> int:
@@ -93,7 +90,7 @@ class Tpa(_Cube):
         :return: The current operating mode of the unit.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
         )
         return st.unpack("<HH", get_msg.data[2:])[0]
 
@@ -121,7 +118,7 @@ class Tpa(_Cube):
         """
         payload = st.pack(
             "<hhhhhhhhh",
-            SUBMSG.QUAD_POSITION_DEMAND_PARAMS_SUB_ID,
+            QUADMSG.QUAD_POSITION_DEMAND_PARAMS_SUB_ID,
             x_pos_min,
             x_pos_max,
             y_pos_min,
@@ -139,7 +136,7 @@ class Tpa(_Cube):
         :return: A tuple containing x_pos_min, x_pos_max, y_pos_min, and y_pos_max.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
         )
         return st.unpack("<hhhhhhhhh", get_msg.data[2:17])
 
@@ -149,7 +146,7 @@ class Tpa(_Cube):
         :return: Status bits of the control unit.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
         )
         return st.unpack("<HF", get_msg.data[2:5])[0]
 
@@ -159,7 +156,7 @@ class Tpa(_Cube):
         :return: Status bits of the quad reading.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
         )
         return st.unpack("hhHhh", get_msg.data[2:11])
 
@@ -174,7 +171,7 @@ class Tpa(_Cube):
         """
         payload = st.pack(
             "<HHHH",
-            SUBMSG.QUAD_DISP_SETTINGS_SUB_ID,
+            QUADMSG.QUAD_DISP_SETTINGS_SUB_ID,
             disp_intensity,
             disp_mode,
             disp_dim_timeout,
@@ -187,7 +184,7 @@ class Tpa(_Cube):
         :return: A tuple containing disp_intensity, disp_mode, and disp_dim_timeout.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
         )
         return st.unpack("<HHH", get_msg.data[2:7])
 
@@ -198,7 +195,7 @@ class Tpa(_Cube):
         :param y_pos: Y-axis position output value (-32768 to 32767).
         """
         payload = st.pack(
-            "<HHH", SUBMSG.QUAD_POSITION_DEMAND_OUTPUTS_SUB_ID, x_pos, y_pos
+            "<HHH", QUADMSG.QUAD_POSITION_DEMAND_OUTPUTS_SUB_ID, x_pos, y_pos
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
@@ -208,7 +205,7 @@ class Tpa(_Cube):
         :return: A tuple containing x_pos and y_pos.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
         )
         return st.unpack("<HHH", get_msg.data[2:5])
 
@@ -236,7 +233,7 @@ class Tpa(_Cube):
         """
         payload = st.pack(
             "<HFFFFFFHH",
-            SUBMSG.QUAD_POSITION_DEMAND_OUTPUTS_SUB_ID,
+            QUADMSG.QUAD_POSITION_DEMAND_OUTPUTS_SUB_ID,
             p_gain,
             i_gain,
             d_gain,
@@ -257,7 +254,7 @@ class Tpa(_Cube):
         notch_freq, filter_q, notch_on, deriv_filter_on.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
         )
         return st.unpack("<HFFFFFFHH", get_msg.data[2:29])
 

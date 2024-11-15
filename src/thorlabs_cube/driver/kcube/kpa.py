@@ -1,13 +1,10 @@
 import struct as st
 
-from thorlabs_cube.driver.base import _Cube
-from thorlabs_cube.driver.message import MGMSG, SUBMSG, Message, MsgError
-
-_CHANNEL: int = 0x01
-_RESERVED: int = 0x00
+from thorlabs_cube.driver.tcube.tpa import Tpa, TpaSim
+from thorlabs_cube.driver.message import MGMSG, QUADMSG, Message, MsgError
 
 
-class Kpa(_Cube):
+class Kpa(Tpa):
     """KPA101 driver implementation."""
 
     def __init__(self, serial_dev: str) -> None:
@@ -15,7 +12,7 @@ class Kpa(_Cube):
 
         :param serial_dev: Serial device identifier.
         """
-        _Cube.__init__(self, serial_dev)
+        super().__init__(self, serial_dev)
         self.loop_params = None
         self.status_report_counter = 0
 
@@ -93,9 +90,9 @@ class Kpa(_Cube):
             trig2_sum_min,
             trig2_sum_max,
             trig2_diff_threshold,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
+            _,
+            _,
+            _,
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
@@ -107,7 +104,7 @@ class Kpa(_Cube):
         :return: A tuple containing trigger configuration parameters for TRIG1 and TRIG2.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
         )
         return st.unpack("<HHHHHHHHHHHHH", get_msg.data[2:27])
 
@@ -117,7 +114,7 @@ class Kpa(_Cube):
         :param digital_outputs: Status of TRIG1 and TRIG2 outputs.
         """
         payload = st.pack(
-            "<HHH", SUBMSG.QUAD_KPA_DIGOPS_SUB_ID, digital_outputs, _RESERVED
+            "<HHH", QUADMSG.QUAD_KPA_DIGOPS_SUB_ID, digital_outputs, self._RESERVED
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
@@ -127,12 +124,12 @@ class Kpa(_Cube):
         :return: Status of TRIG1 and TRIG2 outputs.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], _CHANNEL
+            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
         )
         return st.unpack("<HHH", get_msg.data[2:5])[0]
 
 
-class KpaSim:
+class KpaSim(TpaSim):
     """Simulation class for KPA101."""
 
     def __init__(self):

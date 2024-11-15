@@ -202,6 +202,17 @@ class TestTpzSim(GenericRPCCase, GenericTpzTest):
         except:
             self.skipTest("Could not start server")
 
+class TestTpaSim(GenericRPCCase, GenericTpaTest):
+    def setUp(self):
+        GenericRPCCase.setUp(self)
+        command = (sys.executable.replace("\\", "\\\\")
+                            + " -m thorlabs_tcube.aqctl_thorlabs_tcube "
+                            + "-p 3255 -P tpa101 --simulation")
+        try:
+            self.cont = self.start_server("tpa", command, 3255)
+        except:
+            self.skipTest("Could not start server")
+
 class TestKpaSim(GenericRPCCase, GenericKpaTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
