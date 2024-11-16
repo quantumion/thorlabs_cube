@@ -1,7 +1,7 @@
 import struct as st
 
-from thorlabs_cube.driver.tcube.tpa import Tpa, TpaSim
 from thorlabs_cube.driver.message import MGMSG, QUADMSG, Message, MsgError
+from thorlabs_cube.driver.tcube.tpa import Tpa, TpaSim
 
 
 class Kpa(Tpa):
@@ -12,7 +12,7 @@ class Kpa(Tpa):
 
         :param serial_dev: Serial device identifier.
         """
-        super().__init__(self, serial_dev)
+        super().__init__(serial_dev)
         self.loop_params = None
         self.status_report_counter = 0
 
@@ -90,9 +90,9 @@ class Kpa(Tpa):
             trig2_sum_min,
             trig2_sum_max,
             trig2_diff_threshold,
-            _,
-            _,
-            _,
+            self._RESERVED,
+            self._RESERVED,
+            self._RESERVED,
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
