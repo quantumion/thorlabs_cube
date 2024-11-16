@@ -31,10 +31,10 @@ jobs:
                   isortVersion: 5.13.2
                   sortPaths: ./src/thorlabs_cube
                   configuration: |
-                    --check-only
-                    --diff
-                    --profile black
-                    --filter-files
+                      --check-only
+                      --diff
+                      --profile black
+                      --filter-files
             - name: Setup and run flake8
               run: |
                   flake8 ./src/thorlabs_cube
