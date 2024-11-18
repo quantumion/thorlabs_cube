@@ -134,7 +134,7 @@ class TestTdcSim(GenericRPCCase, GenericTdcTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
         command = (sys.executable.replace("\\", "\\\\")
-                            + " -m thorlabs_tcube.aqctl_thorlabs_tcube "
+                            + " -m thorlabs_cube.aqctl_thorlabs_cube "
                             + "-p 3255 -P tdc001 --simulation")
         try:
             self.cont = self.start_server("tdc", command, 3255)
@@ -146,7 +146,7 @@ class TestTpzSim(GenericRPCCase, GenericTpzTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
         command = (sys.executable.replace("\\", "\\\\")
-                            + " -m thorlabs_tcube.aqctl_thorlabs_tcube "
+                            + " -m thorlabs_cube.aqctl_thorlabs_cube "
                             + "-p 3255 -P tpz001 --simulation")
         try:
             self.cont = self.start_server("tpz", command, 3255)

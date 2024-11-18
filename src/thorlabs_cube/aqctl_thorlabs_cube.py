@@ -9,6 +9,7 @@ from sipyco import common_args
 from sipyco.pc_rpc import simple_server_loop
 
 from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
+from thorlabs_cube.driver.message import PRODUCT_LIST
 from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 
@@ -60,11 +61,14 @@ def main():
                 dev = TpzSim()
             elif product == "kdc101":
                 dev = KdcSim()
-            else:
-                print(
-                    "Invalid product string (-P/--product). Choose from tdc001, tpz001, or kdc101"
+            elif product not in PRODUCT_LIST.controllers.values():
+                raise ValueError(
+                    f"Invalid product string (-P/--product): '{args.product.lower()}'\n"
+                    "Choose from:\n"
+                    + "\n".join(
+                        f"  - {option}" for option in PRODUCT_LIST.controllers.values()
+                    )
                 )
-                sys.exit(1)
         else:
             if product == "tdc001":
                 dev = Tdc(args.device)
@@ -73,12 +77,14 @@ def main():
                 loop.run_until_complete(dev.get_tpz_io_settings())
             elif product == "kdc101":
                 dev = Kdc(args.device)
-            else:
-                print(
-                    "Invalid product string (-P/--product). Choose from tdc001, tpz001, or kdc101"
+            elif product not in PRODUCT_LIST.controllers.values():
+                raise ValueError(
+                    f"Invalid product string (-P/--product): '{args.product.lower()}'\n"
+                    "Choose from:\n"
+                    + "\n".join(
+                        f"  - {option}" for option in PRODUCT_LIST.controllers.values()
+                    )
                 )
-                sys.exit(1)
-
         try:
             simple_server_loop(
                 {product: dev},

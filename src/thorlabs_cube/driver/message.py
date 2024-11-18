@@ -117,6 +117,19 @@ class MGMSG(Enum):
     PZ_GET_TPZ_IOSETTINGS = 0x07D6
 
 
+class PRODUCT_LIST:
+    controllers = {
+        "TDC001": "tdc001",
+        "KDC101": "kdc101",
+        "TPZ001": "tpz001",
+        "KPZ101": "kpz101",
+        "TSC001": "tsc001",
+        "KSC101": "ksc101",
+        "TPA101": "tpa101",
+        "KPA101": "kpa101",
+    }
+
+
 class Direction:
     def __init__(self, direction):
         if direction not in (1, 2):
