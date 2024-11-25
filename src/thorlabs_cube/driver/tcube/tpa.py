@@ -5,7 +5,7 @@ from thorlabs_cube.driver.message import MGMSG, QUADMSG, Message, MsgError
 
 
 class Tpa(_Cube):
-    """TPA101 driver implementation."""
+    """TPA101 Position Sensing Detector driver implementation."""
 
     def __init__(self, serial_dev: str) -> None:
         """Initialize the TPA101 driver.

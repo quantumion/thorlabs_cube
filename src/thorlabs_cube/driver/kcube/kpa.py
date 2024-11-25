@@ -5,7 +5,7 @@ from thorlabs_cube.driver.tcube.tpa import Tpa, TpaSim
 
 
 class Kpa(Tpa):
-    """KPA101 driver implementation."""
+    """KPA101 Position Sensing Detector Auto Aligner driver implementation."""
 
     def __init__(self, serial_dev: str) -> None:
         """Initialize the KPA101 driver.

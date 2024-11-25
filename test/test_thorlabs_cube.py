@@ -166,7 +166,7 @@ class GenericTpaTest:
         self.cont.set_quad_loop_params2(*test_vector)
         self.assertEqual(test_vector, self.cont.get_quad_loop_params2())
 
-class GenericKpaTest:
+class GenericKpaTest(GenericTpaTest):
 
     def test_trigger_config(self):
         test_vector = 1, 0, 100, 200, 50, 2, 1, 150, 250, 75
