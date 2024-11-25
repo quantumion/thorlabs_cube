@@ -6,11 +6,11 @@ from thorlabs_cube.driver.tcube.tsc import Tsc, TscSim
 
 class Ksc(Tsc):
     """
-    KDC101 K-Cube Brushed DC Servo Motor Controller class
+    KSC101 K-Cube Solenoid Controller class
     """
 
     def __init__(self, serial_dev: str) -> None:
-        """Initialize from KSC101 control class"""
+        """Instantiate KSC101 control class"""
         super().__init__(serial_dev)
 
     async def set_kcubemmi_params(

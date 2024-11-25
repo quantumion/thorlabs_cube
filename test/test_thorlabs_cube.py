@@ -254,7 +254,7 @@ class TestTpzSim(GenericRPCCase, GenericTpzTest):
         except:
             self.skipTest("Could not start server")
 
-class TestTszSim(GenericRPCCase, GenericTscTest):
+class TestTscSim(GenericRPCCase, GenericTscTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
         command = (sys.executable.replace("\\", "\\\\")
