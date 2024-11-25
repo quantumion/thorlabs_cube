@@ -7,6 +7,5 @@
 **/__pycache__/
 doc/_build/
 **/**.egg-info/
-.venv/
+venv/
 build/
-thorlabsenv/
