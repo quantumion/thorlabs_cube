@@ -14,7 +14,8 @@ class Kdc(Tdc):
     """
 
     def __init__(self, *args, **kwargs):
-        Tdc.__init__(self, *args, **kwargs)
+        """Initialize from TDC001 control class"""
+        super().__init__(self, *args, **kwargs)
 
     async def handle_message(self, msg: Message) -> None:
         """Parse messages from the device.
