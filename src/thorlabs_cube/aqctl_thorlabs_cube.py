@@ -78,8 +78,7 @@ def main():
                     + "\n".join(f"  - {option}" for option in controller.keys())
                 )
 
-            dev_class = physicalDevice
-            dev = dev_class(args.device)
+            dev = physicalDevice(args.device)
             if product == "tpz001":
                 loop.run_until_complete(dev.get_tpz_io_settings())
 
