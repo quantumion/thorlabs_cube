@@ -12,16 +12,10 @@ from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
 from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 
-simController = {
-    "tdc001": TdcSim(),
-    "kdc101": KdcSim(),
-    "tpz001": TpzSim(),
-}
-
-deviceController = {
-    "tdc001": Tdc,
-    "kdc101": Kdc,
-    "tpz001": Tpz,
+controller = {
+    "tdc001": (Tdc, TdcSim()),
+    "kdc101": (Kdc, KdcSim()),
+    "tpz001": (Tpz, TpzSim()),
 }
 
 
@@ -65,26 +59,28 @@ def main():
     asyncio.set_event_loop(loop)
     try:
         product = args.product.lower()
-        if product not in simController.keys():
+        physicalDevice, simulationDevice = controller[product]
+
+        if product not in controller.keys():
             raise ValueError(
                 f"Invalid product sting (-P/--product): '{args.product.lower()}'\n"
                 "Choose from:\n"
-                + "\n".join(f"  - {option}" for option in simController.keys())
+                + "\n".join(f"  - {option}" for option in controller.keys())
             )
         if args.simulation:
-            dev = simController[product]
+            dev = simulationDevice
         else:
-            if product not in deviceController.keys():
+            if product not in controller.keys():
                 raise ValueError(
                     f"Invalid product sting (-P/--product): '{args.product.lower()}'\n"
                     "Choose from:\n"
-                    + "\n".join(f"  - {option}" for option in deviceController.keys())
+                    + "\n".join(f"  - {option}" for option in controller.keys())
                 )
 
             if product == "tpz001":
                 loop.run_until_complete(dev.get_tpz_io_settings())
 
-            dev_class = deviceController[product]
+            dev_class = physicalDevice
             dev = dev_class(args.device)
         try:
             simple_server_loop(
