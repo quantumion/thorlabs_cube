@@ -14,15 +14,15 @@ from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 
 
 simController = {
-    "tdc001":TdcSim(),
-    "kdc101":KdcSim(),
-    "tpz001":TpzSim(),
-    }
+    "tdc001": TdcSim(),
+    "kdc101": KdcSim(),
+    "tpz001": TpzSim(),
+}
 
 deviceController = {
-    "tdc001":Tdc,
-    "kdc101":Kdc,
-    "tpz001":Tpz,
+    "tdc001": Tdc,
+    "kdc101": Kdc,
+    "tpz001": Tpz,
 }
 
 
@@ -70,9 +70,7 @@ def main():
             raise ValueError(
                 f"Invalid product sting (-P/--product): '{args.product.lower()}'\n"
                 "Choose from:\n"
-                + "\n".join(
-                    f"  - {option}" for option in simController.keys()
-                )
+                + "\n".join(f"  - {option}" for option in simController.keys())
             )
         if args.simulation:
             dev = simController[product]
@@ -81,14 +79,12 @@ def main():
                 raise ValueError(
                     f"Invalid product sting (-P/--product): '{args.product.lower()}'\n"
                     "Choose from:\n"
-                    + "\n".join(
-                        f"  - {option}" for option in deviceController.keys()
-                    )
+                    + "\n".join(f"  - {option}" for option in deviceController.keys())
                 )
 
             if product == "tpz001":
                 loop.run_until_complete(dev.get_tpz_io_settings())
-                
+
             dev_class = deviceController[product]
             dev = dev_object(args.device)
         try:
