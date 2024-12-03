@@ -9,9 +9,21 @@ from sipyco import common_args
 from sipyco.pc_rpc import simple_server_loop
 
 from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
-from thorlabs_cube.driver.message import PRODUCT_LIST
 from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
+
+
+simController = {
+    "tdc001":TdcSim(),
+    "kdc101":KdcSim(),
+    "tpz001":TpzSim(),
+    }
+
+deviceController = {
+    "tdc001":Tdc,
+    "kdc101":Kdc,
+    "tpz001":Tpz,
+}
 
 
 def get_argparser():
@@ -54,37 +66,31 @@ def main():
     asyncio.set_event_loop(loop)
     try:
         product = args.product.lower()
+        if product not in simController.keys():
+            raise ValueError(
+                f"Invalid product sting (-P/--product): '{args.product.lower()}'\n"
+                "Choose from:\n"
+                + "\n".join(
+                    f"  - {option}" for option in simController.keys()
+                )
+            )
         if args.simulation:
-            if product == "tdc001":
-                dev = TdcSim()
-            elif product == "tpz001":
-                dev = TpzSim()
-            elif product == "kdc101":
-                dev = KdcSim()
-            elif product not in PRODUCT_LIST.controllers.values():
-                raise ValueError(
-                    f"Invalid product string (-P/--product): '{args.product.lower()}'\n"
-                    "Choose from:\n"
-                    + "\n".join(
-                        f"  - {option}" for option in PRODUCT_LIST.controllers.values()
-                    )
-                )
+            dev = simController[product]
         else:
-            if product == "tdc001":
-                dev = Tdc(args.device)
-            elif product == "tpz001":
-                dev = Tpz(args.device)
-                loop.run_until_complete(dev.get_tpz_io_settings())
-            elif product == "kdc101":
-                dev = Kdc(args.device)
-            elif product not in PRODUCT_LIST.controllers.values():
+            if product not in deviceController.keys():
                 raise ValueError(
-                    f"Invalid product string (-P/--product): '{args.product.lower()}'\n"
+                    f"Invalid product sting (-P/--product): '{args.product.lower()}'\n"
                     "Choose from:\n"
                     + "\n".join(
-                        f"  - {option}" for option in PRODUCT_LIST.controllers.values()
+                        f"  - {option}" for option in deviceController.keys()
                     )
                 )
+
+            if product == "tpz001":
+                loop.run_until_complete(dev.get_tpz_io_settings())
+                
+            dev_class = deviceController[product]
+            dev = dev_object(args.device)
         try:
             simple_server_loop(
                 {product: dev},
