@@ -8,8 +8,8 @@ import sys
 from sipyco import common_args
 from sipyco.pc_rpc import simple_server_loop
 
-from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
 from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
+from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 
 
