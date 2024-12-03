@@ -57,31 +57,32 @@ def main():
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
+
     try:
         product = args.product.lower()
-        physicalDevice, simulationDevice = controller[product]
-
-        if product not in controller.keys():
+        if product not in controller:
             raise ValueError(
                 f"Invalid product sting (-P/--product): '{args.product.lower()}'\n"
                 "Choose from:\n"
                 + "\n".join(f"  - {option}" for option in controller.keys())
             )
+
+        physicalDevice, simulationDevice = controller[product]
         if args.simulation:
             dev = simulationDevice
         else:
-            if product not in controller.keys():
+            if product not in controller:
                 raise ValueError(
                     f"Invalid product sting (-P/--product): '{args.product.lower()}'\n"
                     "Choose from:\n"
                     + "\n".join(f"  - {option}" for option in controller.keys())
                 )
 
+            dev_class = physicalDevice
+            dev = dev_class(args.device)
             if product == "tpz001":
                 loop.run_until_complete(dev.get_tpz_io_settings())
 
-            dev_class = physicalDevice
-            dev = dev_class(args.device)
         try:
             simple_server_loop(
                 {product: dev},
