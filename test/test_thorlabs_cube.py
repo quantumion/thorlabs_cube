@@ -1,8 +1,10 @@
-import time
 import sys
+import time
 import unittest
 
 from sipyco.test.generic_rpc import GenericRPCCase
+
+_RESERVED: int = 0x0
 
 
 class GenericTdcTest:
@@ -57,7 +59,7 @@ class GenericTdcTest:
         self.assertEqual(test_vector, self.cont.get_limit_switch_parameters())
 
     def test_dc_pid_parameters(self):
-        test_vector = 57, 58, 59, 60, 0x0f
+        test_vector = 57, 58, 59, 60, 0x0F
         self.cont.set_dc_pid_parameters(*test_vector)
         self.assertEqual(test_vector, self.cont.get_dc_pid_parameters())
 
@@ -70,8 +72,7 @@ class GenericTdcTest:
                             with self.subTest(k=k):
                                 test_vector = i << 2 + j << 1 + k
                                 self.cont.set_av_modes(test_vector)
-                                self.assertEqual(test_vector,
-                                                 self.cont.get_av_modes())
+                                self.assertEqual(test_vector, self.cont.get_av_modes())
 
     def test_button_parameters(self):
         test_vector = 2, 3, 4
@@ -103,15 +104,14 @@ class GenericTpzTest:
         self.assertEqual(test_vector, self.cont.get_position_control_mode())
 
     def test_output_volts(self):
-        for voltage in 5.0, 10.0, 15.0, \
-                round(self.cont.get_tpz_io_settings()[0]):
+        for voltage in 5.0, 10.0, 15.0, round(self.cont.get_tpz_io_settings()[0]):
             with self.subTest(voltage=voltage):
                 test_vector = voltage
                 self.cont.set_output_volts(test_vector)
                 time.sleep(1)  # Wait for the output voltage to converge
-                self.assertAlmostEqual(test_vector,
-                                       self.cont.get_output_volts(),
-                                       delta=0.03)
+                self.assertAlmostEqual(
+                    test_vector, self.cont.get_output_volts(), delta=0.03
+                )
 
     def test_output_position(self):
         test_vector = 31000
@@ -123,8 +123,7 @@ class GenericTpzTest:
             test_vector = i
             self.cont.set_input_volts_source(i)
             with self.subTest(i=i):
-                self.assertEqual(test_vector,
-                                 self.cont.get_input_volts_source())
+                self.assertEqual(test_vector, self.cont.get_input_volts_source())
 
     def test_pi_constants(self):
         test_vector = 42, 43
@@ -136,8 +135,7 @@ class GenericTpzTest:
             with self.subTest(intensity=intensity):
                 test_vector = intensity
                 self.cont.set_tpz_display_settings(test_vector)
-                self.assertEqual(test_vector,
-                                 self.cont.get_tpz_display_settings())
+                self.assertEqual(test_vector, self.cont.get_tpz_display_settings())
 
     def test_tpz_io_settings(self):
         for v in 75.0, 100.0, 150.0:
@@ -145,6 +143,34 @@ class GenericTpzTest:
                 test_vector = v, 1
                 self.cont.set_tpz_io_settings(*test_vector)
                 self.assertEqual(test_vector, self.cont.get_tpz_io_settings())
+
+
+class GenericKpzTest:
+    def test_kcubemmi_params(self):
+        test_vector = (1, 2, 3, 4, 5, 6, 7, 8, 9)
+        self.cont.set_kcubemmi_params(*test_vector)
+        expected_result = (
+            *test_vector,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+        )  # Adding reserved bytes for comparison
+        self.assertEqual(expected_result, self.cont.get_kcubemmi_params())
+
+    def test_trigio_config(self):
+        test_vector = (1, 0, 2, 1)
+        self.cont.set_trigio_config(*test_vector)
+        expected_result = (
+            *test_vector,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+            _RESERVED,
+        )  # Adding reserved bytes for comparison
+        self.assertEqual(expected_result, self.cont.get_trigio_config())
 
 class GenericTscTest:
     def test_absolute_position(self):
@@ -251,9 +277,11 @@ class GenericKscTest(GenericTscTest):
 class TestTdcSim(GenericRPCCase, GenericTdcTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
-        command = (sys.executable.replace("\\", "\\\\")
-                            + " -m thorlabs_cube.aqctl_thorlabs_cube "
-                            + "-p 3255 -P tdc001 --simulation")
+        command = (
+            sys.executable.replace("\\", "\\\\")
+            + " -m thorlabs_cube.aqctl_thorlabs_cube "
+            + "-p 3255 -P tdc001 --simulation"
+        )
         try:
             self.cont = self.start_server("tdc", command, 3255)
         except:
@@ -273,32 +301,26 @@ class TestKdcSim(GenericRPCCase, GenericKdcTest):
 class TestTpzSim(GenericRPCCase, GenericTpzTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
-        command = (sys.executable.replace("\\", "\\\\")
-                            + " -m thorlabs_cube.aqctl_thorlabs_cube "
-                            + "-p 3255 -P tpz001 --simulation")
+        command = (
+            sys.executable.replace("\\", "\\\\")
+            + " -m thorlabs_cube.aqctl_thorlabs_cube "
+            + "-p 3255 -P tpz001 --simulation"
+        )
         try:
             self.cont = self.start_server("tpz", command, 3255)
         except:
             self.skipTest("Could not start server")
 
-class TestTscSim(GenericRPCCase, GenericTscTest):
-    def setUp(self):
-        GenericRPCCase.setUp(self)
-        command = (sys.executable.replace("\\", "\\\\")
-                            + " -m thorlabs_tcube.aqctl_thorlabs_tcube "
-                            + "-p 3255 -P tsc001 --simulation")
-        try:
-            self.cont = self.start_server("tsc", command, 3255)
-        except:
-            self.skipTest("Could not start server")
 
-class TestKscSim(GenericRPCCase, GenericKscTest):
+class TestKpzSim(GenericRPCCase, GenericKpzTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
-        command = (sys.executable.replace("\\", "\\\\")
-                            + " -m thorlabs_tcube.aqctl_thorlabs_tcube "
-                            + "-p 3255 -P ksc101 --simulation")
+        command = (
+            sys.executable.replace("\\", "\\\\")
+            + " -m thorlabs_cube.aqctl_thorlabs_cube "
+            + "-p 3255 -P kpz101 --simulation"
+        )
         try:
-            self.cont = self.start_server("ksc", command, 3255)
+            self.cont = self.start_server("kpz", command, 3255)
         except:
             self.skipTest("Could not start server")
