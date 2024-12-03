@@ -8,10 +8,9 @@ import sys
 from sipyco import common_args
 from sipyco.pc_rpc import simple_server_loop
 
-from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
+from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
-#comment
 
 simController = {
     "tdc001": TdcSim(),
@@ -86,7 +85,7 @@ def main():
                 loop.run_until_complete(dev.get_tpz_io_settings())
 
             dev_class = deviceController[product]
-            dev = dev_object(args.device)
+            dev = dev_class(args.device)
         try:
             simple_server_loop(
                 {product: dev},
