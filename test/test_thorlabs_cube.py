@@ -78,6 +78,23 @@ class GenericTdcTest:
         self.cont.set_button_parameters(*test_vector)
         self.assertEqual(test_vector, self.cont.get_button_parameters())
 
+class GenericKdcTest:
+
+    def test_mmi_params(self):
+        test_vector = (1, 12000, 5000, 1, 10000, 15000, 75, 20, 5)
+        self.cont.set_mmi_parameters(*test_vector)
+        self.assertEqual(test_vector, self.cont.get_mmi_parameters())
+
+    def test_trigger_io_config(self):
+         test_vector = (0x01, 0x01, 0x0A, 0x01)
+         self.cont.set_trigger_io_config(*test_vector)
+         self.assertEqual(test_vector, self.cont.get_trigger_io_config())
+
+    def test_position_trigger_parameters(self):
+        test_vector = 1,23,4,3,5,12,6,9
+        self.cont.set_position_trigger_parameters(*test_vector)
+        self.assertEqual(test_vector, self.cont.get_position_trigger_parameters())
+
 
 class GenericTpzTest:
     def test_position_control_mode(self):
@@ -235,19 +252,29 @@ class TestTdcSim(GenericRPCCase, GenericTdcTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
         command = (sys.executable.replace("\\", "\\\\")
-                            + " -m thorlabs_tcube.aqctl_thorlabs_tcube "
+                            + " -m thorlabs_cube.aqctl_thorlabs_cube "
                             + "-p 3255 -P tdc001 --simulation")
         try:
             self.cont = self.start_server("tdc", command, 3255)
         except:
             self.skipTest("Could not start server")
 
+class TestKdcSim(GenericRPCCase, GenericKdcTest):
+    def setUp(self):
+        GenericRPCCase.setUp(self)
+        command = (sys.executable.replace("\\", "\\\\")
+                            + " -m thorlabs_cube.aqctl_thorlabs_cube "
+                            + "-p 3255 -P kdc101 --simulation")
+        try:
+            self.cont = self.start_server("kdc", command, 3255)
+        except:
+            self.skipTest("Could not start server")
 
 class TestTpzSim(GenericRPCCase, GenericTpzTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
         command = (sys.executable.replace("\\", "\\\\")
-                            + " -m thorlabs_tcube.aqctl_thorlabs_tcube "
+                            + " -m thorlabs_cube.aqctl_thorlabs_cube "
                             + "-p 3255 -P tpz001 --simulation")
         try:
             self.cont = self.start_server("tpz", command, 3255)
