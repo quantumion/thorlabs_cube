@@ -15,7 +15,7 @@ class Kdc(Tdc):
 
     def __init__(self, serial_dev: str):
         """Initialize from TDC001 control class"""
-        super().__init__(self, serial_dev)
+        super().__init__(serial_dev)
 
     async def handle_message(self, msg: Message) -> None:
         """Parse messages from the device.
