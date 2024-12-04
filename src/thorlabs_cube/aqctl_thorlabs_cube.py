@@ -13,9 +13,9 @@ from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 
 controller = {
-    "tdc001": (Tdc, TdcSim()),
-    "kdc101": (Kdc, KdcSim()),
-    "tpz001": (Tpz, TpzSim()),
+    "tdc001": (Tdc, TdcSim),
+    "kdc101": (Kdc, KdcSim),
+    "tpz001": (Tpz, TpzSim),
 }
 
 
@@ -62,22 +62,15 @@ def main():
         product = args.product.lower()
         if product not in controller:
             raise ValueError(
-                f"Invalid product sting (-P/--product): '{args.product.lower()}'\n"
+                f"Invalid product string (-P/--product): '{args.product.lower()}'\n"
                 "Choose from:\n"
                 + "\n".join(f"  - {option}" for option in controller.keys())
             )
 
         physicalDevice, simulationDevice = controller[product]
         if args.simulation:
-            dev = simulationDevice
+            dev = simulationDevice()
         else:
-            if product not in controller:
-                raise ValueError(
-                    f"Invalid product sting (-P/--product): '{args.product.lower()}'\n"
-                    "Choose from:\n"
-                    + "\n".join(f"  - {option}" for option in controller.keys())
-                )
-
             dev = physicalDevice(args.device)
             if product == "tpz001":
                 loop.run_until_complete(dev.get_tpz_io_settings())
