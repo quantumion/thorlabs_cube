@@ -1,7 +1,7 @@
 ---
 name: Code Quality
 
-on:   # yamllint disable-line rule:truthy
+on:    # yamllint disable-line rule:truthy
     push:
         branches: [master]
     pull_request:
@@ -29,12 +29,8 @@ jobs:
               uses: isort/isort-action@master
               with:
                   isortVersion: 5.13.2
-                  sortPaths: ../../src/thorlabs_cube
-                  configuration: |
-                      --check-only
-                      --diff
-                      --profile black
-                      --filter-files
+                  sortPaths: ./src/thorlabs_cube
+                  configuration: --check --diff --profile black --filter-files
             - name: Setup and run flake8
               run: |
                   flake8 ./src/thorlabs_cube
