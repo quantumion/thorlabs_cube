@@ -1,5 +1,5 @@
-import time
 import sys
+import time
 import unittest
 
 from sipyco.test.generic_rpc import GenericRPCCase
