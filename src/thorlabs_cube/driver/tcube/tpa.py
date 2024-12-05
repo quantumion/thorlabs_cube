@@ -298,12 +298,31 @@ class TpaSim:
         return self.oper_mode
 
     def set_quad_position_demand_params(
-        self, x_pos_min: int, x_pos_max: int, y_pos_min: int, y_pos_max: int
+        self,
+        x_pos_min: int,
+        x_pos_max: int,
+        y_pos_min: int,
+        y_pos_max: int,
+        low_volt_output_route: int,
+        open_loop_pos_demands: int,
+        x_pos_demand_feedback_sense: int,
+        y_pos_demand_feedback_sense: int,
     ) -> None:
 
-        self.pos_demand_params = (x_pos_min, x_pos_max, y_pos_min, y_pos_max)
+        self.pos_demand_params = (
+            x_pos_min,
+            x_pos_max,
+            y_pos_min,
+            y_pos_max,
+            low_volt_output_route,
+            open_loop_pos_demands,
+            x_pos_demand_feedback_sense,
+            y_pos_demand_feedback_sense,
+        )
 
-    def get_quad_position_demand_params(self) -> tuple[int, int, int, int]:
+    def get_quad_position_demand_params(
+        self,
+    ) -> tuple[int, int, int, int, int, int, int, int]:
 
         return self.pos_demand_params
 
