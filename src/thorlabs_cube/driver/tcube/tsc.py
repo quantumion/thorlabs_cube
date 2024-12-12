@@ -7,8 +7,8 @@ from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 class Tsc(_Cube):
     """TSC001 T-Cube Motor Controller class"""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self, *args, **kwargs)
+    def __init__(self, serial_dev):
+        _Cube.__init__(self, serial_dev)
         self.status_report_counter = 0
 
     async def handle_message(self, msg) -> None:
