@@ -1,4 +1,5 @@
 import struct as st
+from typing import Tuple
 
 from thorlabs_cube.driver.message import MGMSG, QUADMSG, Message, MsgError
 from thorlabs_cube.driver.tcube.tpa import Tpa, TpaSim
@@ -21,8 +22,8 @@ class Kpa(Tpa):
 
         :param msg: Message object received from the device.
         """
-        msg_id: MGMSG = msg.id
-        data: bytes = msg.data
+        msg_id = msg.id
+        data = msg.data
 
         if msg_id == MGMSG.HW_DISCONNECT:
             raise MsgError("Error: Please disconnect the KPA101")
@@ -48,9 +49,6 @@ class Kpa(Tpa):
                 await self.send(Message(MGMSG.QUAD_ACK_STATUSUPDATE))
             else:
                 self.status_report_counter += 1
-
-        else:
-            raise MsgError(f"Unhandled message ID: {msg_id}")
 
     async def set_trigger_config(
         self,
@@ -78,8 +76,10 @@ class Kpa(Tpa):
         :param trig2_sum_max: TRIG2 sum maximum.
         :param trig2_diff_threshold: TRIG2 differential threshold.
         """
+
         payload = st.pack(
-            "<HHHHHHHHHHHHH",
+            "<HHHHHHHHHHHHHH",
+            QUADMSG.QUAD_KPA_TRIGIO_SUB_ID.value,
             trig1_mode,
             trig1_polarity,
             trig1_sum_min,
@@ -90,43 +90,48 @@ class Kpa(Tpa):
             trig2_sum_min,
             trig2_sum_max,
             trig2_diff_threshold,
-            self._RESERVED,
-            self._RESERVED,
-            self._RESERVED,
+            0,
+            0,
+            0,
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_trigger_config(
         self,
-    ) -> tuple[int, int, int, int, int, int, int, int, int, int]:
+    ) -> tuple[int, int, int, int, int, int, int, int, int, int, int, int, int]:
         """Get trigger configuration for both TRIG1 and TRIG2.
 
         :return: A tuple containing trigger configuration parameters for TRIG1 and TRIG2.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
+            MGMSG.QUAD_REQ_PARAMS,
+            [MGMSG.QUAD_GET_PARAMS],
+            param1=QUADMSG.QUAD_KPA_TRIGIO_SUB_ID.value,
         )
-        return st.unpack("<HHHHHHHHHHHHH", get_msg.data[2:27])
 
-    async def set_digital_outputs(self, digital_outputs: int) -> None:
+        return st.unpack("<HHHHHHHHHHHHHHHHH", get_msg.data)[1:]
+
+    async def set_digital_outputs(self, trigOne: int, trigTwo: int) -> None:
         """Set digital outputs for TRIG1 and TRIG2.
 
         :param digital_outputs: Status of TRIG1 and TRIG2 outputs.
         """
         payload = st.pack(
-            "<HHH", QUADMSG.QUAD_KPA_DIGOPS_SUB_ID, digital_outputs, self._RESERVED
+            "<HBBH", QUADMSG.QUAD_KPA_DIGOPS_SUB_ID.value, trigOne, trigTwo, 0
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
-    async def get_digital_outputs(self) -> int:
+    async def get_digital_outputs(self) -> Tuple[int, int]:
         """Get digital outputs for TRIG1 and TRIG2.
 
         :return: Status of TRIG1 and TRIG2 outputs.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
+            MGMSG.QUAD_REQ_PARAMS,
+            [MGMSG.QUAD_GET_PARAMS],
+            param1=QUADMSG.QUAD_KPA_DIGOPS_SUB_ID.value,
         )
-        return st.unpack("<HHH", get_msg.data[2:5])[0]
+        return st.unpack("<HHHHHHHH", get_msg.data)[1]
 
 
 class KpaSim(TpaSim):
