@@ -12,7 +12,7 @@ class Tpa(_Cube):
 
         :param serial_dev: Serial device identifier.
         """
-        _Cube.__init__(self, serial_dev)
+        super().__init__(serial_dev)
         self.loop_params = None
         self.status_report_counter = 0
 

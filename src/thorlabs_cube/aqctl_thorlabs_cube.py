@@ -79,14 +79,8 @@ def main():
             dev = simulationDevice()
         else:
             dev = physicalDevice(args.device)
-            if product == "tpz001":
+            if product == "tpz001" or product == "kpz101":
                 loop.run_until_complete(dev.get_tpz_io_settings())
-            else:
-                raise ValueError(
-                    "Invalid product string (-P/--product),"
-                    " choose from tdc001, tpz001, kdc101, kpz101"
-                )
-
         try:
             simple_server_loop(
                 {product: dev},

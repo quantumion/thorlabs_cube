@@ -15,7 +15,7 @@ class Tpz(_Cube):
     """
 
     def __init__(self, serial_dev) -> None:
-        _Cube.__init__(self, serial_dev)
+        super().__init__(serial_dev)
         self.voltage_limit: Optional[int] = None
 
     async def handle_message(self, msg) -> None:

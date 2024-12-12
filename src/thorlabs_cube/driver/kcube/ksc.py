@@ -9,10 +9,6 @@ class Ksc(Tsc):
     KSC101 K-Cube Solenoid Controller class
     """
 
-    def __init__(self, serial_dev: str) -> None:
-        """Instantiate KSC101 control class"""
-        super().__init__(serial_dev)
-
     async def set_kcubemmi_params(
         self,
         js_mode: int,
