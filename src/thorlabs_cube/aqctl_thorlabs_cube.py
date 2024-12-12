@@ -8,11 +8,24 @@ from sipyco import common_args
 from sipyco.pc_rpc import simple_server_loop
 
 from thorlabs_cube.driver.kcube.kdc import Kdc, KdcSim
+from thorlabs_cube.driver.kcube.kpa import Kpa, KpaSim
 from thorlabs_cube.driver.kcube.kpz import Kpz, KpzSim
 from thorlabs_cube.driver.kcube.ksc import Ksc, KscSim
 from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
+from thorlabs_cube.driver.tcube.tpa import Tpa, TpaSim
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 from thorlabs_cube.driver.tcube.tsc import Tsc, TscSim
+
+controller = {
+    "tdc001": (Tdc, TdcSim),
+    "kdc101": (Kdc, KdcSim),
+    "tpz001": (Tpz, TpzSim),
+    "kpz101": (Kpz, KpzSim),
+    "tsc001": (Tsc, TscSim),
+    "ksc101": (Ksc, KscSim),
+    "tpa101": (Tpa, TpaSim),
+    "kpa101": (Kpa, KpaSim),
+}
 
 
 def get_argparser():
@@ -54,38 +67,19 @@ def main():
     asyncio.set_event_loop(loop)
     try:
         product = args.product.lower()
+        if product not in controller:
+            raise ValueError(
+                f"Invalid product string (-P/--product): '{args.product.lower()}'\n"
+                "Choose from:\n"
+                + "\n".join(f"  - {option}" for option in controller.keys())
+            )
+
+        physicalDevice, simulationDevice = controller[product]
         if args.simulation:
-            if product == "tdc001":
-                dev = TdcSim()
-            elif product == "tpz001":
-                dev = TpzSim()
-            elif product == "tsc001":
-                dev = TscSim()
-            elif product == "kdc101":
-                dev = KdcSim()
-            elif product == "ksc101":
-                dev = KscSim()
-            elif product == "kpz101":
-                dev = KpzSim()
-            else:
-                raise ValueError(
-                    "Invalid product string (-P/--product),"
-                    " choose from tdc001, tpz001, or kdc101, kpz101"
-                )
+            dev = simulationDevice()
         else:
-            if product == "tdc001":
-                dev = Tdc(args.device)
-            elif product == "tpz001":
-                dev = Tpz(args.device)
-                loop.run_until_complete(dev.get_tpz_io_settings())
-            elif product == "tsc001":
-                dev = Tsc(args.device)
-            elif product == "kdc101":
-                dev = Kdc(args.device)
-            elif product == "ksc101":
-                dev = Ksc(args.device)
-            elif product == "kpz101":
-                dev = Kpz(args.device)
+            dev = physicalDevice(args.device)
+            if product == "tpz001":
                 loop.run_until_complete(dev.get_tpz_io_settings())
             else:
                 raise ValueError(
