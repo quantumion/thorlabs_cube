@@ -65,7 +65,7 @@ class Kpz(Tpz):
             MGMSG.KPZ_REQ_KCUBEMMIPARAMS, [MGMSG.KPZ_GET_KCUBEMMIPARAMS], _CHANNEL
         )
 
-        return st.unpack("<HHHLHLLHHHHHHH", get_msg.data[6:])
+        return st.unpack("<HHHLHLLHHHHHHH", get_msg.data)
 
     async def set_trigio_config(
         self, trig1_mode: int, trig1_polarity: int, trig2_mode: int, trig2_polarity: int
@@ -105,7 +105,7 @@ class Kpz(Tpz):
         get_msg = await self.send_request(
             MGMSG.KPZ_REQ_KCUBETRIGIOCONFIG, [MGMSG.KPZ_GET_KCUBETRIGIOCONFIG], _CHANNEL
         )
-        return st.unpack("<HHHHHHHHHHH", get_msg.data[6:])
+        return st.unpack("<HHHH", get_msg.data[2:10])
 
 
 class KpzSim(TpzSim):
