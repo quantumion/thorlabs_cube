@@ -49,9 +49,6 @@ class Tpa(_Cube):
             else:
                 self.status_report_counter += 1
 
-        else:
-            raise MsgError(f"Unhandled message ID: {msg_id}")
-
     async def set_loop_params(self, p_gain: int, i_gain: int, d_gain: int) -> None:
         """Set proportional, integral, and differential feedback loop constants.
 
@@ -60,7 +57,7 @@ class Tpa(_Cube):
         :param d_gain: Differential gain value.
         """
         payload = st.pack(
-            "<HHHH", QUADMSG.QUAD_LOOP_PARAMS_SUB_ID, p_gain, i_gain, d_gain
+            "<HHHH", QUADMSG.QUAD_LOOP_PARAMS_SUB_ID.value, p_gain, i_gain, d_gain
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
@@ -71,9 +68,11 @@ class Tpa(_Cube):
         """
 
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
+            MGMSG.QUAD_REQ_PARAMS,
+            [MGMSG.QUAD_GET_PARAMS],
+            param1=QUADMSG.QUAD_LOOP_PARAMS_SUB_ID.value,
         )
-        return st.unpack("<HHHH", get_msg.data[2:])
+        return st.unpack("<HHHH", get_msg.data)[1:]
 
     async def set_quad_oper_mode(self, mode: int) -> None:
         """Set the operating mode of the unit.
@@ -81,7 +80,7 @@ class Tpa(_Cube):
         :param mode: 1 for Monitor Mode, 2 for Open Loop, 3 for Closed Loop.
         """
 
-        payload = st.pack("<HH", QUADMSG.QUAD_OPER_MODE_SUB_ID, mode)
+        payload = st.pack("<HH", QUADMSG.QUAD_OPER_MODE_SUB_ID.value, mode)
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
     async def get_quad_oper_mode(self) -> int:
@@ -89,10 +88,13 @@ class Tpa(_Cube):
 
         :return: The current operating mode of the unit.
         """
+
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
+            MGMSG.QUAD_REQ_PARAMS,
+            [MGMSG.QUAD_GET_PARAMS],
+            param1=QUADMSG.QUAD_OPER_MODE_SUB_ID.value,
         )
-        return st.unpack("<HH", get_msg.data[2:])[0]
+        return st.unpack("<HH", get_msg.data)[1]
 
     async def set_quad_position_demand_params(
         self,
@@ -118,7 +120,7 @@ class Tpa(_Cube):
         """
         payload = st.pack(
             "<hhhhhhhhh",
-            QUADMSG.QUAD_POSITION_DEMAND_PARAMS_SUB_ID,
+            QUADMSG.QUAD_POSITION_DEMAND_PARAMS_SUB_ID.value,
             x_pos_min,
             x_pos_max,
             y_pos_min,
@@ -136,9 +138,11 @@ class Tpa(_Cube):
         :return: A tuple containing x_pos_min, x_pos_max, y_pos_min, and y_pos_max.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
+            MGMSG.QUAD_REQ_PARAMS,
+            [MGMSG.QUAD_GET_PARAMS],
+            param1=QUADMSG.QUAD_POSITION_DEMAND_PARAMS_SUB_ID.value,
         )
-        return st.unpack("<hhhhhhhhh", get_msg.data[2:17])
+        return st.unpack("<hhhhhhhhh", get_msg.data)[1:]
 
     async def get_quad_status_bits(self) -> int:
         """Get the status bits of the control unit.
@@ -146,9 +150,11 @@ class Tpa(_Cube):
         :return: Status bits of the control unit.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
+            MGMSG.QUAD_REQ_PARAMS,
+            [MGMSG.QUAD_GET_PARAMS],
+            param1=QUADMSG.QUAD_STATUS_BITS_SUB_ID.value,
         )
-        return st.unpack("<HF", get_msg.data[2:5])[0]
+        return st.unpack("<HI", get_msg.data)[1]
 
     async def get_quad_readings(self) -> tuple[int, int, int, int, int]:
         """Get the status bits of the quad readings.
@@ -156,9 +162,11 @@ class Tpa(_Cube):
         :return: Status bits of the quad reading.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
+            MGMSG.QUAD_REQ_PARAMS,
+            [MGMSG.QUAD_GET_PARAMS],
+            param1=QUADMSG.QUAD_READINGS_SUB_ID.value,
         )
-        return st.unpack("hhHhh", get_msg.data[2:11])
+        return st.unpack("HHHHHH", get_msg.data)[1:]
 
     async def set_quad_display_settings(
         self, disp_intensity: int, disp_mode: int, disp_dim_timeout: int
@@ -171,7 +179,7 @@ class Tpa(_Cube):
         """
         payload = st.pack(
             "<HHHH",
-            QUADMSG.QUAD_DISP_SETTINGS_SUB_ID,
+            QUADMSG.QUAD_DISP_SETTINGS_SUB_ID.value,
             disp_intensity,
             disp_mode,
             disp_dim_timeout,
@@ -184,9 +192,11 @@ class Tpa(_Cube):
         :return: A tuple containing disp_intensity, disp_mode, and disp_dim_timeout.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
+            MGMSG.QUAD_REQ_PARAMS,
+            [MGMSG.QUAD_GET_PARAMS],
+            param1=QUADMSG.QUAD_DISP_SETTINGS_SUB_ID.value,
         )
-        return st.unpack("<HHH", get_msg.data[2:7])
+        return st.unpack("<HHHH", get_msg.data)[1:]
 
     async def set_quad_position_outputs(self, x_pos: int, y_pos: int) -> None:
         """Set the X and Y position outputs.
@@ -195,7 +205,7 @@ class Tpa(_Cube):
         :param y_pos: Y-axis position output value (-32768 to 32767).
         """
         payload = st.pack(
-            "<HHH", QUADMSG.QUAD_POSITION_DEMAND_OUTPUTS_SUB_ID, x_pos, y_pos
+            "<HHH", QUADMSG.QUAD_POSITION_OUTPUTS_SUB_ID.value, x_pos, y_pos
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
@@ -205,11 +215,13 @@ class Tpa(_Cube):
         :return: A tuple containing x_pos and y_pos.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
+            MGMSG.QUAD_REQ_PARAMS,
+            [MGMSG.QUAD_GET_PARAMS],
+            param1=QUADMSG.QUAD_POSITION_OUTPUTS_SUB_ID.value,
         )
-        return st.unpack("<HHH", get_msg.data[2:5])
+        return st.unpack("<Hhh", get_msg.data)[1:]
 
-    async def set_quad_loop_params2(
+    async def set_quad_loop_params_two(
         self,
         p_gain: float,
         i_gain: float,
@@ -233,7 +245,7 @@ class Tpa(_Cube):
         """
         payload = st.pack(
             "<HFFFFFFHH",
-            QUADMSG.QUAD_POSITION_DEMAND_OUTPUTS_SUB_ID,
+            QUADMSG.QUAD_LOOP_PARAMS_TWO_SUB_ID.value,
             p_gain,
             i_gain,
             d_gain,
@@ -245,7 +257,7 @@ class Tpa(_Cube):
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
-    async def get_quad_loop_params2(
+    async def get_quad_loop_params_two(
         self,
     ) -> tuple[float, float, float, float, float, float, int, int]:
         """Get the extended loop parameters for the quad system.
@@ -254,9 +266,11 @@ class Tpa(_Cube):
         notch_freq, filter_q, notch_on, deriv_filter_on.
         """
         get_msg = await self.send_request(
-            MGMSG.QUAD_REQ_PARAMS, [MGMSG.QUAD_GET_PARAMS], self._CHANNEL
+            MGMSG.QUAD_REQ_PARAMS,
+            [MGMSG.QUAD_GET_PARAMS],
+            param1=QUADMSG.QUAD_LOOP_PARAMS_TWO_SUB_ID.value,
         )
-        return st.unpack("<HFFFFFFHH", get_msg.data[2:29])
+        return st.unpack("<HFFFFFFHH", get_msg.data)
 
     async def set_eeprom_params(self, msg_id: int) -> None:
         """Save the parameter settings for the specified message.
