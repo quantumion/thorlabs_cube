@@ -90,9 +90,9 @@ class Kpa(Tpa):
             trig2_sum_min,
             trig2_sum_max,
             trig2_diff_threshold,
-            0,
-            0,
-            0,
+            Kpa._RESERVED,
+            Kpa._RESERVED,
+            Kpa._RESERVED,
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 
@@ -117,7 +117,11 @@ class Kpa(Tpa):
         :param digital_outputs: Status of TRIG1 and TRIG2 outputs.
         """
         payload = st.pack(
-            "<HBBH", QUADMSG.QUAD_KPA_DIGOPS_SUB_ID.value, trigOne, trigTwo, 0
+            "<HBBH",
+            QUADMSG.QUAD_KPA_DIGOPS_SUB_ID.value,
+            trigOne,
+            trigTwo,
+            Kpa._RESERVED,
         )
         await self.send(Message(MGMSG.QUAD_SET_PARAMS, data=payload))
 

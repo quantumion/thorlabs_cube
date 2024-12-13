@@ -3,9 +3,6 @@ import struct as st
 from thorlabs_cube.driver.message import MGMSG, Message
 from thorlabs_cube.driver.tcube.tpz import Tpz, TpzSim
 
-_RESERVED: int = 0x0
-_CHANNEL: int = 0x01
-
 
 class Kpz(Tpz):
 
@@ -35,7 +32,7 @@ class Kpz(Tpz):
         """
         payload = st.pack(
             "<HHHLHLLHHHHHHH",
-            _CHANNEL,
+            Kpz._CHANNEL,
             js_mode,
             js_volt_gearbox,
             js_volt_step,
@@ -45,10 +42,10 @@ class Kpz(Tpz):
             disp_brightness,
             disp_timeout,
             disp_dim_level,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
         )
         await self.send(Message(MGMSG.KPZ_SET_KCUBEMMIPARAMS, data=payload))
 
@@ -62,7 +59,7 @@ class Kpz(Tpz):
         brightness, timeout, and dim level. Purpose descriptions found in set_kcubemmi_params()
         """
         get_msg = await self.send_request(
-            MGMSG.KPZ_REQ_KCUBEMMIPARAMS, [MGMSG.KPZ_GET_KCUBEMMIPARAMS], _CHANNEL
+            MGMSG.KPZ_REQ_KCUBEMMIPARAMS, [MGMSG.KPZ_GET_KCUBEMMIPARAMS], Kpz._CHANNEL
         )
 
         return st.unpack("<HHHLHLLHHHHHHH", get_msg.data[6:])
@@ -79,17 +76,17 @@ class Kpz(Tpz):
         """
         payload = st.pack(
             "<HHHHHHHHHHH",
-            _CHANNEL,
+            Kpz._CHANNEL,
             trig1_mode,
             trig1_polarity,
             trig2_mode,
             trig2_polarity,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
         )
         await self.send(Message(MGMSG.KPZ_SET_KCUBETRIGIOCONFIG, data=payload))
 
@@ -103,7 +100,9 @@ class Kpz(Tpz):
         Purpose description can be found in set_trigio_config()
         """
         get_msg = await self.send_request(
-            MGMSG.KPZ_REQ_KCUBETRIGIOCONFIG, [MGMSG.KPZ_GET_KCUBETRIGIOCONFIG], _CHANNEL
+            MGMSG.KPZ_REQ_KCUBETRIGIOCONFIG,
+            [MGMSG.KPZ_GET_KCUBETRIGIOCONFIG],
+            Kpz._CHANNEL,
         )
         return st.unpack("<HHHHHHHHHHH", get_msg.data[6:])
 
@@ -153,10 +152,10 @@ class KpzSim(TpzSim):
             self.disp_brightness,
             self.disp_timeout,
             self.disp_dim_level,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
         )
 
     def set_trigio_config(
@@ -183,10 +182,10 @@ class KpzSim(TpzSim):
             self.trig1_polarity,
             self.trig2_mode,
             self.trig2_polarity,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
+            Kpz._RESERVED,
         )

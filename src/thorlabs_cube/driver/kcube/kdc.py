@@ -3,10 +3,6 @@ import struct as st
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 from thorlabs_cube.driver.tcube.tdc import Tdc, TdcSim
 
-_RESERVED: int = 0x0
-_CHANNEL: int = 0x01
-_REQUEST_LENGTH: int = 1
-
 
 class Kdc(Tdc):
     """
@@ -132,7 +128,7 @@ class Kdc(Tdc):
         """
         payload = st.pack(
             "<HHllHllHHHlHH",
-            _CHANNEL,
+            Kdc._CHANNEL,
             mode,
             max_velocity,
             max_acceleration,
@@ -142,9 +138,9 @@ class Kdc(Tdc):
             brightness,
             timeout,
             dim,
-            _RESERVED,
-            _RESERVED,
-            _RESERVED,
+            Kdc._RESERVED,
+            Kdc._RESERVED,
+            Kdc._RESERVED,
         )
         await self.send(Message(MGMSG.MOT_SET_KCUBEMMIPARAMS, data=payload))
 
@@ -163,7 +159,7 @@ class Kdc(Tdc):
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBEMMIPARAMS,
             [MGMSG.MOT_GET_KCUBEMMIPARAMS],
-            _REQUEST_LENGTH,
+            Kdc._REQUEST_LENGTH,
         )
         return st.unpack("<HllHllHHH", get_msg.data[2:28])
 
@@ -253,13 +249,13 @@ class Kdc(Tdc):
         """
         payload = st.pack(
             "<HHHHHQH",
-            _CHANNEL,
+            Kdc._CHANNEL,
             mode1,
             polarity1,
             mode2,
             polarity2,
-            _RESERVED,
-            _RESERVED,
+            Kdc._RESERVED,
+            Kdc._RESERVED,
         )
         await self.send(Message(MGMSG.MOT_SET_KCUBETRIGIOCONFIG, data=payload))
 
@@ -275,7 +271,7 @@ class Kdc(Tdc):
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBETRIGIOCONFIG,
             [MGMSG.MOT_GET_KCUBETRIGIOCONFIG],
-            _REQUEST_LENGTH,
+            Kdc._REQUEST_LENGTH,
         )
         return st.unpack("<HHHH", get_msg.data[2:10])
 
@@ -346,7 +342,7 @@ class Kdc(Tdc):
         """
         payload = st.pack(
             "<Hllllllll",
-            _CHANNEL,
+            Kdc._CHANNEL,
             start_position_fwd,
             interval_fwd,
             num_pulses_fwd,
@@ -378,7 +374,7 @@ class Kdc(Tdc):
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBEPOSTRIGPARAMS,
             [MGMSG.MOT_GET_KCUBEPOSTRIGPARAMS],
-            _REQUEST_LENGTH,
+            Kdc._REQUEST_LENGTH,
         )
         return st.unpack("<llllllll", get_msg.data[2:34])
 

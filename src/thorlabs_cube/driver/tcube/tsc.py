@@ -53,7 +53,7 @@ class Tsc(_Cube):
         :return: Integer representing the bay being used on the Thorlabs Hub
         """
         get_msg = await self.send_request(
-            MGMSG.HUB_REQ_BAYUSED, [MGMSG.HUB_GET_BAYUSED], self._CHANNEL
+            MGMSG.HUB_REQ_BAYUSED, [MGMSG.HUB_GET_BAYUSED], Tsc._CHANNEL
         )
 
         return get_msg.param1
@@ -64,7 +64,7 @@ class Tsc(_Cube):
         :param absolute_position: The absolute position in encoder counts.
                                 E.g., 200,000 counts for 10 mm.
         """
-        payload = st.pack("<Hl", self._CHANNEL, absolute_position)
+        payload = st.pack("<Hl", Tsc._CHANNEL, absolute_position)
 
         await self.send_request(
             MGMSG.MOT_MOVE_ABSOLUTE,
@@ -80,7 +80,7 @@ class Tsc(_Cube):
         await self.send_request(
             MGMSG.MOT_MOVE_STOP,
             [MGMSG.MOT_MOVE_STOPPED],
-            param1=self._CHANNEL,
+            param1=Tsc._CHANNEL,
             param2=stop_mode,
         )
 
@@ -92,7 +92,7 @@ class Tsc(_Cube):
                         - 2 (LEDMODE_LIMITSWITCH): LED flashes when motor reaches limit switch.
                         - 8 (LEDMODE_MOVING): LED is lit when the motor is moving.
         """
-        payload = st.pack("<Hl", self._CHANNEL, mode_bits)
+        payload = st.pack("<Hl", Tsc._CHANNEL, mode_bits)
         await self.send(Message(MGMSG.MOT_SET_AVMODES, data=payload))
 
     async def get_av_modes(self) -> int:
@@ -101,7 +101,7 @@ class Tsc(_Cube):
         :return: The LED mode bits set
         """
         get_msg = await self.send_request(
-            MGMSG.MOT_REQ_AVMODES, [MGMSG.MOT_GET_AVMODES], self._CHANNEL
+            MGMSG.MOT_REQ_AVMODES, [MGMSG.MOT_GET_AVMODES], Tsc._CHANNEL
         )
 
         return get_msg.data[2:]
@@ -118,7 +118,7 @@ class Tsc(_Cube):
         :param timeout2: Timeout in ms for position2.
         """
         payload = st.pack(
-            "<HHllHH", self._CHANNEL, mode, position1, position2, timeout1, timeout2
+            "<HHllHH", Tsc._CHANNEL, mode, position1, position2, timeout1, timeout2
         )
 
         await self.send(Message(MGMSG.MOT_SET_BUTTONPARAMS, data=payload))
@@ -129,7 +129,7 @@ class Tsc(_Cube):
         :return: A tuple containing (mode, position1, position2, timeout1, timeout2)
         """
         get_msg = await self.send_request(
-            MGMSG.MOT_REQ_BUTTONPARAMS, [MGMSG.MOT_GET_BUTTONPARAMS], self._CHANNEL
+            MGMSG.MOT_REQ_BUTTONPARAMS, [MGMSG.MOT_GET_BUTTONPARAMS], Tsc._CHANNEL
         )
 
         return st.unpack("<HllHH", get_msg.data[2:])
@@ -144,7 +144,7 @@ class Tsc(_Cube):
         :param msg_id: The message ID of the message containing the parameters
                        that need to be saved in the EEPROM.
         """
-        payload = st.pack("<HH", self._CHANNEL, msg_id)
+        payload = st.pack("<HH", Tsc._CHANNEL, msg_id)
 
         await self.send(Message(MGMSG.MOT_SET_EEPROMPARAMS, data=payload))
 
@@ -158,7 +158,7 @@ class Tsc(_Cube):
         :return: A tuple containing (position, encoder_count, status_bits, chan_identity_two)
         """
         get_msg = await self.send_request(
-            MGMSG.MOT_REQ_STATUSUPDATE, [MGMSG.MOT_GET_STATUSUPDATE], self._CHANNEL
+            MGMSG.MOT_REQ_STATUSUPDATE, [MGMSG.MOT_GET_STATUSUPDATE], Tsc._CHANNEL
         )
         (
             position,
@@ -187,7 +187,7 @@ class Tsc(_Cube):
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_SOL_OPERATINGMODE,
             [MGMSG.MOT_GET_SOL_OPERATINGMODE],
-            param1=self._CHANNEL,
+            param1=Tsc._CHANNEL,
         )
 
         return get_msg.param2
@@ -201,7 +201,7 @@ class Tsc(_Cube):
         :param off_time: Time (in ms) the solenoid stays off (100ms to 10,000ms).
         :param num_cycles: Number of open/close cycles (0 for infinite, up to 1,000,000).
         """
-        payload = st.pack("<HLLL", self._CHANNEL, on_time, off_time, num_cycles)
+        payload = st.pack("<HLLL", Tsc._CHANNEL, on_time, off_time, num_cycles)
         await self.send(Message(MGMSG.MOT_SET_SOL_CYCLEPARAMS, data=payload))
 
     async def get_solenoid_cycle_parameters(self) -> tuple[int, int, int]:
@@ -209,7 +209,7 @@ class Tsc(_Cube):
 
         :return: A tuple containing (on_time, off_time, num_cycles).
         """
-        payload = st.pack("<H", self._CHANNEL)
+        payload = st.pack("<H", Tsc._CHANNEL)
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_SOL_CYCLEPARAMS, [MGMSG.MOT_GET_SOL_CYCLEPARAMS], data=payload
         )
@@ -235,7 +235,7 @@ class Tsc(_Cube):
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_SOL_INTERLOCKMODE,
             [MGMSG.MOT_GET_SOL_INTERLOCKMODE],
-            param1=self._CHANNEL,
+            param1=Tsc._CHANNEL,
         )
 
         return get_msg.param2
@@ -248,7 +248,7 @@ class Tsc(_Cube):
                     - 0x02 = SOLENOID_OFF (solenoid is deactivated).
         """
         await self.send(
-            Message(MGMSG.MOT_SET_SOL_STATE, param1=self._CHANNEL, param2=state)
+            Message(MGMSG.MOT_SET_SOL_STATE, param1=Tsc._CHANNEL, param2=state)
         )
 
     async def get_sol_state(self) -> int:
@@ -259,7 +259,7 @@ class Tsc(_Cube):
                 - 0x02 = SOLENOID_OFF (solenoid is deactivated).
         """
         get_msg = await self.send_request(
-            MGMSG.MOT_REQ_SOL_STATE, [MGMSG.MOT_GET_SOL_STATE], param1=self._CHANNEL
+            MGMSG.MOT_REQ_SOL_STATE, [MGMSG.MOT_GET_SOL_STATE], param1=Tsc._CHANNEL
         )
 
         return get_msg.param2

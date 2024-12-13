@@ -4,9 +4,6 @@ from typing import Optional
 from thorlabs_cube.driver.base import _Cube
 from thorlabs_cube.driver.message import MGMSG, Message, MsgError
 
-_CHANNEL: int = 0x01
-_RESERVED: int = 0x00
-
 
 class Tpz(_Cube):
     """Either :py:meth:`set_tpz_io_settings()<Tpz.set_tpz_io_settings>`
@@ -50,7 +47,9 @@ class Tpz(_Cube):
             0x04 for Closed Loop Smooth.
         """
         await self.send(
-            Message(MGMSG.PZ_SET_POSCONTROLMODE, param1=_CHANNEL, param2=control_mode)
+            Message(
+                MGMSG.PZ_SET_POSCONTROLMODE, param1=Tpz._CHANNEL, param2=control_mode
+            )
         )
 
     async def get_position_control_mode(self) -> int:
@@ -64,7 +63,7 @@ class Tpz(_Cube):
         :rtype: int
         """
         get_msg = await self.send_request(
-            MGMSG.PZ_REQ_POSCONTROLMODE, [MGMSG.PZ_GET_POSCONTROLMODE], _CHANNEL
+            MGMSG.PZ_REQ_POSCONTROLMODE, [MGMSG.PZ_GET_POSCONTROLMODE], Tpz._CHANNEL
         )
         return get_msg.param2
 
@@ -88,7 +87,7 @@ class Tpz(_Cube):
                 "Voltage must be in range [0;{}]".format(self.voltage_limit)
             )
         volt = int(voltage * 32767 / self.voltage_limit)
-        payload = st.pack("<HH", _CHANNEL, volt)
+        payload = st.pack("<HH", Tpz._CHANNEL, volt)
         await self.send(Message(MGMSG.PZ_SET_OUTPUTVOLTS, data=payload))
 
     async def get_output_volts(self) -> float:
@@ -98,7 +97,7 @@ class Tpz(_Cube):
         :rtype: float
         """
         get_msg = await self.send_request(
-            MGMSG.PZ_REQ_OUTPUTVOLTS, [MGMSG.PZ_GET_OUTPUTVOLTS], _CHANNEL
+            MGMSG.PZ_REQ_OUTPUTVOLTS, [MGMSG.PZ_GET_OUTPUTVOLTS], Tpz._CHANNEL
         )
         return st.unpack("<H", get_msg.data[2:])[0] * self.voltage_limit / 32767
 
@@ -114,7 +113,7 @@ class Tpz(_Cube):
             [0; 65535] depending on the unit. This corresponds to 0 to 100% of
             the maximum piezo extension.
         """
-        payload = st.pack("<HH", _CHANNEL, position_sw)
+        payload = st.pack("<HH", Tpz._CHANNEL, position_sw)
         await self.send(Message(MGMSG.PZ_SET_OUTPUTPOS, data=payload))
 
     async def get_output_position(self) -> int:
@@ -125,7 +124,7 @@ class Tpz(_Cube):
         :rtype: int
         """
         get_msg = await self.send_request(
-            MGMSG.PZ_REQ_OUTPUTPOS, [MGMSG.PZ_GET_OUTPUTPOS], _CHANNEL
+            MGMSG.PZ_REQ_OUTPUTPOS, [MGMSG.PZ_GET_OUTPUTPOS], Tpz._CHANNEL
         )
         return st.unpack("<H", get_msg.data[2:])[0]
 
@@ -152,7 +151,7 @@ class Tpz(_Cube):
             The values can be bitwise or'ed to sum the software source with
             either or both of the other source options.
         """
-        payload = st.pack("<HH", _CHANNEL, volt_src)
+        payload = st.pack("<HH", Tpz._CHANNEL, volt_src)
         await self.send(Message(MGMSG.PZ_SET_INPUTVOLTSSRC, data=payload))
 
     async def get_input_volts_source(self) -> int:
@@ -165,7 +164,7 @@ class Tpz(_Cube):
         :rtype: int
         """
         get_msg = await self.send_request(
-            MGMSG.PZ_REQ_INPUTVOLTSSRC, [MGMSG.PZ_GET_INPUTVOLTSSRC], _CHANNEL
+            MGMSG.PZ_REQ_INPUTVOLTSSRC, [MGMSG.PZ_GET_INPUTVOLTSSRC], Tpz._CHANNEL
         )
         return st.unpack("<H", get_msg.data[2:])[0]
 
@@ -182,7 +181,7 @@ class Tpz(_Cube):
         :param prop_const: Value of the proportional term in range [0; 255].
         :param int_const: Value of the integral term in range [0; 255].
         """
-        payload = st.pack("<HHH", _CHANNEL, prop_const, int_const)
+        payload = st.pack("<HHH", Tpz._CHANNEL, prop_const, int_const)
         await self.send(Message(MGMSG.PZ_SET_PICONSTS, data=payload))
 
     async def get_pi_constants(self) -> tuple[int, int]:
@@ -193,7 +192,7 @@ class Tpz(_Cube):
         :rtype: a 2 int elements tuple : (int, int)
         """
         get_msg = await self.send_request(
-            MGMSG.PZ_REQ_PICONSTS, [MGMSG.PZ_GET_PICONSTS], _CHANNEL
+            MGMSG.PZ_REQ_PICONSTS, [MGMSG.PZ_GET_PICONSTS], Tpz._CHANNEL
         )
         return st.unpack("<HH", get_msg.data[2:])
 
@@ -241,7 +240,7 @@ class Tpz(_Cube):
             raise ValueError("Voltage limit is not set")
 
         volt = round(output * 32767 / self.voltage_limit)
-        payload = st.pack("<HHH", _CHANNEL, lut_index, volt)
+        payload = st.pack("<HHH", Tpz._CHANNEL, lut_index, volt)
         await self.send(Message(MGMSG.PZ_SET_OUTPUTLUT, data=payload))
 
     async def get_output_lut(self) -> tuple[int, float]:
@@ -252,7 +251,7 @@ class Tpz(_Cube):
         :rtype: a 2 elements tuple (int, float)
         """
         get_msg = await self.send_request(
-            MGMSG.PZ_REQ_OUTPUTLUT, [MGMSG.PZ_GET_OUTPUTLUT], _CHANNEL
+            MGMSG.PZ_REQ_OUTPUTLUT, [MGMSG.PZ_GET_OUTPUTLUT], Tpz._CHANNEL
         )
         index, output = st.unpack("<Hh", get_msg.data[2:])
         return index, output * self.voltage_limit / 32767
@@ -327,7 +326,7 @@ class Tpz(_Cube):
         # triggering is not supported by the TPZ device
         payload = st.pack(
             "<HHHLLLLHLH",
-            _CHANNEL,
+            Tpz._CHANNEL,
             mode,
             cycle_length,
             num_cycles,
@@ -350,17 +349,17 @@ class Tpz(_Cube):
         get_msg = await self.send_request(
             MGMSG.PZ_REQ_OUTPUTLUTPARAMS,
             [MGMSG.PZ_GET_OUTPUTLUTPARAMS],
-            _CHANNEL,
+            Tpz._CHANNEL,
         )
         return st.unpack("<HHLLLL", get_msg.data[2:22])
 
     async def start_lut_output(self) -> None:
         """Start the voltage waveform (LUT) outputs."""
-        await self.send(Message(MGMSG.PZ_START_LUTOUTPUT, param1=_CHANNEL))
+        await self.send(Message(MGMSG.PZ_START_LUTOUTPUT, param1=Tpz._CHANNEL))
 
     async def stop_lut_output(self) -> None:
         """Stop the voltage waveform (LUT) outputs."""
-        await self.send(Message(MGMSG.PZ_STOP_LUTOUTPUT, param1=_CHANNEL))
+        await self.send(Message(MGMSG.PZ_STOP_LUTOUTPUT, param1=Tpz._CHANNEL))
 
     async def set_eeprom_parameters(self, msg_id: int) -> None:
         """Save the parameter settings for the specified message.
@@ -368,7 +367,7 @@ class Tpz(_Cube):
         :param msg_id: The message ID of the message containing the parameters
             to be saved.
         """
-        payload = st.pack("<HH", _CHANNEL, msg_id)
+        payload = st.pack("<HH", Tpz._CHANNEL, msg_id)
         await self.send(Message(MGMSG.PZ_SET_EEPROMPARAMS, data=payload))
 
     async def set_tpz_display_settings(self, intensity: int) -> None:
@@ -387,7 +386,7 @@ class Tpz(_Cube):
         :rtype: int
         """
         get_msg = await self.send_request(
-            MGMSG.PZ_REQ_TPZ_DISPSETTINGS, [MGMSG.PZ_GET_TPZ_DISPSETTINGS], _CHANNEL
+            MGMSG.PZ_REQ_TPZ_DISPSETTINGS, [MGMSG.PZ_GET_TPZ_DISPSETTINGS], Tpz._CHANNEL
         )
         return st.unpack("<H", get_msg.data)[0]
 
@@ -435,7 +434,12 @@ class Tpz(_Cube):
             raise ValueError("voltage_limit must be 75 V, 100 V or 150 V")
 
         payload = st.pack(
-            "<HHHHH", _CHANNEL, voltage_limit, hub_analog_input, _RESERVED, _RESERVED
+            "<HHHHH",
+            Tpz._CHANNEL,
+            voltage_limit,
+            hub_analog_input,
+            Tpz._RESERVED,
+            Tpz._RESERVED,
         )
         await self.send(Message(MGMSG.PZ_SET_TPZ_IOSETTINGS, data=payload))
 
@@ -449,7 +453,7 @@ class Tpz(_Cube):
         :rtype: a 2 elements tuple (int, int)
         """
         get_msg = await self.send_request(
-            MGMSG.PZ_REQ_TPZ_IOSETTINGS, [MGMSG.PZ_GET_TPZ_IOSETTINGS], _CHANNEL
+            MGMSG.PZ_REQ_TPZ_IOSETTINGS, [MGMSG.PZ_GET_TPZ_IOSETTINGS], Tpz._CHANNEL
         )
         voltage_limit, hub_analog_input = st.unpack("<HH", get_msg.data[2:6])
         if voltage_limit == 1:

@@ -69,7 +69,7 @@ def main():
         product = args.product.lower()
         if product not in controller:
             raise ValueError(
-                f"Invalid product string (-P/--product): '{args.product.lower()}'\n"
+                f"Invalid product string (-P/--product): '{product}'\n"
                 "Choose from:\n"
                 + "\n".join(f"  - {option}" for option in controller.keys())
             )

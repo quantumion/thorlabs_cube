@@ -39,7 +39,7 @@ class Ksc(Tsc):
         """
         payload = st.pack(
             "<HHLLLHHLLLLH",
-            self._CHANNEL,
+            Ksc._CHANNEL,
             js_mode,
             js_max_vel,
             js_accn,
@@ -63,7 +63,7 @@ class Ksc(Tsc):
         acceleration, direction sense, preset positions, display
         settings, and joystick sensitivity.
         """
-        payload = st.pack("<H", self._CHANNEL)
+        payload = st.pack("<H", Ksc._CHANNEL)
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBEMMIPARAMS, [MGMSG.MOT_GET_KCUBEMMIPARAMS], data=payload
         )
@@ -82,7 +82,7 @@ class Ksc(Tsc):
         """
         payload = st.pack(
             "<HBBBB",
-            self._CHANNEL,
+            Ksc._CHANNEL,
             trig1_mode,
             trig1_polarity,
             trig2_mode,
@@ -132,7 +132,7 @@ class Ksc(Tsc):
             0x0F Trigger output active (pulsed) at pre-defined positions moving forwards and
             backward. Only one Trigger port at a time can be set to this mode.
         """
-        payload = st.pack("<H", self._CHANNEL)
+        payload = st.pack("<H", Ksc._CHANNEL)
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBETRIGIOCONFIG,
             [MGMSG.MOT_GET_KCUBETRIGIOCONFIG],
@@ -165,7 +165,7 @@ class Ksc(Tsc):
         """
         payload = st.pack(
             "<HLLLLLLLL",
-            self._CHANNEL,
+            Ksc._CHANNEL,
             start_pos_fwd,
             interval_fwd,
             num_pulses_fwd,
@@ -186,7 +186,7 @@ class Ksc(Tsc):
         num_pulses_fwd, start_pos_rev, interval_rev, num_pulses_rev,
         pulse_width, num_cycles).
         """
-        payload = st.pack("<H", self._CHANNEL)
+        payload = st.pack("<H", Ksc._CHANNEL)
         get_msg = await self.send_request(
             MGMSG.MOT_REQ_KCUBEPOSTRIGPARAMS,
             [MGMSG.MOT_GET_KCUBEPOSTRIGPARAMS],
