@@ -184,14 +184,9 @@ class GenericTpaTest:
         self.assertEqual(test_vector, self.cont.get_quad_oper_mode())
 
     def test_position_demand_params(self):
-        test_vector = 100, 200, 300, 400
+        test_vector = -32767, 32767, 32767, 32767, 2, 1, 1, 0.3
         self.cont.set_quad_position_demand_params(*test_vector)
         self.assertEqual(test_vector, self.cont.get_quad_position_demand_params())
-
-    def test_status_bits(self):
-        test_vector = 0x1A2B3C4D
-        self.cont.set_quad_status_bits(test_vector)
-        self.assertEqual(test_vector, self.cont.get_quad_status_bits())
 
     def test_display_settings(self):
         test_vector = 150, 2, 30

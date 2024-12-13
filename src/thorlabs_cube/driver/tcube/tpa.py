@@ -104,8 +104,8 @@ class Tpa(_Cube):
         y_pos_max: int,
         low_volt_output_route: int,
         open_loop_pos_demands: int,
-        x_pos_demand_feedback_sense: int,
-        y_pos_demand_feedback_sense: int,
+        x_pos_demand_feedback_sense: float,
+        y_pos_demand_feedback_sense: float,
     ) -> None:
         """Set position demand parameters for the quad system.
 
@@ -319,8 +319,8 @@ class TpaSim:
         y_pos_max: int,
         low_volt_output_route: int,
         open_loop_pos_demands: int,
-        x_pos_demand_feedback_sense: int,
-        y_pos_demand_feedback_sense: int,
+        x_pos_demand_feedback_sense: float,
+        y_pos_demand_feedback_sense: float,
     ) -> None:
 
         self.pos_demand_params = (
