@@ -1,5 +1,5 @@
 ---
-# builds and runs the thorlabs t/kcube control services
+# Builds and runs the Thorlabs T/KCube control services
 name: ablation_aim
 
 services:
