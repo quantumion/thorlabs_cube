@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="thorlabs_cube",
-    version="0.0.3",
+    version="0.1.0",
     url="https://github.com/quantumion/thorlabs_cube",
     description="ARTIQ NDSP for Thorlabs T/K-Cube controllers",
     install_requires=[
