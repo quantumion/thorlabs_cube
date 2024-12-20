@@ -7,27 +7,22 @@ Clone the repository then install using [pip](https://pip.pypa.io/en/stable/inst
 ```sh
 $ git clone git@github.com:quantumion/thorlabs_cube.git
 $ cd thorlabs_cube
+```
+
+## Virtual Environment
+Recommended, create virtual environment using [venv](https://docs.python.org/3/library/venv.html) for dependency isolation
+```sh
+$ python3 -m venv venv
+$ source venv/bin/activate
 $ pip install .
 ```
 
-Optionally, install with [Sphinx](https://www.sphinx-doc.org/) to build autodocumentation:
-```sh
-$ pip install .[docs]
-```
-
-### Docker Container
-Build and launch the application as a service in a container with [Docker Compose](https://docs.docker.com/compose/):
-```sh
-$ docker compose build
-$ docker compose up -d
-```
-
 ## Usage
-See the [documentation](/doc/index.rst) for setup and usage instructions.
+See the [documentation](/docs) for setup and usage instructions.
 
 ## Documentation
-Build the documentation with [Sphinx](https://www.sphinx-doc.org/):
+Recommended, build [MkDocs Documentation](https://www.mkdocs.org/):
 ```sh
-$ cd doc
-$ make html
+$ mkdocs build
+$ mkdocs serve
 ```
