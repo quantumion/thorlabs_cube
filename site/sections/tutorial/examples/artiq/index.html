@@ -256,7 +256,9 @@
 
 
 
-<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../../../.." title="Thorlabs Repository Documentation" class="md-nav__button md-logo" aria-label="Thorlabs Repository Documentation" data-md-component="logo">
 
@@ -928,122 +930,6 @@
 
 
 
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-
-
-
-
-
-
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-
-        <li class="md-nav__item">
-  <a href="#step-1-set-up-your-device-and-controller" class="md-nav__link">
-    <span class="md-ellipsis">
-      Step 1: Set Up Your Device and Controller
-    </span>
-  </a>
-
-    <nav class="md-nav" aria-label="Step 1: Set Up Your Device and Controller">
-      <ul class="md-nav__list">
-
-          <li class="md-nav__item">
-  <a href="#tpz001-t-cube-piezo-controller" class="md-nav__link">
-    <span class="md-ellipsis">
-      TPZ001 (T-Cube Piezo Controller)
-    </span>
-  </a>
-
-</li>
-
-      </ul>
-    </nav>
-
-</li>
-
-        <li class="md-nav__item">
-  <a href="#step-2-add-device-to-the-artiq-device-database" class="md-nav__link">
-    <span class="md-ellipsis">
-      Step 2: Add Device to the ARTIQ Device Database
-    </span>
-  </a>
-
-    <nav class="md-nav" aria-label="Step 2: Add Device to the ARTIQ Device Database">
-      <ul class="md-nav__list">
-
-          <li class="md-nav__item">
-  <a href="#explanation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Explanation:
-    </span>
-  </a>
-
-</li>
-
-      </ul>
-    </nav>
-
-</li>
-
-        <li class="md-nav__item">
-  <a href="#step-3-interact-with-the-device-using-artiq_rpctool" class="md-nav__link">
-    <span class="md-ellipsis">
-      Step 3: Interact with the Device Using artiq_rpctool
-    </span>
-  </a>
-
-    <nav class="md-nav" aria-label="Step 3: Interact with the Device Using artiq_rpctool">
-      <ul class="md-nav__list">
-
-          <li class="md-nav__item">
-  <a href="#tpz001-t-cube-piezo-controller_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      TPZ001 (T-Cube Piezo Controller)
-    </span>
-  </a>
-
-</li>
-
-      </ul>
-    </nav>
-
-</li>
-
-        <li class="md-nav__item">
-  <a href="#step-4-verify-and-debug-with-artiq_rpctool" class="md-nav__link">
-    <span class="md-ellipsis">
-      Step 4: Verify and Debug with artiq_rpctool
-    </span>
-  </a>
-
-</li>
-
-        <li class="md-nav__item">
-  <a href="#notes" class="md-nav__link">
-    <span class="md-ellipsis">
-      Notes
-    </span>
-  </a>
-
-</li>
-
-    </ul>
-
-</nav>
-                  </div>
-                </div>
-              </div>
-
-
 
             <div class="md-content" data-md-component="content">
               <article class="md-content__inner md-typeset">
@@ -1168,6 +1054,8 @@ artiq_rpctool ::1 3255 call close                 # Close the device
             </div>
 
 
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
 
@@ -1197,7 +1085,7 @@ artiq_rpctool ::1 3255 call close                 # Close the device
     </div>
 
 
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs", "navigation.indexes", "navigation.expand", "content.code.copy"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs", "navigation.indexes", "navigation.expand", "content.code.copy", "toc.integrate", "content.tabs.link"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
 
 
       <script src="../../../../assets/javascripts/bundle.88dd0f4e.min.js"></script>

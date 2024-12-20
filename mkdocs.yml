@@ -8,20 +8,17 @@ theme:
         - navigation.indexes
         - navigation.expand
         - content.code.copy
-    copy:
-        text:
-            - '$ '      # Define the prefixes to ignore when copying
+        - toc.integrate
+        - content.tabs.link
 
 plugins:
     - search
-    - mkdocstrings
-
-mkdocstrings:
-    handlers:
-        python:
-            options:
-                show_source: true
-                show_root_full_path: false
+    - mkdocstrings:
+          handlers:
+              python:
+                  options:
+                      show_source: true
+                      show_root_full_path: false
 
 nav:
     - Home: index.md
