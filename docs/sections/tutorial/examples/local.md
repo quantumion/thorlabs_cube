@@ -13,7 +13,7 @@ To start a local server to run the Thorlabs application using the `aqctl_thorlab
 The command follows this structure:
 
 ```bash
-$ aqctl_thorlabs_cube -p [port] -P [product_identifier] -d [device_address]
+$ aqctl_thorlabs_cube -p <port> -P <product_identifier> -d <device_address>
 ```
 
 ---

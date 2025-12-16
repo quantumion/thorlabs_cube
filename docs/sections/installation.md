@@ -35,8 +35,10 @@ This will install the core package dependencies defined in `setup.py`.
 To build and view the documentation locally, first install the documentation dependencies:
 
 ```bash
-$ pip install -e .[docs]
+$ pip install -e '.[docs]'
 ```
+
+**Note**: In some shells (like zsh), you may need to quote the brackets: `'.[docs]'`
 
 Then build and serve the documentation:
 
