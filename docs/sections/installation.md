@@ -38,7 +38,7 @@ To build and view the documentation locally, first install the documentation dep
 $ pip install -e '.[docs]'
 ```
 
-**Note**: In some shells (like zsh), you may need to quote the brackets: `'.[docs]'`
+**Note**: Some shells (like zsh) require quoting the brackets. If you encounter errors, use the quoted form shown above.
 
 Then build and serve the documentation:
 
