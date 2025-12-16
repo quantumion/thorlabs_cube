@@ -11,9 +11,9 @@ setup(
     ],
     extras_require={
         "docs": [
-            "mkdocs>=1.5.0",
-            "mkdocs-material>=9.0.0",
-            "mkdocstrings[python]>=0.24.0",
+            "mkdocs==1.6.1",
+            "mkdocs-material==9.7.0",
+            "mkdocstrings[python]==1.0.0",
         ],
         "lint": [
             "flake8==7.0.0",
