@@ -11,9 +11,9 @@ setup(
     ],
     extras_require={
         "docs": [
-            "sphinx==7.3.7",
-            "sphinx-argparse==0.4.0",
-            "sphinx-autodoc-typehints==2.2.2",
+            "mkdocs==1.6.1",
+            "mkdocs-material==9.7.0",
+            "mkdocstrings[python]==1.0.0",
         ],
         "lint": [
             "flake8==7.0.0",
