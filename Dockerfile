@@ -7,9 +7,9 @@ ENV PYTHONUNBUFFERED 1
 
 # Install base tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
+    git="1:2.39.5*" \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-RUN python -m pip install --no-cache-dir --upgrade pip
+RUN python -m pip install --no-cache-dir --upgrade "pip>=24.1,<26.0"
 
 WORKDIR /app
 COPY . .
