@@ -17,6 +17,13 @@ $ source venv/bin/activate
 $ pip install .
 ```
 
+## Docker
+Build and run the application in Docker containers using [Docker Compose](https://docs.docker.com/compose/):
+```sh
+$ docker compose build
+$ docker compose up -d
+```
+
 ## Usage
 See the [documentation](/docs) for setup and usage instructions.
 

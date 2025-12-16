@@ -1,5 +1,6 @@
 ---
 site_name: Thorlabs Repository Documentation
+repo_url: https://github.com/quantumion/thorlabs_cube
 
 theme:
     name: material
@@ -11,6 +12,15 @@ theme:
         - toc.integrate
         - content.tabs.link
 
+markdown_extensions:
+    - pymdownx.highlight:
+          anchor_linenums: true
+          line_spans: __span
+          pygments_lang_class: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
+
 plugins:
     - search
     - mkdocstrings:
@@ -19,6 +29,7 @@ plugins:
                   options:
                       show_source: true
                       show_root_full_path: false
+                      docstring_style: google
 
 nav:
     - Home: index.md
@@ -39,3 +50,5 @@ nav:
           - Tutorials: sections/tutorial/tutorials.md
           - SiPyCo RPC Control: sections/tutorial/examples/sipyco.md
           - ARTIQ Control: sections/tutorial/examples/artiq.md
+          - Docker Container: sections/tutorial/examples/docker.md
+          - Local Server: sections/tutorial/examples/local.md
