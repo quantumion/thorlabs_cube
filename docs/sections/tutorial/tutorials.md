@@ -8,7 +8,7 @@ This tutorial demonstrates how to start your Thorlabs application in a local ser
 
 ## 2. [ARTIQ Control 🔗](examples/artiq.md)
 
-This tutorial demonstrates how to configure Thorlabs devices in the [ARTIQ device database](https://m-labs.hk/artiq/manual/developing_a_ndsp.html) and interact with them using ARTIQ's control system.
+This tutorial demonstrates how to configure Thorlabs devices in the [ARTIQ device database](https://m-labs.hk/artiq/manual/developing_a_ndsp.html#integration-with-artiq-experiments) and interact with them using ARTIQ's control system.
 
 ## 3. [Docker Container 🔗](examples/docker.md)
 

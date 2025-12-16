@@ -114,7 +114,8 @@ class Kpa(Tpa):
     async def set_digital_outputs(self, trigOne: int, trigTwo: int) -> None:
         """Set digital outputs for TRIG1 and TRIG2.
 
-        :param digital_outputs: Status of TRIG1 and TRIG2 outputs.
+        :param trigOne: Status of TRIG1 output.
+        :param trigTwo: Status of TRIG2 output.
         """
         payload = st.pack(
             "<HBBH",

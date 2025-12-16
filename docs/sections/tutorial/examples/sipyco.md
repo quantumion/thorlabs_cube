@@ -33,7 +33,7 @@ $ pip install git+https://github.com/m-labs/sipyco.git
 To view the available targets (endpoints) exposed by the Thorlabs driver implementation, use the `list-targets` command:
 
 ```bash
-sipyco_rpctool [localhost or IP address] [port] list-targets
+$ sipyco_rpctool [localhost or IP address] [port] list-targets
 ```
 
 #### Example:
@@ -51,7 +51,7 @@ This command will return a list of all the exposed targets that can be called vi
 To view the available methods provided by a specific target, use the `list-methods` command:
 
 ```bash
-sipyco_rpctool [localhost or IP address] [port] list-methods
+$ sipyco_rpctool [localhost or IP address] [port] list-methods
 ```
 
 #### Example:

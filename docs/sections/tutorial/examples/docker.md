@@ -7,20 +7,20 @@ Follow the steps below to use containers to host Thorlabs controllers.
 
 ```yaml
 container_name: ksc101
-        restart: always
-        ports:
-            - 3255:3255
-        devices:
-            - /dev/kdc101:/dev/ttyUSB0
-        networks:
-            - thorlabs_cube
-        build:
-            context: ./
-            dockerfile: ./Dockerfile
-        # to run in simulation mode, include "--simulation"
-        # in the entrypoint command after port number
-        entrypoint: [aqctl_thorlabs_cube]
-        command: [-p, '3255', -P, ksc101, -d, /dev/ttyUSB0, --bind, '*']
+    restart: always
+    ports:
+        - 3255:3255
+    devices:
+        - /dev/kdc101:/dev/ttyUSB0
+    networks:
+        - thorlabs_cube
+    build:
+        context: ./
+        dockerfile: ./Dockerfile
+    # to run in simulation mode, include "--simulation"
+    # in the entrypoint command after port number
+    entrypoint: [aqctl_thorlabs_cube]
+    command: [-p, '3255', -P, ksc101, -d, /dev/ttyUSB0, --bind, '*']
 ```
 
 ### Explanation of Key Elements:
