@@ -1,4 +1,4 @@
-FROM python:3.12-rc-slim-bookworm
+FROM python:3.12-slim-bookworm
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PIP_ROOT_USER_ACTION=ignore
@@ -7,9 +7,9 @@ ENV PYTHONUNBUFFERED 1
 
 # Install base tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git=1:2.39.5-0+deb12u1 \
+    git \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-RUN python -m pip install --no-cache-dir --upgrade pip==24.1
+RUN python -m pip install --no-cache-dir --upgrade pip
 
 WORKDIR /app
 COPY . .
