@@ -9,3 +9,4 @@ doc/_build/
 **/**.egg-info/
 venv/
 build/
+site/

@@ -7,27 +7,41 @@ Clone the repository then install using [pip](https://pip.pypa.io/en/stable/inst
 ```sh
 $ git clone git@github.com:quantumion/thorlabs_cube.git
 $ cd thorlabs_cube
+```
+
+## Virtual Environment
+Recommended, create virtual environment using [venv](https://docs.python.org/3/library/venv.html) for dependency isolation
+```sh
+$ python3 -m venv venv
+$ source venv/bin/activate
 $ pip install .
 ```
 
-Optionally, install with [Sphinx](https://www.sphinx-doc.org/) to build autodocumentation:
-```sh
-$ pip install .[docs]
-```
-
-### Docker Container
-Build and launch the application as a service in a container with [Docker Compose](https://docs.docker.com/compose/):
+## Docker
+Build and run the application in Docker containers using [Docker Compose](https://docs.docker.com/compose/):
 ```sh
 $ docker compose build
 $ docker compose up -d
 ```
 
 ## Usage
-See the [documentation](/doc/index.rst) for setup and usage instructions.
+
+Start an example controller (e.g., for a KSC101 stepper controller):
+```sh
+$ aqctl_thorlabs_cube -p 3255 -P ksc101 -d /dev/ttyUSB0
+```
+
+Check that the controller is running using `sipyco_rpctool`:
+```sh
+$ sipyco_rpctool localhost 3255 list-targets
+$ sipyco_rpctool localhost 3255 list-methods
+```
+
+See the [documentation](/docs) for detailed setup and usage instructions.
 
 ## Documentation
-Build the documentation with [Sphinx](https://www.sphinx-doc.org/):
+Recommended, build [MkDocs Documentation](https://www.mkdocs.org/):
 ```sh
-$ cd doc
-$ make html
+$ mkdocs build
+$ mkdocs serve
 ```
