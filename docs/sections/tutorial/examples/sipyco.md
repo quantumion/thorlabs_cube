@@ -88,19 +88,16 @@ The output will display the result of the function call.
 ## Workflow Example
 
 1. Start by listing the available targets:
-
    ```bash
    $ sipyco_rpctool localhost 5000 list-targets
    ```
 
 2. Select a target and view its methods:
-
    ```bash
    $ sipyco_rpctool localhost 5000 list-methods
    ```
 
 3. Call a specific method with the required arguments:
-
    ```bash
    $ sipyco_rpctool localhost 5000 call move_to_position 150
    ```

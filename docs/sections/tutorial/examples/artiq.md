@@ -58,7 +58,7 @@ device_db = {
 ### Explanation:
 
 - **`type`**: Set to `controller` for remote (non-real-time) devices.
-- **`host`**: Set to `localhost` if the controller is running on the same machine, or the IP of the computer connected to the Thorlabs controller.
+- **`host`**: Set to `localhost` if the controller is running on the same machine, or to the IP of the computer connected to the Thorlabs controller.
 - **`port`**: TCP port the controller is listening on (`3255` in this example).
 - **`target`**: The target name.
 - **`command`**: Command to start the controller.
