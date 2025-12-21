@@ -1,6 +1,7 @@
 # **Thorlabs Cube**
 
-Cubes are controllers made by [**Thorlabs**](https://www.thorlabs.com/) that are used to **control** a variety of devices such as **motors**, **piezo actuators**, and other laboratory equipment. These **controllers**, including the **K-Cube** and **T-Cube** series, are commonly used in experimental setups for precise motion control and automation.
+T/K-Cubes are controllers made by [**Thorlabs**](https://www.thorlabs.com/) that are used to **control** a variety of devices such as **motors**, **piezo actuators**, and other laboratory equipment.
+These **controllers**, including the **K-Cube** and **T-Cube** series, are commonly used in experimental setups for precise motion control and automation.
 
 ## **T-Cubes**
 * [**TDC001**: T-Cube DC Servo Motor Controller 🔗](tcube/tdc001.md)

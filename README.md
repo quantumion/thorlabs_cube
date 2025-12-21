@@ -17,8 +17,27 @@ $ source venv/bin/activate
 $ pip install .
 ```
 
+## Docker
+Build and run the application in Docker containers using [Docker Compose](https://docs.docker.com/compose/):
+```sh
+$ docker compose build
+$ docker compose up -d
+```
+
 ## Usage
-See the [documentation](/docs) for setup and usage instructions.
+
+Start an example controller (e.g., for a KSC101 stepper controller):
+```sh
+$ aqctl_thorlabs_cube -p 3255 -P ksc101 -d /dev/ttyUSB0
+```
+
+Check that the controller is running using `sipyco_rpctool`:
+```sh
+$ sipyco_rpctool localhost 3255 list-targets
+$ sipyco_rpctool localhost 3255 list-methods
+```
+
+See the [documentation](/docs) for detailed setup and usage instructions.
 
 ## Documentation
 Recommended, build [MkDocs Documentation](https://www.mkdocs.org/):
